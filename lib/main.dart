@@ -2,17 +2,15 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:oktoast/oktoast.dart';
+import 'package:weva/presentation/screens/Live.dart';
 import 'back/checLogin.dart';
 import 'firebase_options.dart';
 import 'presentation/on_boarding/on_boarding_screen.dart';
 import 'package:is_first_run/is_first_run.dart';
 
-
 //Localizations.localeOf(context).toString()
 
-
-void main() async{
-
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await EasyLocalization.ensureInitialized();
@@ -21,17 +19,14 @@ void main() async{
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  runApp(
-      OKToast(
-          position: ToastPosition.bottom,
-          child: EasyLocalization(
-              supportedLocales: L10n.all,
-              path: 'assets/translations', // <-- change the path of the translation files
-              fallbackLocale: L10n.all[0],
-              child: const MyApp())
-      )
-  );
-
+  runApp(OKToast(
+      position: ToastPosition.bottom,
+      child: EasyLocalization(
+          supportedLocales: L10n.all,
+          path:
+              'assets/translations', // <-- change the path of the translation files
+          fallbackLocale: L10n.all[0],
+          child: const MyApp())));
 }
 
 class MyApp extends StatelessWidget {
@@ -50,7 +45,6 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
       ),
       home: const Splash(),
-
     );
   }
 }
@@ -63,31 +57,23 @@ class Splash extends StatefulWidget {
 }
 
 class _SplashState extends State<Splash> {
-
-
   @override
   void initState() {
     super.initState();
 
     checkFirstTime();
-
   }
 
-
-  void checkFirstTime() async{
-
+  void checkFirstTime() async {
     bool firstRun = await IsFirstRun.isFirstRun();
 
-    if(firstRun){
-
-      Navigator.of(context).push(MaterialPageRoute(builder: (context)=> OnBoardingScreen()));
-
-    }else{
-
-      Navigator.of(context).push(MaterialPageRoute(builder: (context)=> const checkLogin()));
-
+    if (firstRun) {
+      Navigator.of(context)
+          .push(MaterialPageRoute(builder: (context) => LiveComments()));
+    } else {
+      Navigator.of(context)
+          .push(MaterialPageRoute(builder: (context) => const LiveComments()));
     }
-
   }
 
   @override
@@ -96,7 +82,7 @@ class _SplashState extends State<Splash> {
   }
 }
 
-class L10n{
+class L10n {
   static final all = [
     const Locale('en'),
     const Locale('ar'),

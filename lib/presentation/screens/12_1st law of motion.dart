@@ -11,10 +11,18 @@ import '../../back/loading.dart';
 import '../../back/models/subject.dart';
 import '../../constants.dart';
 import '13_selectedLesson.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 
 // ignore_for_file: prefer_const_constructors
 class ListofVids extends StatefulWidget {
-  ListofVids({Key? key, required this.chName, required this.lessonID, required this.nameAR, required this.nameEN, required this.lesonNum}) : super(key: key);
+  ListofVids(
+      {Key? key,
+      required this.chName,
+      required this.lessonID,
+      required this.nameAR,
+      required this.nameEN,
+      required this.lesonNum})
+      : super(key: key);
 
   String chName;
   String lessonID;
@@ -22,38 +30,32 @@ class ListofVids extends StatefulWidget {
   String nameEN;
   int lesonNum;
 
-
   @override
   State<ListofVids> createState() => _ListofVidsState();
 }
 
 class _ListofVidsState extends State<ListofVids> {
-
-
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
 
     getVideos();
-
   }
-
 
   List<video> videos = [];
 
-  void getVideos() async{
-
+  void getVideos() async {
     videos = [];
 
-    if(await checkConnectionn()){
-
+    if (await checkConnectionn()) {
       loading(context: context);
 
-      FirebaseFirestore.instance.collection('videos').where("lessonID", isEqualTo: widget.lessonID).get(const GetOptions(source: Source.server))
+      FirebaseFirestore.instance
+          .collection('videos')
+          .where("lessonID", isEqualTo: widget.lessonID)
+          .get(const GetOptions(source: Source.server))
           .then((value) {
-
-
         final List<video> loadData = [];
 
         for (var element in value.docs) {
@@ -71,11 +73,9 @@ class _ListofVidsState extends State<ListofVids> {
             mrID: element.data()['mrID'] ?? "",
             vidNum: element.data()['vidNum'] ?? "",
             imgURL: element.data()['imgURL'] ?? "",
-
             userDoneAction: element.data()['userDoneAction'] ?? "",
             LastUserDoneAction: element.data()['LastUserDoneAction'] ?? "",
             status: element.data()['status'] ?? "",
-
           ));
         }
 
@@ -86,110 +86,105 @@ class _ListofVidsState extends State<ListofVids> {
         });
 
         Navigator.of(context).pop();
-
       }).onError((error, stackTrace) {
-
         log(error.toString());
         showToast("Error: $error");
-
       });
-
-    }else{
-
+    } else {
       showToast("Check Internet Connection !");
-
     }
-
   }
-
-
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
+    if (kIsWeb) {
+      return Scaffold(
         backgroundColor: Colors.white,
-        elevation: 0.0,
-        leading: IconButton(
-          onPressed: () {
-            Navigator.pop(context);
-          },
-          icon: Icon(
-            Icons.arrow_back_ios,
-            color: Colors.black,
+        appBar: AppBar(
+          backgroundColor: Colors.white,
+          elevation: 0.0,
+          leading: IconButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            icon: Icon(
+              Icons.arrow_back_ios,
+              color: Colors.black,
+            ),
           ),
         ),
-      ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(15.0),
-                child: Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(15.0),
-                    color: Color(0xffe4f1f8),
-                  ),
-                  width: double.infinity,
-                  height: MediaQuery.of(context).size.height * 0.27,
-                  child: Padding(
-                    padding: const EdgeInsets.only(
-                      top: 50.0,
-                      left: 25.0,
-                    ),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        SizedBox(
-                          height: MediaQuery.of(context).size.height * 0.02,
+        body: SafeArea(
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10.0),
+              child: Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(25.0),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(15.0),
+                        color: Color(0xffe4f1f8),
+                      ),
+                      width: double.infinity,
+                      height: MediaQuery.of(context).size.height * 0.27,
+                      child: Padding(
+                        padding: const EdgeInsets.only(
+                          top: 50.0,
+                          left: 40.0,
                         ),
-                        Text(
-                          widget.chName,
-                          style: GoogleFonts.rubik(
-                            color: dodblue,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 20.0,
-                          ),
-                        ),
-                        SizedBox(
-                          height: MediaQuery.of(context).size.height * 0.02,
-                        ),
-                        Row(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
+                            SizedBox(
+                              height: MediaQuery.of(context).size.height * 0.01,
+                            ),
                             Text(
-                              'Lesson ${widget.lesonNum} |',
+                              widget.chName,
                               style: GoogleFonts.rubik(
                                 color: dodblue,
-                                fontWeight: FontWeight.w500,
-                                fontSize: 14.0,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 22.0,
                               ),
                             ),
                             SizedBox(
-                              width: MediaQuery.of(context).size.width * 0.01,
+                              height: MediaQuery.of(context).size.height * 0.02,
                             ),
-                            Text(
-                              Localizations.localeOf(context).toString() == "en" ? widget.nameEN : widget.nameAR,
-                              style: GoogleFonts.rubik(
-                                color: Colors.grey,
-                                fontWeight: FontWeight.w500,
-                                fontSize: 14.0,
-                              ),
+                            Row(
+                              children: [
+                                Text(
+                                  'Lesson ${widget.lesonNum}  |',
+                                  style: GoogleFonts.rubik(
+                                    color: dodblue,
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 16.0,
+                                  ),
+                                ),
+                                SizedBox(
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.02,
+                                ),
+                                Text(
+                                  Localizations.localeOf(context).toString() ==
+                                          "en"
+                                      ? widget.nameEN
+                                      : widget.nameAR,
+                                  style: GoogleFonts.rubik(
+                                    color: Colors.grey,
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 16.0,
+                                  ),
+                                ),
+                              ],
                             ),
-                          ],
-                        ),
-                        SizedBox(
-                          height: MediaQuery.of(context).size.height * 0.02,
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
+                            SizedBox(
+                              height: MediaQuery.of(context).size.height * 0.04,
+                            ),
                             Container(
                               child: LinearPercentIndicator(
                                 padding: EdgeInsets.all(0.0),
-                                width: 200.0,
+                                width: MediaQuery.of(context).size.width * 0.9,
                                 percent: 60 / 100,
                                 barRadius: Radius.circular(20),
                                 // animation: true,
@@ -197,101 +192,290 @@ class _ListofVidsState extends State<ListofVids> {
                                 progressColor: dodblue,
                               ),
                             ),
-                            Spacer(),
-                            IconButton(
-                              onPressed: () {},
-                              icon: Icon(
-                                Icons.play_circle,
-                                color: dodblue,
-                                size: 32.0,
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(
+                    height: MediaQuery.of(context).size.height * 0.03,
+                  ),
+                  ListView.separated(
+                    physics: NeverScrollableScrollPhysics(),
+                    itemCount: videos.length,
+                    shrinkWrap: true,
+                    separatorBuilder: (context, index) => SizedBox(
+                      height: MediaQuery.of(context).size.height * 0.02,
+                    ),
+                    itemBuilder: (context, index) => Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                      child: Material(
+                        borderRadius: BorderRadius.circular(20),
+                        elevation: 20,
+                        shadowColor: Colors.black.withOpacity(0.3),
+                        child: ListTile(
+                          // tileColor: Colors.white.withOpacity(0.1),
+                          // shape: RoundedRectangleBorder(
+                          //   borderRadius: BorderRadius.circular(20),
+                          //   // side:  BorderSide(
+                          //   //   color: Colors.black,
+                          //   // ),
+                          // ),
+                          isThreeLine: true,
+                          dense: false,
+                          visualDensity:
+                              VisualDensity(vertical: 4), // to compact
+
+                          contentPadding: EdgeInsets.all(10.0),
+                          onTap: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => SelectedLesson(
+                                        videoID: videos[index].idToEdit)));
+                          },
+                          title: Text(
+                            Localizations.localeOf(context).toString() == "en"
+                                ? videos[index].nameEN
+                                : videos[index].nameAr,
+                            style: GoogleFonts.rubik(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 18.0,
+                            ),
+                          ),
+                          subtitle: Row(
+                            children: [
+                              Icon(Icons.people_outline),
+                              Text(
+                                ' 1200 students enrolled',
+                                style: GoogleFonts.rubik(
+                                  fontSize: 14.0,
+                                ),
+                              ),
+                            ],
+                          ),
+                          leading: ClipRRect(
+                            borderRadius: BorderRadius.circular(8.0),
+                            child: Stack(
+                              alignment: Alignment.center,
+                              children: [
+                                Image.network(
+                                  videos[index].imgURL,
+                                  height: 150.0,
+                                  width: 100.0,
+                                  fit: BoxFit.fill,
+                                ),
+                                Icon(
+                                  Icons.play_circle,
+                                  color: Colors.white,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
+    } else {
+      return Scaffold(
+        backgroundColor: Colors.white,
+        appBar: AppBar(
+          backgroundColor: Colors.white,
+          elevation: 0.0,
+          leading: IconButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            icon: Icon(
+              Icons.arrow_back_ios,
+              color: Colors.black,
+            ),
+          ),
+        ),
+        body: SafeArea(
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(15.0),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(15.0),
+                      color: Color(0xffe4f1f8),
+                    ),
+                    width: double.infinity,
+                    height: MediaQuery.of(context).size.height * 0.27,
+                    child: Padding(
+                      padding: const EdgeInsets.only(
+                        top: 50.0,
+                        left: 25.0,
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SizedBox(
+                            height: MediaQuery.of(context).size.height * 0.02,
+                          ),
+                          Text(
+                            widget.chName,
+                            style: GoogleFonts.rubik(
+                              color: dodblue,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 20.0,
+                            ),
+                          ),
+                          SizedBox(
+                            height: MediaQuery.of(context).size.height * 0.02,
+                          ),
+                          Row(
+                            children: [
+                              Text(
+                                'Lesson ${widget.lesonNum} |',
+                                style: GoogleFonts.rubik(
+                                  color: dodblue,
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 14.0,
+                                ),
+                              ),
+                              SizedBox(
+                                width: MediaQuery.of(context).size.width * 0.01,
+                              ),
+                              Text(
+                                Localizations.localeOf(context).toString() ==
+                                        "en"
+                                    ? widget.nameEN
+                                    : widget.nameAR,
+                                style: GoogleFonts.rubik(
+                                  color: Colors.grey,
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 14.0,
+                                ),
+                              ),
+                            ],
+                          ),
+                          SizedBox(
+                            height: MediaQuery.of(context).size.height * 0.02,
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Container(
+                                child: LinearPercentIndicator(
+                                  padding: EdgeInsets.all(0.0),
+                                  width: 200.0,
+                                  percent: 60 / 100,
+                                  barRadius: Radius.circular(20),
+                                  // animation: true,
+                                  // animationDuration: 1500,
+                                  progressColor: dodblue,
+                                ),
+                              ),
+                              Spacer(),
+                              IconButton(
+                                onPressed: () {},
+                                icon: Icon(
+                                  Icons.play_circle,
+                                  color: dodblue,
+                                  size: 32.0,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.03,
+                ),
+                ListView.separated(
+                  physics: NeverScrollableScrollPhysics(),
+                  itemCount: videos.length,
+                  shrinkWrap: true,
+                  separatorBuilder: (context, index) => SizedBox(
+                    height: MediaQuery.of(context).size.height * 0.02,
+                  ),
+                  itemBuilder: (context, index) => Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                    child: Material(
+                      borderRadius: BorderRadius.circular(20),
+                      elevation: 20,
+                      shadowColor: Colors.black.withOpacity(0.3),
+                      child: ListTile(
+                        // tileColor: Colors.white.withOpacity(0.1),
+                        // shape: RoundedRectangleBorder(
+                        //   borderRadius: BorderRadius.circular(20),
+                        //   // side:  BorderSide(
+                        //   //   color: Colors.black,
+                        //   // ),
+                        // ),
+                        isThreeLine: true,
+                        dense: false,
+                        visualDensity: VisualDensity(vertical: 4), // to compact
+
+                        contentPadding: EdgeInsets.all(10.0),
+                        onTap: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => SelectedLesson(
+                                      videoID: videos[index].idToEdit)));
+                        },
+                        title: Text(
+                          Localizations.localeOf(context).toString() == "en"
+                              ? videos[index].nameEN
+                              : videos[index].nameAr,
+                          style: GoogleFonts.rubik(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18.0,
+                          ),
+                        ),
+                        subtitle: Row(
+                          children: [
+                            Icon(Icons.people_outline),
+                            Text(
+                              ' 1200 students enrolled',
+                              style: GoogleFonts.rubik(
+                                fontSize: 14.0,
                               ),
                             ),
                           ],
                         ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-              SizedBox(
-                height: MediaQuery.of(context).size.height * 0.03,
-              ),
-              ListView.separated(
-                physics: NeverScrollableScrollPhysics(),
-                itemCount: videos.length,
-                shrinkWrap: true,
-                separatorBuilder: (context, index) => SizedBox(
-                  height: MediaQuery.of(context).size.height * 0.02,
-                ),
-                itemBuilder: (context, index) => Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                  child: Material(
-                    borderRadius: BorderRadius.circular(20),
-                    elevation: 20,
-                    shadowColor: Colors.black.withOpacity(0.3),
-                    child: ListTile(
-                      // tileColor: Colors.white.withOpacity(0.1),
-                      // shape: RoundedRectangleBorder(
-                      //   borderRadius: BorderRadius.circular(20),
-                      //   // side:  BorderSide(
-                      //   //   color: Colors.black,
-                      //   // ),
-                      // ),
-                      isThreeLine: true,
-                      dense: false,
-                      visualDensity: VisualDensity(vertical: 4), // to compact
-
-                      contentPadding: EdgeInsets.all(10.0),
-                      onTap: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => SelectedLesson(videoID: videos[index].idToEdit, chaName: widget.chName, lessonName: Localizations.localeOf(context).toString() == "en"? widget.nameEN : widget.nameAR, videoName: Localizations.localeOf(context).toString() == "en"? videos[index].nameEN : videos[index].nameAr)));
-                      },
-                      title: Text(
-                        Localizations.localeOf(context).toString() == "en"? videos[index].nameEN : videos[index].nameAr,
-                        style: GoogleFonts.rubik(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 18.0,
-                        ),
-                      ),
-                      subtitle: Row(
-                        children: [
-                          Icon(Icons.people_outline),
-                          Text(
-                            ' 1200 students enrolled',
-                            style: GoogleFonts.rubik(
-                              fontSize: 14.0,
-                            ),
+                        leading: ClipRRect(
+                          borderRadius: BorderRadius.circular(8.0),
+                          child: Stack(
+                            alignment: Alignment.center,
+                            children: [
+                              Image.network(
+                                videos[index].imgURL,
+                                height: 150.0,
+                                width: 100.0,
+                                fit: BoxFit.fill,
+                              ),
+                              Icon(
+                                Icons.play_circle,
+                                color: Colors.white,
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
-                      leading: ClipRRect(
-                        borderRadius: BorderRadius.circular(8.0),
-                        child: Stack(
-                          alignment: Alignment.center,
-                          children: [
-                            Image.network(
-                              videos[index].imgURL,
-                              height: 150.0,
-                              width: 100.0,
-                              fit: BoxFit.fill,
-                            ),
-                            Icon(
-                              Icons.play_circle,
-                              color: Colors.white,
-                            ),
-                          ],
                         ),
                       ),
                     ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
-      ),
-    );
+      );
+    }
   }
 }

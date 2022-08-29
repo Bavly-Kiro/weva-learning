@@ -33,3 +33,35 @@ Widget progressCard({
     ),
   );
 }
+
+Widget webprogressCard({
+  required int percent,
+  required Color foregroundColor,
+  required Color backgroundColor,
+  required BuildContext context,
+}) {
+  return Card(
+    shape: RoundedRectangleBorder(
+      borderRadius:
+          BorderRadius.circular(MediaQuery.of(context).size.width * 0.09),
+    ),
+    clipBehavior: Clip.antiAlias,
+    child: CircularPercentIndicator(
+      radius: MediaQuery.of(context).size.width * 0.04,
+      // lineWidth: 5.0,
+      percent: percent / 100,
+      center: Text(
+        "$percent %",
+        style: GoogleFonts.rubik(
+          fontSize: 18,
+          color: Colors.white,
+        ),
+      ),
+      progressColor: foregroundColor,
+      backgroundColor: backgroundColor,
+      fillColor: backgroundColor,
+      animation: true,
+      animationDuration: 2000,
+    ),
+  );
+}

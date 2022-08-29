@@ -12,6 +12,7 @@ import 'package:weva/cubit/main_cubit/main_cubit_state.dart';
 
 import '../../translations/locale_keys.g.dart';
 import 'Screen11_drawer.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 
 class MainScreen extends StatefulWidget {
   MainScreen({Key? key}) : super(key: key);
@@ -23,7 +24,6 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
-
   String name = "";
 
   @override
@@ -32,23 +32,17 @@ class _MainScreenState extends State<MainScreen> {
     super.initState();
 
     readData();
-
   }
 
-
-  void readData() async{
-
+  void readData() async {
     final prefs = await SharedPreferences.getInstance();
 
-    setState((){
+    setState(() {
       name = prefs.getString('name') ?? "";
     });
 
     log("444444444444");
-
   }
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -58,102 +52,204 @@ class _MainScreenState extends State<MainScreen> {
           listener: (context, state) {},
           builder: (context, state) {
             MainCubitBloc cubit = MainCubitBloc.get(context);
-            return Scaffold(
-                key: _scaffoldKey,
-                backgroundColor: Color(0XFFe4f1f8),
-                appBar: AppBar(
+            if (kIsWeb) {
+              return Scaffold(
+                  key: _scaffoldKey,
                   backgroundColor: Color(0XFFe4f1f8),
-                  elevation: 0,
-                  title:
-                  cubit.currentIndex == 0 ?
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        name,
-                        style: GoogleFonts.montserrat(
-                          fontSize: 16,
-                          color: Colors.black,
-                          fontWeight: FontWeight.bold,
-                        ),
+                  appBar: AppBar(
+                    backgroundColor: Color(0XFFe4f1f8),
+                    elevation: 0,
+                    title: cubit.currentIndex == 0
+                        ? Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                name,
+                                style: GoogleFonts.montserrat(
+                                  fontSize: 16,
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              Text(
+                                LocaleKeys.what_do_you.tr(),
+                                style: GoogleFonts.montserrat(
+                                  fontSize: 10,
+                                  color: Colors.black,
+                                ),
+                              ),
+                            ],
+                          )
+                        : Text(
+                            cubit.screensNames[cubit.currentIndex],
+                            style: GoogleFonts.montserrat(
+                              fontSize: 16,
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                    leading: IconButton(
+                      icon: Icon(
+                        Icons.menu,
+                        color: Colors.black,
                       ),
-                      Text(
-                        LocaleKeys.what_do_you.tr(),
-                        style: GoogleFonts.montserrat(
-                          fontSize: 10,
-                          color: Colors.black,
-                        ),
-                      ),
-                    ],
-                  ) :
-                  Text(
-                    cubit.screensNames[cubit.currentIndex],
-                    style: GoogleFonts.montserrat(
-                      fontSize: 16,
-                      color: Colors.black,
-                      fontWeight: FontWeight.bold,
+                      onPressed: () {
+                        _scaffoldKey.currentState?.openDrawer();
+                      },
                     ),
                   ),
-                  leading: IconButton(
-                    icon: Icon(
-                      Icons.menu,
-                      color: Colors.black,
-                    ),
-                    onPressed: () {
-                      _scaffoldKey.currentState?.openDrawer();
+                  drawer: const Drawer11(),
+                  body: cubit.screens[cubit.currentIndex],
+                  bottomNavigationBar: BottomNavyBar(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    selectedIndex: cubit.currentIndex,
+                    showElevation: false,
+                    onItemSelected: (index) {
+                      cubit.changeIndex(index);
                     },
+                    items: [
+                      BottomNavyBarItem(
+                        textAlign: TextAlign.center,
+                        icon: Icon(
+                          CupertinoIcons.home,
+                          color: cubit.currentIndex == 0
+                              ? Colors.blue
+                              : Colors.black,
+                        ),
+                        title: Text('Home'),
+                        activeColor: Colors.blue,
+                      ),
+                      BottomNavyBarItem(
+                        textAlign: TextAlign.center,
+                        icon: Icon(
+                          CupertinoIcons.minus_circled,
+                          color: cubit.currentIndex == 1
+                              ? Colors.blue
+                              : Colors.black,
+                        ),
+                        title: Text('Score'),
+                        activeColor: Colors.blue,
+                      ),
+                      BottomNavyBarItem(
+                          textAlign: TextAlign.center,
+                          icon: Icon(
+                            Icons.people_outline,
+                            color: cubit.currentIndex == 2
+                                ? Colors.blue
+                                : Colors.black,
+                          ),
+                          title: Text('Friends'),
+                          activeColor: Colors.blue),
+                      BottomNavyBarItem(
+                          textAlign: TextAlign.center,
+                          icon: Icon(
+                            CupertinoIcons.person,
+                            color: cubit.currentIndex == 3
+                                ? Colors.blue
+                                : Colors.black,
+                          ),
+                          title: Text('Profile'),
+                          activeColor: Colors.blue),
+                    ],
+                  ));
+            } else {
+              return Scaffold(
+                  key: _scaffoldKey,
+                  backgroundColor: Color(0XFFe4f1f8),
+                  appBar: AppBar(
+                    backgroundColor: Color(0XFFe4f1f8),
+                    elevation: 0,
+                    title: cubit.currentIndex == 0
+                        ? Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                name,
+                                style: GoogleFonts.montserrat(
+                                  fontSize: 16,
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              Text(
+                                LocaleKeys.what_do_you.tr(),
+                                style: GoogleFonts.montserrat(
+                                  fontSize: 10,
+                                  color: Colors.black,
+                                ),
+                              ),
+                            ],
+                          )
+                        : Text(
+                            cubit.screensNames[cubit.currentIndex],
+                            style: GoogleFonts.montserrat(
+                              fontSize: 16,
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                    leading: IconButton(
+                      icon: Icon(
+                        Icons.menu,
+                        color: Colors.black,
+                      ),
+                      onPressed: () {
+                        _scaffoldKey.currentState?.openDrawer();
+                      },
+                    ),
                   ),
-                ),
-                drawer: const Drawer11(),
-                body: cubit.screens[cubit.currentIndex],
-                bottomNavigationBar: BottomNavyBar(
-                  selectedIndex: cubit.currentIndex,
-                  showElevation: false,
-                  onItemSelected: (index) {
-                    cubit.changeIndex(index);
-                  },
-                  items: [
-                    BottomNavyBarItem(
-                      icon: Icon(
-                        CupertinoIcons.home,
-                        color: cubit.currentIndex == 0
-                            ? Colors.blue
-                            : Colors.black,
-                      ),
-                      title: Text('Home'),
-                      activeColor: Colors.blue,
-                    ),
-                    BottomNavyBarItem(
-                      icon: Icon(
-                        CupertinoIcons.minus_circled,
-                        color: cubit.currentIndex == 1
-                            ? Colors.blue
-                            : Colors.black,
-                      ),
-                      title: Text('Score'),
-                      activeColor: Colors.blue,
-                    ),
-                    BottomNavyBarItem(
+                  drawer: const Drawer11(),
+                  body: cubit.screens[cubit.currentIndex],
+                  bottomNavigationBar: BottomNavyBar(
+                    selectedIndex: cubit.currentIndex,
+                    showElevation: false,
+                    onItemSelected: (index) {
+                      cubit.changeIndex(index);
+                    },
+                    items: [
+                      BottomNavyBarItem(
                         icon: Icon(
-                          Icons.people_outline,
-                          color: cubit.currentIndex == 2
+                          CupertinoIcons.home,
+                          color: cubit.currentIndex == 0
                               ? Colors.blue
                               : Colors.black,
                         ),
-                        title: Text('Friends'),
-                        activeColor: Colors.blue),
-                    BottomNavyBarItem(
+                        title: Text('Home'),
+                        activeColor: Colors.blue,
+                      ),
+                      BottomNavyBarItem(
                         icon: Icon(
-                          CupertinoIcons.person,
-                          color: cubit.currentIndex == 3
+                          CupertinoIcons.minus_circled,
+                          color: cubit.currentIndex == 1
                               ? Colors.blue
                               : Colors.black,
                         ),
-                        title: Text('Profile'),
-                        activeColor: Colors.blue),
-                  ],
-                ));
+                        title: Text('Score'),
+                        activeColor: Colors.blue,
+                      ),
+                      BottomNavyBarItem(
+                          icon: Icon(
+                            Icons.people_outline,
+                            color: cubit.currentIndex == 2
+                                ? Colors.blue
+                                : Colors.black,
+                          ),
+                          title: Text('Friends'),
+                          activeColor: Colors.blue),
+                      BottomNavyBarItem(
+                          icon: Icon(
+                            CupertinoIcons.person,
+                            color: cubit.currentIndex == 3
+                                ? Colors.blue
+                                : Colors.black,
+                          ),
+                          title: Text('Profile'),
+                          activeColor: Colors.blue),
+                    ],
+                  ));
+            }
           },
         ));
   }

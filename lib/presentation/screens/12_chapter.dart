@@ -12,6 +12,8 @@ import '../widgets/dropdown_textField.dart';
 import '../widgets/registration_button.dart';
 import '12_1st law of motion.dart';
 import '13_selectedLesson.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
+
 // ignore_for_file: prefer_const_constructors
 
 class Chapter extends StatefulWidget {
@@ -169,108 +171,240 @@ class _ChapterState extends State<Chapter> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.only(
-            left: 20,
-            top: 50,
-            right: 20,
+    if (kIsWeb) {
+      return Scaffold(
+        appBar: AppBar(
+          backgroundColor: Colors.white,
+          elevation: 0.0,
+          leading: IconButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            icon: Icon(
+              Icons.arrow_back_ios,
+              color: Colors.black,
+            ),
           ),
-          child: SingleChildScrollView(
-            child: Form(
-              key: formKey,
-              child: Column(
-                children: [
-                  SizedBox(
-                    height: 5.0,
-                  ),
-                  SizedBox(
-                    height: MediaQuery.of(context).size.height * 0.45,
-                    child: Stack(
+        ),
+        backgroundColor: Colors.white,
+        body: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.only(
+              left: 20,
+              top: 50,
+              right: 20,
+            ),
+            child: SingleChildScrollView(
+              child: Form(
+                key: formKey,
+                child: Column(
+                  children: [
+
+                    SizedBox(
+                      height: MediaQuery.of(context).size.height * 0.45,
+                      child: Stack(
+                        children: [
+                          Image(
+                            image: AssetImage("assets/images/science.png"),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Image(
-                          image: AssetImage("assets/images/science.png"),
+                        Text(
+                          widget.name,
+                          style: GoogleFonts.rubik(
+                            fontSize: 26.0,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ],
                     ),
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      Text(
-                      widget.name,
-                        style: GoogleFonts.rubik(
-                          fontSize: 26.0,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(
-                    height: MediaQuery.of(context).size.height * 0.04,
-                  ),
-                  DropDown(
-                    Selecteditems: chapterss.map(buildMenuitem).toList(),
-                    SelectedValue: Selectedvalue1,
-                    onChanged: (value) {
-                      setState(() {
-                        Selectedvalue1 = value;
+                    SizedBox(
+                      height: MediaQuery.of(context).size.height * 0.04,
+                    ),
+                    webDropDown(
+                      Selecteditems: chapterss.map(buildMenuitem).toList(),
+                      SelectedValue: Selectedvalue1,
+                      onChanged: (value) {
+                        setState(() {
+                          Selectedvalue1 = value;
 
-                        log(value);
+                          log(value);
 
-                        log(chapters[chapters.indexWhere((f) => (Localizations.localeOf(context).toString() == "en"? f.nameEN : f.nameAr) == value)].idToEdit);
+                          log(chapters[chapters.indexWhere((f) => (Localizations.localeOf(context).toString() == "en"? f.nameEN : f.nameAr) == value)].idToEdit);
 
 
-                        getLessons(chapters[chapters.indexWhere((f) => (Localizations.localeOf(context).toString() == "en"? f.nameEN : f.nameAr) == value)].idToEdit);
+                          getLessons(chapters[chapters.indexWhere((f) => (Localizations.localeOf(context).toString() == "en"? f.nameEN : f.nameAr) == value)].idToEdit);
 
-                      });
-                    },
-                    context: context,
-                    hint: 'Chapter',
-                  ),
-                  SizedBox(
-                    height: MediaQuery.of(context).size.height * 0.03,
-                  ),
-                  DropDown(
-                    Selecteditems: lessonss.map(buildMenuitem).toList(),
-                    SelectedValue: Selectedvalue2,
-                    onChanged: (value) {
-                      setState(() {
-                        Selectedvalue2 = value;
-                      });
-                    },
-                    context: context,
-                    hint: 'Lesson',
-                  ),
-                  SizedBox(
-                    height: MediaQuery.of(context).size.height * 0.09,
-                  ),
-                  registrationButton(
-                    text: "Next",
-                    onTap: () {
-                      if (formKey.currentState!.validate()) {
-                        //Navigate to b2a hna
+                        });
+                      },
+                      context: context,
+                      hint: 'Chapter',
+                    ),
+                    SizedBox(
+                      height: MediaQuery.of(context).size.height * 0.03,
+                    ),
+                    webDropDown(
+                      Selecteditems: lessonss.map(buildMenuitem).toList(),
+                      SelectedValue: Selectedvalue2,
+                      onChanged: (value) {
+                        setState(() {
+                          Selectedvalue2 = value;
+                        });
+                      },
+                      context: context,
+                      hint: 'Lesson',
+                    ),
+                    SizedBox(
+                      height: MediaQuery.of(context).size.height * 0.04,
+                    ),
+                    webregistrationButton(
+                      text: "Next",
+                      onTap: () {
+                        if (formKey.currentState!.validate()) {
+                          //Navigate to b2a hna
 
 
-                        if(Selectedvalue1 != null && Selectedvalue2 != null){
+                          if(Selectedvalue1 != null && Selectedvalue2 != null){
 
-                          Navigator.of(context).push(MaterialPageRoute(builder: (context)=> ListofVids(chName: Selectedvalue1!, lessonID: lessons[lessons.indexWhere((f) => (Localizations.localeOf(context).toString() == "en"? f.nameEN : f.nameAr) == Selectedvalue2)].idToEdit, nameAR: lessons[lessons.indexWhere((f) => (Localizations.localeOf(context).toString() == "en"? f.nameEN : f.nameAr) == Selectedvalue2)].nameAr, nameEN: lessons[lessons.indexWhere((f) => (Localizations.localeOf(context).toString() == "en"? f.nameEN : f.nameAr) == Selectedvalue2)].nameEN, lesonNum: lessons[lessons.indexWhere((f) => (Localizations.localeOf(context).toString() == "en"? f.nameEN : f.nameAr) == Selectedvalue2)].lessNum)));
+                            Navigator.of(context).push(MaterialPageRoute(builder: (context)=> ListofVids(chName: Selectedvalue1!, lessonID: lessons[lessons.indexWhere((f) => (Localizations.localeOf(context).toString() == "en"? f.nameEN : f.nameAr) == Selectedvalue2)].idToEdit, nameAR: lessons[lessons.indexWhere((f) => (Localizations.localeOf(context).toString() == "en"? f.nameEN : f.nameAr) == Selectedvalue2)].nameAr, nameEN: lessons[lessons.indexWhere((f) => (Localizations.localeOf(context).toString() == "en"? f.nameEN : f.nameAr) == Selectedvalue2)].nameEN, lesonNum: lessons[lessons.indexWhere((f) => (Localizations.localeOf(context).toString() == "en"? f.nameEN : f.nameAr) == Selectedvalue2)].lessNum)));
+
+                          }
+
 
                         }
-
-
-                      }
-                    },
-                    context: context,
-                  ),
-                ],
+                      },
+                      context: context,
+                    ),
+                    SizedBox(
+                      height: MediaQuery.of(context).size.height * 0.04,
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
         ),
-      ),
-    );
+      );    } else {
+      return Scaffold(
+        appBar: AppBar(
+          backgroundColor: Colors.white,
+          elevation: 0.0,
+          leading: IconButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            icon: Icon(
+              Icons.arrow_back_ios,
+              color: Colors.black,
+            ),
+          ),
+        ),
+        backgroundColor: Colors.white,
+        body: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.only(
+              left: 20,
+              top: 50,
+              right: 20,
+            ),
+            child: SingleChildScrollView(
+              child: Form(
+                key: formKey,
+                child: Column(
+                  children: [
+                    SizedBox(
+                      height: 5.0,
+                    ),
+                    SizedBox(
+                      height: MediaQuery.of(context).size.height * 0.45,
+                      child: Stack(
+                        children: [
+                          Image(
+                            image: AssetImage("assets/images/science.png"),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        Text(
+                          widget.name,
+                          style: GoogleFonts.rubik(
+                            fontSize: 26.0,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(
+                      height: MediaQuery.of(context).size.height * 0.04,
+                    ),
+                    DropDown(
+                      Selecteditems: chapterss.map(buildMenuitem).toList(),
+                      SelectedValue: Selectedvalue1,
+                      onChanged: (value) {
+                        setState(() {
+                          Selectedvalue1 = value;
+
+                          log(value);
+
+                          log(chapters[chapters.indexWhere((f) => (Localizations.localeOf(context).toString() == "en"? f.nameEN : f.nameAr) == value)].idToEdit);
+
+
+                          getLessons(chapters[chapters.indexWhere((f) => (Localizations.localeOf(context).toString() == "en"? f.nameEN : f.nameAr) == value)].idToEdit);
+
+                        });
+                      },
+                      context: context,
+                      hint: 'Chapter',
+                    ),
+                    SizedBox(
+                      height: MediaQuery.of(context).size.height * 0.03,
+                    ),
+                    DropDown(
+                      Selecteditems: lessonss.map(buildMenuitem).toList(),
+                      SelectedValue: Selectedvalue2,
+                      onChanged: (value) {
+                        setState(() {
+                          Selectedvalue2 = value;
+                        });
+                      },
+                      context: context,
+                      hint: 'Lesson',
+                    ),
+                    SizedBox(
+                      height: MediaQuery.of(context).size.height * 0.09,
+                    ),
+                    registrationButton(
+                      text: "Next",
+                      onTap: () {
+                        if (formKey.currentState!.validate()) {
+                          //Navigate to b2a hna
+
+
+                          if(Selectedvalue1 != null && Selectedvalue2 != null){
+
+                            Navigator.of(context).push(MaterialPageRoute(builder: (context)=> ListofVids(chName: Selectedvalue1!, lessonID: lessons[lessons.indexWhere((f) => (Localizations.localeOf(context).toString() == "en"? f.nameEN : f.nameAr) == Selectedvalue2)].idToEdit, nameAR: lessons[lessons.indexWhere((f) => (Localizations.localeOf(context).toString() == "en"? f.nameEN : f.nameAr) == Selectedvalue2)].nameAr, nameEN: lessons[lessons.indexWhere((f) => (Localizations.localeOf(context).toString() == "en"? f.nameEN : f.nameAr) == Selectedvalue2)].nameEN, lesonNum: lessons[lessons.indexWhere((f) => (Localizations.localeOf(context).toString() == "en"? f.nameEN : f.nameAr) == Selectedvalue2)].lessNum)));
+
+                          }
+
+
+                        }
+                      },
+                      context: context,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      );    }
+
   }
 }

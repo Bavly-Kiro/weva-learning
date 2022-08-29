@@ -1,0 +1,139 @@
+{
+  "skip": "skip",
+  "onboard1": "learn any time and anywhere",
+  "onboard2": "this is the perfect time to spend",
+  "continuee": "continue",
+  "onboard3": "start your journey with fun",
+  "onboard4": "explore various learning..........",
+  "onboard5": "find your favorite ............",
+  "onboard6": "anyone can join.......",
+
+
+  "sign_up_face": "Sign up with Facebook",
+  "sign_up_google": "Sign up with Google",
+  "or": "or",
+  "sign_up_email": "Sign up with email",
+  "already_have_acc": "Already have an account ?",
+  "sign_in": "Login",
+  "personal_info": "Personal Information",
+  "full_name": "Full Name",
+  "gender": "Gender",
+  "date_birth": "Date of Birth",
+  "subjects": "Subjects",
+  "country": "Country",
+  "Edu_year": "Educational Year",
+  "grade": "Grade",
+  "school_type": "School Type",
+  "email": "E-mail",
+  "pass": "Password",
+  "confirm_pass": "confirm Password",
+
+
+  "sign_in_face": "Sign in with Facebook",
+  "sign_in_google": "Sign in with Google",
+  "forget_pass": "Forget Password ?",
+
+
+
+  "hello": "Hello",
+  "what_do_you": "what do you learn today ?",
+  "search_num": "Search for your Friends by number",
+  "new_games": "New Games",
+  "discussion": "Discussion",
+  "about_discussion": "Test your Academic Achievements......",
+  "five_days_chall": "5-Days Challenge",
+  "about_5_days_chall": "Test your Academic Achievements......",
+  "challenge": "Challenge",
+  "about_chall": "Compete with your Friends......",
+  "last_test_score": "Last Test Score",
+  "last_game_score": "Last Game Score",
+
+  "home": "Home",
+  "score": "Score",
+  "friends": "Friends",
+  "profile": "Profile",
+
+
+
+  "dashboard": "Dashboard",
+  "offers": "Offers",
+  "Payment_meth": "Payment Methods",
+  "settings": "Settings",
+  "about_us": "About us",
+  "support": "Support",
+  "log_out": "Logout",
+  "light": "Light",
+  "dark": "Dark",
+
+
+  "chapter": "Chapter",
+  "lesson": "Lesson",
+  "next": "Next",
+  "student_watch": "students watched",
+
+
+  "notes": "Notes",
+  "save": "save",
+  "exams": "Exams",
+  "easy": "easy",
+  "moderate": "moderate",
+  "hard": "hard",
+
+
+  "no_internet": "No Internet Connection",
+  "please_internet": "Please check your internet connection",
+
+
+  "game": "GAME",
+
+
+  "no_result": "No results found",
+  "check_no_result": "check the number again",
+
+
+  "s_remaining": "s remaining",
+  "question": "Question",
+  "of": "of",
+  "submit": "Submit",
+  "previous": "Previous",
+
+
+  "report": "Report",
+
+
+  "personal_details": "Personal Details",
+  "payments": "payments",
+  "complaints_suggestions": "Complaints and Suggestions",
+
+
+  "select_levels": "Select Levels",
+  "free_trial": "Free Trial",
+  "month": "month",
+  "this_plan": "This plan includes",
+  "tests": "Tests",
+  "videos": "Videos",
+  "games_chall": "Games and Challenges",
+
+
+  "login_point": "Logging In....",
+  "sign_up": "Sign up",
+
+  "back": "back",
+  "pass_not_conf": "Passwords are not matched",
+  "pass_not_conf2": "Make sure the password matches password confirmation",
+  "cancel": "cancel",
+  "done": "Done",
+  "please_rate": "Please Rate this video and leave a comment if you like",
+
+  "weak_pass1": "the password is too weak",
+  "weak_pass2": "please enter a 6 digit stronger password to be sure that your account is fully secured",
+  "email_used1": "email already exists",
+  "email_used2": "there is already a registered account with that email, try to login with your email or enter another mail",
+  "inv_email1": "Invalid Email",
+  "inv_email2": "the email you entered is Invalid, please check it again",
+  "signup_error1": "Error",
+  "signup_error2": "Error Occurred please contact us, error code: 301"
+
+
+
+}

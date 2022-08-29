@@ -246,7 +246,7 @@ class _ListofVidsState extends State<ListofVids> {
                         Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => SelectedLesson(videoID: videos[index].idToEdit)));
+                                builder: (context) => SelectedLesson(videoID: videos[index].idToEdit, chaName: widget.chName, lessonName: Localizations.localeOf(context).toString() == "en"? widget.nameEN : widget.nameAR, videoName: Localizations.localeOf(context).toString() == "en"? videos[index].nameEN : videos[index].nameAr)));
                       },
                       title: Text(
                         Localizations.localeOf(context).toString() == "en"? videos[index].nameEN : videos[index].nameAr,

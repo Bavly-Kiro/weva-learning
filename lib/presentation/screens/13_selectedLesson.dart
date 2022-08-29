@@ -14,7 +14,7 @@ import 'Exam.dart';
 
 // ignore_for_file: prefer_const_constructors
 class SelectedLesson extends StatefulWidget {
-  SelectedLesson({Key? key,required this.videoID}) : super(key: key);
+  SelectedLesson({Key? key, required this.videoID}) : super(key: key);
 
   String videoID;
 
@@ -25,10 +25,8 @@ class SelectedLesson extends StatefulWidget {
 class _SelectedLessonState extends State<SelectedLesson> {
   TextEditingController notesController = TextEditingController();
 
-
   String URL = "";
   String imgURL = "";
-
 
   @override
   void initState() {
@@ -36,23 +34,17 @@ class _SelectedLessonState extends State<SelectedLesson> {
     super.initState();
 
     getVideos();
-
   }
 
-
-
-  void getVideos() async{
-
-
-    if(await checkConnectionn()){
-
+  void getVideos() async {
+    if (await checkConnectionn()) {
       loading(context: context);
 
-      FirebaseFirestore.instance.collection('videos').doc(widget.videoID).get(const GetOptions(source: Source.server))
+      FirebaseFirestore.instance
+          .collection('videos')
+          .doc(widget.videoID)
+          .get(const GetOptions(source: Source.server))
           .then((value) {
-
-
-
         setState(() {
           URL = value.get("URL");
           imgURL = value.get("imgURL");
@@ -63,50 +55,34 @@ class _SelectedLessonState extends State<SelectedLesson> {
         _controller = VideoPlayerController.network(URL);
 
         _controller.initialize();
-
       }).onError((error, stackTrace) {
-
         log(error.toString());
         showToast("Error: $error");
-
       });
-
-    }else{
-
+    } else {
       showToast("Check Internet Connection !");
-
     }
-
   }
 
   late VideoPlayerController _controller;
 
-  void startVideo(){
-
+  void startVideo() {
     setState(() {
-
       play = false;
 
       _controller.play();
     });
-
   }
 
-  void stopVideo(){
-
+  void stopVideo() {
     setState(() {
-
       play = true;
 
       _controller.pause();
     });
-
   }
 
-
   bool play = true;
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -144,42 +120,42 @@ class _SelectedLessonState extends State<SelectedLesson> {
                   ),
                 ),
                 SizedBox(
-                  height: MediaQuery.of(context).size.height * 0.03,
+                  height: MediaQuery.of(context).size.height * 0.02,
                 ),
                 ClipRRect(
                   borderRadius: BorderRadius.circular(15.0),
                   child: Stack(
                     alignment: Alignment.center,
                     children: [
-                      play?Image.network(
-                        imgURL,
-                        fit: BoxFit.cover,
-                      ) : Container(),
-                      play?IconButton(onPressed: (){
-
-                        startVideo();
-
-                      },
-                        icon: Icon(
-                          Icons.play_circle,
-                          color: Colors.white70,
-                          size: 70,
-                        ),
-                      ): Container(),
-
-                      play==false?
-
-                      SizedBox(
-                          height: MediaQuery.of(context).size.width * 0.62,
-                          width: MediaQuery.of(context).size.width * 0.92,
-                          child: InkWell(
-                              onTap: () async {
-                                stopVideo();
+                      play
+                          ? Image.network(
+                              imgURL,
+                              fit: BoxFit.cover,
+                              height: MediaQuery.of(context).size.height * 0.25,
+                            )
+                          : Container(),
+                      play
+                          ? IconButton(
+                              onPressed: () {
+                                startVideo();
                               },
-
-                              child: VideoPlayer(_controller)))
-
-                          :Container(),
+                              icon: Icon(
+                                Icons.play_circle,
+                                color: Colors.white70,
+                                size: 70,
+                              ),
+                            )
+                          : Container(),
+                      play == false
+                          ? SizedBox(
+                              height: MediaQuery.of(context).size.height * 0.25,
+                              width: MediaQuery.of(context).size.width * 0.90,
+                              child: InkWell(
+                                  onTap: () async {
+                                    stopVideo();
+                                  },
+                                  child: VideoPlayer(_controller)))
+                          : Container(),
                     ],
                   ),
                 ),

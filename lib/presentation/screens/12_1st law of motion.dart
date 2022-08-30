@@ -14,7 +14,14 @@ import '13_selectedLesson.dart';
 
 // ignore_for_file: prefer_const_constructors
 class ListofVids extends StatefulWidget {
-  ListofVids({Key? key, required this.chName, required this.lessonID, required this.nameAR, required this.nameEN, required this.lesonNum}) : super(key: key);
+  ListofVids(
+      {Key? key,
+      required this.chName,
+      required this.lessonID,
+      required this.nameAR,
+      required this.nameEN,
+      required this.lesonNum})
+      : super(key: key);
 
   String chName;
   String lessonID;
@@ -22,38 +29,32 @@ class ListofVids extends StatefulWidget {
   String nameEN;
   int lesonNum;
 
-
   @override
   State<ListofVids> createState() => _ListofVidsState();
 }
 
 class _ListofVidsState extends State<ListofVids> {
-
-
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
 
     getVideos();
-
   }
-
 
   List<video> videos = [];
 
-  void getVideos() async{
-
+  void getVideos() async {
     videos = [];
 
-    if(await checkConnectionn()){
-
+    if (await checkConnectionn()) {
       loading(context: context);
 
-      FirebaseFirestore.instance.collection('videos').where("lessonID", isEqualTo: widget.lessonID).get(const GetOptions(source: Source.server))
+      FirebaseFirestore.instance
+          .collection('videos')
+          .where("lessonID", isEqualTo: widget.lessonID)
+          .get(const GetOptions(source: Source.server))
           .then((value) {
-
-
         final List<video> loadData = [];
 
         for (var element in value.docs) {
@@ -72,11 +73,9 @@ class _ListofVidsState extends State<ListofVids> {
             vidNum: element.data()['vidNum'] ?? "",
             imgURL: element.data()['imgURL'] ?? "",
             documentURL: element.data()['documentURL'] ?? "",
-
             userDoneAction: element.data()['userDoneAction'] ?? "",
             LastUserDoneAction: element.data()['LastUserDoneAction'] ?? "",
             status: element.data()['status'] ?? "",
-
           ));
         }
 
@@ -87,23 +86,14 @@ class _ListofVidsState extends State<ListofVids> {
         });
 
         Navigator.of(context).pop();
-
       }).onError((error, stackTrace) {
-
         log(error.toString());
         showToast("Error: $error");
-
       });
-
-    }else{
-
+    } else {
       showToast("Check Internet Connection !");
-
     }
-
   }
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -172,7 +162,9 @@ class _ListofVidsState extends State<ListofVids> {
                               width: MediaQuery.of(context).size.width * 0.01,
                             ),
                             Text(
-                              Localizations.localeOf(context).toString() == "en" ? widget.nameEN : widget.nameAR,
+                              Localizations.localeOf(context).toString() == "en"
+                                  ? widget.nameEN
+                                  : widget.nameAR,
                               style: GoogleFonts.rubik(
                                 color: Colors.grey,
                                 fontWeight: FontWeight.w500,
@@ -247,10 +239,24 @@ class _ListofVidsState extends State<ListofVids> {
                         Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => SelectedLesson(videoID: videos[index].idToEdit, chaName: widget.chName, lessonName: Localizations.localeOf(context).toString() == "en"? widget.nameEN : widget.nameAR, videoName: Localizations.localeOf(context).toString() == "en"? videos[index].nameEN : videos[index].nameAr)));
+                                builder: (context) => SelectedLesson(
+                                    videoID: videos[index].idToEdit,
+                                    chaName: widget.chName,
+                                    lessonName: Localizations.localeOf(context)
+                                                .toString() ==
+                                            "en"
+                                        ? widget.nameEN
+                                        : widget.nameAR,
+                                    videoName: Localizations.localeOf(context)
+                                                .toString() ==
+                                            "en"
+                                        ? videos[index].nameEN
+                                        : videos[index].nameAr)));
                       },
                       title: Text(
-                        Localizations.localeOf(context).toString() == "en"? videos[index].nameEN : videos[index].nameAr,
+                        Localizations.localeOf(context).toString() == "en"
+                            ? videos[index].nameEN
+                            : videos[index].nameAr,
                         style: GoogleFonts.rubik(
                           fontWeight: FontWeight.bold,
                           fontSize: 18.0,

@@ -73,11 +73,12 @@
 
 
   "notes": "Notes",
-  "save": "save",
+  "save": "Save",
   "exams": "Exams",
   "easy": "easy",
   "moderate": "moderate",
   "hard": "hard",
+  "download_pdf": "Download PDF",
 
 
   "no_internet": "No Internet Connection",

@@ -39,7 +39,6 @@ class MyApp extends StatelessWidget {
       localizationsDelegates: context.localizationDelegates,
       supportedLocales: context.supportedLocales,
       locale: context.locale,
-      title: 'Flutter Demo',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primarySwatch: Colors.blue,
@@ -69,10 +68,10 @@ class _SplashState extends State<Splash> {
 
     if (firstRun) {
       Navigator.of(context)
-          .push(MaterialPageRoute(builder: (context) => LiveComments()));
+          .push(MaterialPageRoute(builder: (context) => OnBoardingScreen()));
     } else {
       Navigator.of(context)
-          .push(MaterialPageRoute(builder: (context) => const LiveComments()));
+          .push(MaterialPageRoute(builder: (context) => const checkLogin()));
     }
   }
 

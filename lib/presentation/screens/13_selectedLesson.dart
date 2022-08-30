@@ -1,24 +1,31 @@
 import 'dart:developer';
 
+//import 'package:chewie/chewie.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:easy_localization/easy_localization.dart';
+import 'package:flick_video_player/flick_video_player.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:oktoast/oktoast.dart';
-import 'package:responsive_builder/responsive_builder.dart';
 import 'package:video_player/video_player.dart';
 import '../../back/checkConnection.dart';
 import '../../back/loading.dart';
+import '../../translations/locale_keys.g.dart';
 import '../widgets/default_button.dart';
 import '../widgets/default_text_button.dart';
 import 'Discussion.dart';
 import 'Exam.dart';
+
 import 'package:flutter/foundation.dart' show kIsWeb;
 
 // ignore_for_file: prefer_const_constructors
 class SelectedLesson extends StatefulWidget {
-  SelectedLesson({Key? key, required this.videoID}) : super(key: key);
+  SelectedLesson({Key? key, required this.videoID, required this.chaName, required this.lessonName, required this.videoName}) : super(key: key);
 
   String videoID;
+  String chaName;
+  String lessonName;
+  String videoName;
 
   @override
   State<SelectedLesson> createState() => _SelectedLessonState();
@@ -46,7 +53,7 @@ class _SelectedLessonState extends State<SelectedLesson> {
           .collection('videos')
           .doc(widget.videoID)
           .get(const GetOptions(source: Source.server))
-          .then((value) {
+          .then((value) async {
         setState(() {
           URL = value.get("URL");
           imgURL = value.get("imgURL");
@@ -54,9 +61,20 @@ class _SelectedLessonState extends State<SelectedLesson> {
 
         Navigator.of(context).pop();
 
-        _controller = VideoPlayerController.network(URL);
+        // _controller = VideoPlayerController.network(URL);
 
-        _controller.initialize();
+
+        //videoPlayerController = VideoPlayerController.network(URL);
+
+        //await videoPlayerController.initialize();
+
+
+        flickManager = FlickManager(
+          videoPlayerController:
+          VideoPlayerController.network(URL),
+        );
+
+        // _controller.initialize();
       }).onError((error, stackTrace) {
         log(error.toString());
         showToast("Error: $error");
@@ -66,25 +84,15 @@ class _SelectedLessonState extends State<SelectedLesson> {
     }
   }
 
-  late VideoPlayerController _controller;
-
-  void startVideo() {
-    setState(() {
-      play = false;
-
-      _controller.play();
-    });
+  @override
+  void dispose() {
+    //videoPlayerController.dispose();
+    flickManager.dispose();
+    super.dispose();
   }
 
-  void stopVideo() {
-    setState(() {
-      play = true;
+  late FlickManager flickManager;
 
-      _controller.pause();
-    });
-  }
-
-  bool play = true;
 
   @override
   Widget build(BuildContext context) {
@@ -98,12 +106,12 @@ class _SelectedLessonState extends State<SelectedLesson> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Introduction to Forces > 1st Law of Motion'),
+                  Text('${widget.chaName} > ${widget.lessonName}'),
                   SizedBox(
                     height: MediaQuery.of(context).size.height * 0.01,
                   ),
                   Text(
-                    '1st law of motion',
+                    widget.videoName,
                     style: GoogleFonts.rubik(
                       fontSize: 26.0,
                       fontWeight: FontWeight.bold,
@@ -114,46 +122,24 @@ class _SelectedLessonState extends State<SelectedLesson> {
                   ),
                   ClipRRect(
                     borderRadius: BorderRadius.circular(15.0),
-                    child: Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        play
-                            ? Image.network(
-                                imgURL,
-                                fit: BoxFit.cover,
-                              )
-                            : Container(),
-                        play
-                            ? IconButton(
-                                onPressed: () {
-                                  startVideo();
-                                },
-                                icon: Icon(
-                                  Icons.play_circle,
-                                  color: Colors.white70,
-                                  size: 70,
-                                ),
-                              )
-                            : Container(),
-                        play == false
-                            ? SizedBox(
-                                height:
-                                    MediaQuery.of(context).size.width * 0.62,
-                                width: MediaQuery.of(context).size.width * 0.92,
-                                child: InkWell(
-                                    onTap: () async {
-                                      stopVideo();
-                                    },
-                                    child: VideoPlayer(_controller)))
-                            : Container(),
-                      ],
-                    ),
+                    child: SizedBox(
+                        height:
+                        MediaQuery.of(context).size.width * 0.62,
+                        width: MediaQuery.of(context).size.width * 0.92,
+                        child: FlickVideoPlayer(
+                            flickManager: flickManager
+                        )),
                   ),
                   Row(
                     children: [
                       defaultTextButton(
-                        text: 'Download PDF',
-                        onpressed: () {},
+                        text: LocaleKeys.download_pdf.tr(),
+                        onpressed: () {
+
+
+
+
+                        },
                         color: Colors.teal,
                       ),
                       Icon(
@@ -264,12 +250,12 @@ class _SelectedLessonState extends State<SelectedLesson> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Introduction to Forces > 1st Law of Motion'),
+                  Text('${widget.chaName} > ${widget.lessonName}'),
                   SizedBox(
                     height: MediaQuery.of(context).size.height * 0.01,
                   ),
                   Text(
-                    '1st law of motion',
+                    widget.videoName,
                     style: GoogleFonts.rubik(
                       fontSize: 26.0,
                       fontWeight: FontWeight.bold,
@@ -280,39 +266,8 @@ class _SelectedLessonState extends State<SelectedLesson> {
                   ),
                   ClipRRect(
                     borderRadius: BorderRadius.circular(15.0),
-                    child: Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        play
-                            ? Image.network(
-                                imgURL,
-                                fit: BoxFit.cover,
-                              )
-                            : Container(),
-                        play
-                            ? IconButton(
-                                onPressed: () {
-                                  startVideo();
-                                },
-                                icon: Icon(
-                                  Icons.play_circle,
-                                  color: Colors.white70,
-                                  size: 70,
-                                ),
-                              )
-                            : Container(),
-                        play == false
-                            ? SizedBox(
-                                height:
-                                    MediaQuery.of(context).size.width * 0.62,
-                                width: MediaQuery.of(context).size.width * 0.92,
-                                child: InkWell(
-                                    onTap: () async {
-                                      stopVideo();
-                                    },
-                                    child: VideoPlayer(_controller)))
-                            : Container(),
-                      ],
+                    child: FlickVideoPlayer(
+                        flickManager: flickManager
                     ),
                   ),
                   Row(

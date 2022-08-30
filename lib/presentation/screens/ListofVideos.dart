@@ -176,30 +176,15 @@ class _ListofVidsState extends State<ListofVids> {
                         SizedBox(
                           height: MediaQuery.of(context).size.height * 0.02,
                         ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Container(
-                              child: LinearPercentIndicator(
-                                padding: EdgeInsets.all(0.0),
-                                width: 200.0,
-                                percent: 60 / 100,
-                                barRadius: Radius.circular(20),
-                                // animation: true,
-                                // animationDuration: 1500,
-                                progressColor: dodblue,
-                              ),
-                            ),
-                            Spacer(),
-                            IconButton(
-                              onPressed: () {},
-                              icon: Icon(
-                                Icons.play_circle,
-                                color: dodblue,
-                                size: 32.0,
-                              ),
-                            ),
-                          ],
+                        Container(
+                          child: LinearPercentIndicator(
+                            width: MediaQuery.of(context).size.width * 0.9,
+                            percent: 60 / 100,
+                            barRadius: Radius.circular(20),
+                            // animation: true,
+                            // animationDuration: 1500,
+                            progressColor: dodblue,
+                          ),
                         ),
                       ],
                     ),

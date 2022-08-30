@@ -85,6 +85,7 @@ class video {
   final String mrID;
   final int vidNum;
   final String imgURL;
+  final String documentURL;
 
 
   final String userDoneAction;
@@ -96,7 +97,7 @@ class video {
 
   video({required this.idToEdit, required this.nameAr, required this.nameEN, required this.URL,
     required this.subjectID, required this.chapterID, required this.lessonID, required this.mrID,
-    required this.vidNum, required this.imgURL
+    required this.vidNum, required this.imgURL, required this.documentURL
     , required this.userDoneAction, required this.LastUserDoneAction, required this.status});
 }
 

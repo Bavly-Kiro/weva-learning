@@ -57,6 +57,7 @@ class _DiscussionState extends State<Discussion> {
       backgroundColor: Colors.white,
       body: SafeArea(
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.end,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Column(
@@ -69,36 +70,48 @@ class _DiscussionState extends State<Discussion> {
                       color: Color(0xffe4f1f8),
                     ),
                     width: double.infinity,
-                    height: MediaQuery.of(context).size.height * 0.1,
-                    child: Padding(
-                      padding: const EdgeInsets.only(
-                        top: 50.0,
-                        left: 25.0,
-                      ),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              SizedBox(
-                                width: MediaQuery.of(context).size.width * 0.01,
+                    height: MediaQuery.of(context).size.height * 0.19,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            CircleAvatar(
+                              radius: 40.0,
+                              backgroundImage: NetworkImage(
+                                  'https://img.freepik.com/free-photo/photo-stunned-displeased-man-makes-size-gesture-demonstrates-how-much-attention-help-he-needs-completes-task-models-desktop_273609-23670.jpg?w=740&t=st=1661759672~exp=1661760272~hmac=666c8bea67c8698a55b15635a88bda8a9c09de1757fbf8f3acb4e388a75d5cd9'),
+                              backgroundColor: Colors.transparent,
+                            ),
+                            SizedBox(
+                              width: MediaQuery.of(context).size.width * 0.06,
+                            ),
+                            Text(
+                              'VS',
+                              style: GoogleFonts.rubik(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 20,
+                                color: dodblue,
                               ),
-                            ],
-                          ),
-                          SizedBox(
-                            height: MediaQuery.of(context).size.height * 0.02,
-                          ),
-                        ],
-                      ),
+                            ),
+                            SizedBox(
+                              width: MediaQuery.of(context).size.width * 0.06,
+                            ),
+                            CircleAvatar(
+                              radius: 40.0,
+                              backgroundImage: NetworkImage(
+                                  'https://img.freepik.com/free-photo/photo-stunned-displeased-man-makes-size-gesture-demonstrates-how-much-attention-help-he-needs-completes-task-models-desktop_273609-23670.jpg?w=740&t=st=1661759672~exp=1661760272~hmac=666c8bea67c8698a55b15635a88bda8a9c09de1757fbf8f3acb4e388a75d5cd9'),
+                              backgroundColor: Colors.transparent,
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
                   ),
                 ),
-                SizedBox(
-                  height: MediaQuery.of(context).size.height * 0.01,
-                ),
                 Padding(
-                  padding: const EdgeInsets.all(20.0),
+                  padding: const EdgeInsets.symmetric(horizontal: 20.0),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -196,7 +209,6 @@ class _DiscussionState extends State<Discussion> {
                 ),
               ],
             ),
-            Spacer(),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20.0),
               child: Row(
@@ -283,10 +295,7 @@ class _DiscussionState extends State<Discussion> {
                     Spacer(),
                     defaultButton(
                       text: 'Submit',
-                      onpressed: () {
-
-
-                      },
+                      onpressed: () {},
                       color: dodblue,
                       context: context,
                     ),

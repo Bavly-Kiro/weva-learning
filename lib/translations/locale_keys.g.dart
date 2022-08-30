@@ -102,5 +102,6 @@ abstract class  LocaleKeys {
   static const inv_email2 = 'inv_email2';
   static const signup_error1 = 'signup_error1';
   static const signup_error2 = 'signup_error2';
+  static const download_pdf = 'download_pdf';
 
 }

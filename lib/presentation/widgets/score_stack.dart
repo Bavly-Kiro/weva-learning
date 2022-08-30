@@ -66,3 +66,63 @@ Widget scoreStack({
     ],
   );
 }
+
+Widget webscoreStack({
+  required String subject,
+  required String score,
+  required BuildContext context,
+  required int percent,
+  required Color foregroundColor,
+  required Color backgroundColor,
+  required Direction direction,
+}) {
+  return Stack(
+    alignment: direction == Direction.rtl
+        ? Alignment.centerRight
+        : Alignment.centerLeft,
+    children: [
+      Card(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: Container(
+          color: Colors.white,
+          width: MediaQuery.of(context).size.width,
+          height: MediaQuery.of(context).size.height * 0.15,
+          child: Padding(
+            padding: const EdgeInsets.only(left: 15.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(score,
+                    style: GoogleFonts.rubik(
+                      fontSize: 20,
+                      color: Colors.black,
+                      fontWeight: FontWeight.bold,
+                    )),
+                SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.01,
+                ),
+                Text(subject,
+                    style: GoogleFonts.rubik(
+                      fontSize: 14,
+                      color: Colors.black,
+                    )),
+              ],
+            ),
+          ),
+        ),
+      ),
+      Padding(
+        padding: const EdgeInsets.only(right: 8.0),
+        child: webprogressCard(
+            percent: percent,
+            foregroundColor: foregroundColor,
+            backgroundColor: backgroundColor,
+            context: context),
+      )
+    ],
+  );
+}

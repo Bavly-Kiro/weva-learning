@@ -14,10 +14,9 @@ import '../../back/models/levels.dart';
 import '../../constants.dart';
 import '../../translations/locale_keys.g.dart';
 import '../widgets/alert_dialog.dart';
+import '../widgets/default_button.dart';
 import '../widgets/registration_button.dart';
 import 'main_screen.dart';
-
-
 
 class ChooseLevel extends StatefulWidget {
   @override
@@ -41,22 +40,18 @@ class _ChooseLevelState extends State<ChooseLevel> {
     getLevels();
 
     getOffer();
-
   }
 
-
-  void getLevels() async{
-
+  void getLevels() async {
     levels = [];
 
-    if(await checkConnectionn()){
-
+    if (await checkConnectionn()) {
       loading(context: context);
 
-      FirebaseFirestore.instance.collection('levels').get(const GetOptions(source: Source.server))
+      FirebaseFirestore.instance
+          .collection('levels')
+          .get(const GetOptions(source: Source.server))
           .then((value) {
-
-
         final List<level> loadData = [];
 
         for (var element in value.docs) {
@@ -68,12 +63,11 @@ class _ChooseLevelState extends State<ChooseLevel> {
             nameAr: element.data()['nameAr'] ?? "",
             nameEN: element.data()['nameEN'] ?? "",
             price: element.data()['price'] ?? "",
-            checkBox: Checkbox(value: false, onChanged: (v){}),
+            checkBox: Checkbox(value: false, onChanged: (v) {}),
             checkBoxValue: false,
             text: "",
             isExpanded: false,
             status: element.data()['status'] ?? "",
-
           ));
         }
 
@@ -84,63 +78,60 @@ class _ChooseLevelState extends State<ChooseLevel> {
         });
 
         Navigator.of(context).pop();
-
       }).onError((error, stackTrace) {
-
         log(error.toString());
         showToast("Error: $error");
-
       });
-
-    }else{
-
+    } else {
       showToast("Check Internet Connection !");
-
     }
-
   }
 
-  void getOffer() async{
+  void getOffer() async {
+    if (await checkConnectionn()) {
+      loading(context: context);
 
-    if(await checkConnectionn()){
+      FirebaseFirestore.instance
+          .collection('students')
+          .doc(FirebaseAuth.instance.currentUser!.uid)
+          .get(const GetOptions(source: Source.server))
+          .then((value) {
+        if (value.get("status") == "") {
+          setState(() {
+            offerTrial = true;
+          });
+        } else {
+          setState(() {
+            offerTrial = false;
+          });
+        }
 
-    loading(context: context);
-
-    FirebaseFirestore.instance.collection('students').doc(FirebaseAuth.instance.currentUser!.uid).get(const GetOptions(source: Source.server))
-        .then((value) {
-
-          if(value.get("status") == ""){
-
-            setState(() {
-              offerTrial = true;
-            });
-
-          }else{
-            setState(() {
-              offerTrial = false;
-            });
-          }
-
-          Navigator.of(context).pop();
-
-    }).onError((error, stackTrace) {
-
-    log(error.toString());
-    showToast("Error: $error");
-
-    });
-
-    }else{
-
-    showToast("Check Internet Connection !");
-
+        Navigator.of(context).pop();
+      }).onError((error, stackTrace) {
+        log(error.toString());
+        showToast("Error: $error");
+      });
+    } else {
+      showToast("Check Internet Connection !");
     }
-
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        elevation: 0.0,
+        backgroundColor: Colors.white,
+        leading: IconButton(
+          icon: Icon(
+            Icons.arrow_back_ios,
+            color: Colors.black,
+          ),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+      ),
       backgroundColor: Colors.white,
       body: SafeArea(
         child: SingleChildScrollView(
@@ -151,75 +142,75 @@ class _ChooseLevelState extends State<ChooseLevel> {
               children: [
                 Row(
                   children: [
-                    Text(
-                      LocaleKeys.select_levels.tr(),
-                      style: GoogleFonts.rubik(
-                        fontSize: 28.0,
-                        fontWeight: FontWeight.bold,
+                    Padding(
+                      padding: const EdgeInsets.only(left: 8.0),
+                      child: Text(
+                        LocaleKeys.select_levels.tr(),
+                        style: GoogleFonts.rubik(
+                          fontSize: 24.0,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
+                    Spacer(),
+                    smalldefaultButton(
+                      onpressed: () {},
+                      context: context,
+                      color: dodblue,
+                      text: 'Free Trial',
+                    ),
+                    offerTrial
+                        ? GestureDetector(
+                            onTap: () async {
+                              if (await checkConnectionn()) {
+                                loading(context: context);
 
-                    offerTrial? GestureDetector(
-                      onTap: () async{
+                                FirebaseFirestore.instance
+                                    .collection('students')
+                                    .doc(FirebaseAuth.instance.currentUser!.uid)
+                                    .update({
+                                  'status': "trial",
+                                  'trialStartingDate': DateTime.now(),
+                                }).then((value) {
+                                  Navigator.of(context).pop();
 
-                        if(await checkConnectionn()){
-
-                        loading(context: context);
-
-                        FirebaseFirestore.instance.collection('students').doc(FirebaseAuth.instance.currentUser!.uid).update({
-                        'status': "trial",
-                        'trialStartingDate': DateTime.now(),
-
-                        })
-                            .then((value) {
-
-                        Navigator.of(context).pop();
-
-                        Navigator.of(context).push(MaterialPageRoute(builder: (context)=> MainScreen()));
-
-                        })
-                            .catchError((error) {
-
-                        showToast("Failed to add: $error");
-                        print("Failed to add: $error");
-
-                        });
-
-                        }else{
-
-                        showToast("Check Internet Connection !");
-
-                        }
-
-                      },
-                      child: Container(
-                        alignment: Alignment.center,
-                        height: MediaQuery.of(context).size.height * 0.07,
-                        decoration: BoxDecoration(
-                          color: Color(0XFF3787ff),
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            // SizedBox(width: MediaQuery.of(context).size.width*0.05,),
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text(
-                                LocaleKeys.free_trial.tr(),
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 16,
-                                  // fontWeight: FontWeight.bold,
-                                ),
+                                  Navigator.of(context).push(MaterialPageRoute(
+                                      builder: (context) => MainScreen()));
+                                }).catchError((error) {
+                                  showToast("Failed to add: $error");
+                                  print("Failed to add: $error");
+                                });
+                              } else {
+                                showToast("Check Internet Connection !");
+                              }
+                            },
+                            child: Container(
+                              alignment: Alignment.center,
+                              height: MediaQuery.of(context).size.height * 0.07,
+                              decoration: BoxDecoration(
+                                color: Color(0XFF3787ff),
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  // SizedBox(width: MediaQuery.of(context).size.width*0.05,),
+                                  Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Text(
+                                      LocaleKeys.free_trial.tr(),
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 16,
+                                        // fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
-                          ],
-                        ),
-                      ),
-                    )
+                          )
                         : Container()
-
                   ],
                 ),
                 SizedBox(
@@ -367,7 +358,10 @@ class _ChooseLevelState extends State<ChooseLevel> {
                       headerBuilder: (BuildContext context, bool isExpanded) {
                         return ListTile(
                           leading: level.checkBox,
-                          title: Text(Localizations.localeOf(context).toString() == "en" ? level.nameEN : level.nameAr),
+                          title: Text(
+                              Localizations.localeOf(context).toString() == "en"
+                                  ? level.nameEN
+                                  : level.nameAr),
                         );
                       },
                       body: ListTile(
@@ -388,4 +382,3 @@ class _ChooseLevelState extends State<ChooseLevel> {
     );
   }
 }
-

@@ -39,12 +39,6 @@ Widget profileWidget({
           ),
         ],
       )),
-      IconButton(
-          onPressed: () {},
-          icon: Icon(
-            Icons.close,
-            size: MediaQuery.of(context).size.width * 0.08,
-          )),
     ],
   );
 }

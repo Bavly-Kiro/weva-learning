@@ -8,11 +8,14 @@ class FriendsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView.builder(itemBuilder: (context, index) {
-      return friendCard(
-        context,
-        'Friend ${index + 1}',
-        'https://www.onlinewebfonts.com/icon/553330',
-        "01222222222",
+      return Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: friendCard(
+          context,
+          'Friend ${index + 1}',
+          'https://thumbs.dreamstime.com/b/male-student-portrait-handsome-man-enjoy-study-home-schooling-concept-education-knowledge-work-as-office-assistant-178491145.jpg',
+          "012",
+        ),
       );
     });
   }

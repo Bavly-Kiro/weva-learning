@@ -31,14 +31,14 @@ Widget scoreStack({
           width: MediaQuery.of(context).size.width,
           height: MediaQuery.of(context).size.height * 0.1,
           child: Padding(
-            padding: const EdgeInsets.only(left: 8.0),
+            padding: const EdgeInsets.only(left: 12.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(score,
                     style: GoogleFonts.rubik(
-                      fontSize: 15,
+                      fontSize: 14,
                       color: Colors.black,
                       fontWeight: FontWeight.bold,
                     )),
@@ -47,7 +47,7 @@ Widget scoreStack({
                 ),
                 Text(subject,
                     style: GoogleFonts.rubik(
-                      fontSize: 9,
+                      fontSize: 12,
                       color: Colors.black,
                     )),
               ],

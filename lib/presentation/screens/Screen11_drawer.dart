@@ -169,12 +169,13 @@ class _Drawer11State extends State<Drawer11> {
           } else {
             return SafeArea(
               child: Container(
-                width: MediaQuery.of(context).size.width * 0.9,
+                width: MediaQuery.of(context).size.width * 0.7,
                 color: Colors.white,
                 child: Padding(
                   padding: EdgeInsets.only(
-                      top: MediaQuery.of(context).size.height * 0.04,
-                      left: MediaQuery.of(context).size.width * 0.05),
+                    top: MediaQuery.of(context).size.height * 0.04,
+                    left: MediaQuery.of(context).size.width * 0.05,
+                  ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -183,6 +184,9 @@ class _Drawer11State extends State<Drawer11> {
                           image: AssetImage("assets/images/Group 624543.png"),
                           name: name,
                           email: email),
+                      SizedBox(
+                        height: MediaQuery.of(context).size.height * 0.01,
+                      ),
                       drawerRow(
                           context: context,
                           icon: Icons.dashboard_outlined,
@@ -228,43 +232,45 @@ class _Drawer11State extends State<Drawer11> {
                         )
                       ],
                     ),*/
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Container(
-                              height: 1,
-                              width: MediaQuery.of(context).size.width * 0.5,
-                              color: Colors.black,
-                            ),
-                            drawerRow(
-                                context: context,
-                                icon: Icons.help_outline,
-                                title: LocaleKeys.about_us.tr(),
-                                onTap: () {}),
-                            drawerRow(
-                                context: context,
-                                icon: Icons.call_outlined,
-                                title: LocaleKeys.support.tr(),
-                                onTap: () {}),
-                            drawerRow(
-                                context: context,
-                                icon: Icons.logout,
-                                title: LocaleKeys.log_out.tr(),
-                                onTap: () async {
-                                  log("tapped");
+                      Spacer(),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Container(
+                            height: 1,
+                            width: MediaQuery.of(context).size.width * 0.5,
+                            color: Colors.black,
+                          ),
+                          drawerRow(
+                              context: context,
+                              icon: Icons.help_outline,
+                              title: LocaleKeys.about_us.tr(),
+                              onTap: () {}),
+                          drawerRow(
+                              context: context,
+                              icon: Icons.call_outlined,
+                              title: LocaleKeys.support.tr(),
+                              onTap: () {}),
+                          drawerRow(
+                              context: context,
+                              icon: Icons.logout,
+                              title: LocaleKeys.log_out.tr(),
+                              onTap: () async {
+                                log("tapped");
 
-                                  if (await checkConnectionn()) {
-                                    showToast("logging out...");
+                                if (await checkConnectionn()) {
+                                  showToast("logging out...");
 
-                                    await FirebaseAuth.instance.signOut();
-                                  } else {
-                                    showToast("Check Internet Connection !");
-                                  }
-                                }),
-                          ],
-                        ),
+                                  await FirebaseAuth.instance.signOut();
+                                } else {
+                                  showToast("Check Internet Connection !");
+                                }
+                              }),
+                          SizedBox(
+                            height: MediaQuery.of(context).size.height * 0.02,
+                          ),
+                        ],
                       ),
                     ],
                   ),

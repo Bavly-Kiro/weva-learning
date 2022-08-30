@@ -4,7 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 Widget friendCard(
     BuildContext context, String name, String imageUrl, String phone) {
   return Padding(
-      padding: EdgeInsets.all(10),
+      padding: EdgeInsets.all(12),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
@@ -14,7 +14,7 @@ Widget friendCard(
             radius: MediaQuery.of(context).size.width * 0.09,
           ),
           SizedBox(
-            width: MediaQuery.of(context).size.width * 0.05,
+            width: MediaQuery.of(context).size.width * 0.04,
           ),
           Expanded(
             child: Column(

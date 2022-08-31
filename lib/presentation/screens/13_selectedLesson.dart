@@ -41,7 +41,6 @@ class SelectedLesson extends StatefulWidget {
 }
 
 class _SelectedLessonState extends State<SelectedLesson> {
-
   TextEditingController notesController = TextEditingController();
 
   String URL = "";
@@ -51,7 +50,6 @@ class _SelectedLessonState extends State<SelectedLesson> {
   void initState() {
     // TODO: implement initState
     super.initState();
-
 
     getVideos();
   }
@@ -77,19 +75,14 @@ class _SelectedLessonState extends State<SelectedLesson> {
         //await videoPlayerController.initialize();
 
         flickManager = FlickManager(
-          onVideoEnd: (){
-
+          onVideoEnd: () {
             showDialog(
                 barrierDismissible: false,
                 context: context,
                 builder: (context) {
-                  return rateAlert(
-                    context,
-                    widget.videoID,
-                    FirebaseAuth.instance.currentUser!.uid
-                  );
+                  return rateAlert(context, widget.videoID,
+                      FirebaseAuth.instance.currentUser!.uid);
                 });
-
           },
           videoPlayerController: VideoPlayerController.network(URL),
         );
@@ -120,35 +113,27 @@ class _SelectedLessonState extends State<SelectedLesson> {
   String noteID = "";
 
   void getNotes() async {
-
     if (await checkConnectionn()) {
-
       FirebaseFirestore.instance
           .collection('Notes')
-          .where("userID", isEqualTo: await FirebaseAuth.instance.currentUser!.uid)
+          .where("userID",
+              isEqualTo: await FirebaseAuth.instance.currentUser!.uid)
           .where("videoID", isEqualTo: widget.videoID)
           .get(const GetOptions(source: Source.server))
           .then((value) async {
-
-
-
         for (var element in value.docs) {
-
           setState(() {
             noteID = element.id;
             notesController.text = element.data()["text"];
           });
-
         }
 
         Navigator.of(context).pop();
-
       }).onError((error, stackTrace) {
         log(error.toString());
         showToast("Error: $error");
       });
-    }
-    else {
+    } else {
       showDialog(
           barrierDismissible: false,
           context: context,
@@ -158,9 +143,7 @@ class _SelectedLessonState extends State<SelectedLesson> {
             );
           });
     }
-
   }
-
 
   @override
   void dispose() {
@@ -177,6 +160,19 @@ class _SelectedLessonState extends State<SelectedLesson> {
   Widget build(BuildContext context) {
     if (kIsWeb) {
       return Scaffold(
+        appBar: AppBar(
+          backgroundColor: Colors.white,
+          elevation: 0.0,
+          leading: IconButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            icon: Icon(
+              Icons.arrow_back_ios,
+              color: Colors.black,
+            ),
+          ),
+        ),
         backgroundColor: Colors.white,
         body: SafeArea(
           child: SingleChildScrollView(
@@ -199,29 +195,34 @@ class _SelectedLessonState extends State<SelectedLesson> {
                   SizedBox(
                     height: MediaQuery.of(context).size.height * 0.03,
                   ),
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(15.0),
-                    child: SizedBox(
-                        height: MediaQuery.of(context).size.width * 0.62,
-                        width: MediaQuery.of(context).size.width * 0.92,
-                        child: loadingg? Center(child: CircularProgressIndicator()) : FlickVideoPlayer(flickManager: flickManager)),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(15.0),
+                        child: SizedBox(
+                            height: MediaQuery.of(context).size.width * 0.4,
+                            width: MediaQuery.of(context).size.width * 0.8,
+                            child: loadingg
+                                ? Center(child: CircularProgressIndicator())
+                                : FlickVideoPlayer(flickManager: flickManager)),
+                      ),
+                    ],
+                  ),
+                  SizedBox(
+                    height: MediaQuery.of(context).size.height * 0.01,
                   ),
                   Row(
                     children: [
                       defaultTextButton(
                         text: LocaleKeys.download_pdf.tr(),
-                        onpressed: () async{
-
+                        onpressed: () async {
                           if (await checkConnectionn()) {
-
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(
                                     builder: (context) => pdfScreen()));
-
-
-                          }
-                          else {
+                          } else {
                             showDialog(
                                 barrierDismissible: false,
                                 context: context,
@@ -231,7 +232,6 @@ class _SelectedLessonState extends State<SelectedLesson> {
                                   );
                                 });
                           }
-
                         },
                         color: Colors.teal,
                       ),
@@ -252,53 +252,40 @@ class _SelectedLessonState extends State<SelectedLesson> {
                       ),
                       Spacer(),
                       defaultTextButton(
-                        text: '${LocaleKeys.save.tr()} ${LocaleKeys.notes.tr()}',
-                        onpressed: () async{
-
-                          if(await checkConnectionn()){
-
+                        text:
+                            '${LocaleKeys.save.tr()} ${LocaleKeys.notes.tr()}',
+                        onpressed: () async {
+                          if (await checkConnectionn()) {
                             loading(context: context);
 
-                            if(noteID == ""){
-
-                              FirebaseFirestore.instance.collection("Notes").add({
-                                'userID': await FirebaseAuth.instance.currentUser!.uid,
+                            if (noteID == "") {
+                              FirebaseFirestore.instance
+                                  .collection("Notes")
+                                  .add({
+                                'userID': await FirebaseAuth
+                                    .instance.currentUser!.uid,
                                 'videoID': widget.videoID,
                                 'text': notesController.text,
-
-                              })
-                                  .catchError((error) {
-
+                              }).catchError((error) {
                                 showToast("Failed to add: $error");
                                 print("Failed to add: $error");
-
                               }).then((value) {
-
                                 Navigator.of(context).pop();
-
                               });
-
-                            }else{
-
-                              FirebaseFirestore.instance.collection("Notes").doc(noteID).update({
+                            } else {
+                              FirebaseFirestore.instance
+                                  .collection("Notes")
+                                  .doc(noteID)
+                                  .update({
                                 'text': notesController.text,
-
-                              })
-                                  .catchError((error) {
-
+                              }).catchError((error) {
                                 showToast("Failed to add: $error");
                                 print("Failed to add: $error");
-
                               }).then((value) {
-
                                 Navigator.of(context).pop();
-
                               });
-
                             }
-
-                          }
-                          else{
+                          } else {
                             showDialog(
                                 barrierDismissible: false,
                                 context: context,
@@ -308,7 +295,6 @@ class _SelectedLessonState extends State<SelectedLesson> {
                                   );
                                 });
                           }
-
                         },
                         color: Colors.teal,
                       ),
@@ -415,22 +401,20 @@ class _SelectedLessonState extends State<SelectedLesson> {
                   ),
                   ClipRRect(
                     borderRadius: BorderRadius.circular(15.0),
-                      child: loadingg? Center(child: CircularProgressIndicator()) : FlickVideoPlayer(flickManager: flickManager),
+                    child: loadingg
+                        ? Center(child: CircularProgressIndicator())
+                        : FlickVideoPlayer(flickManager: flickManager),
                   ),
                   Row(
                     children: [
                       defaultTextButton(
                         text: LocaleKeys.download_pdf.tr(),
-                        onpressed: () async{
-
+                        onpressed: () async {
                           if (await checkConnectionn()) {
-
-                          Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                          builder: (context) => pdfScreen()));
-
-
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => pdfScreen()));
                           } else {
                             showDialog(
                                 barrierDismissible: false,
@@ -441,7 +425,6 @@ class _SelectedLessonState extends State<SelectedLesson> {
                                   );
                                 });
                           }
-
                         },
                         color: Colors.teal,
                       ),
@@ -462,53 +445,40 @@ class _SelectedLessonState extends State<SelectedLesson> {
                       ),
                       Spacer(),
                       defaultTextButton(
-                        text: '${LocaleKeys.save.tr()} ${LocaleKeys.notes.tr()}',
-                        onpressed: () async{
-
-                          if(await checkConnectionn()){
-
+                        text:
+                            '${LocaleKeys.save.tr()} ${LocaleKeys.notes.tr()}',
+                        onpressed: () async {
+                          if (await checkConnectionn()) {
                             loading(context: context);
 
-                            if(noteID == ""){
-
-                              FirebaseFirestore.instance.collection("Notes").add({
-                                'userID': await FirebaseAuth.instance.currentUser!.uid,
+                            if (noteID == "") {
+                              FirebaseFirestore.instance
+                                  .collection("Notes")
+                                  .add({
+                                'userID': await FirebaseAuth
+                                    .instance.currentUser!.uid,
                                 'videoID': widget.videoID,
                                 'text': notesController.text,
-
-                              })
-                                  .catchError((error) {
-
+                              }).catchError((error) {
                                 showToast("Failed to add: $error");
                                 print("Failed to add: $error");
-
                               }).then((value) {
-
                                 Navigator.of(context).pop();
-
                               });
-
-                            }else{
-
-                              FirebaseFirestore.instance.collection("Notes").doc(noteID).update({
+                            } else {
+                              FirebaseFirestore.instance
+                                  .collection("Notes")
+                                  .doc(noteID)
+                                  .update({
                                 'text': notesController.text,
-
-                              })
-                                  .catchError((error) {
-
+                              }).catchError((error) {
                                 showToast("Failed to add: $error");
                                 print("Failed to add: $error");
-
                               }).then((value) {
-
                                 Navigator.of(context).pop();
-
                               });
-
                             }
-
-                          }
-                          else{
+                          } else {
                             showDialog(
                                 barrierDismissible: false,
                                 context: context,
@@ -518,7 +488,6 @@ class _SelectedLessonState extends State<SelectedLesson> {
                                   );
                                 });
                           }
-
                         },
                         color: Colors.teal,
                       ),

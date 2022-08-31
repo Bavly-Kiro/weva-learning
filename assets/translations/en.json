@@ -78,7 +78,8 @@
   "easy": "easy",
   "moderate": "moderate",
   "hard": "hard",
-  "download_pdf": "Download PDF",
+  "download_pdf": "Open PDF",
+  "write_notes": "Write Notes Here....",
 
 
   "no_internet": "No Internet Connection",

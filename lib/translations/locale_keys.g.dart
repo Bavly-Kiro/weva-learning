@@ -103,5 +103,6 @@ abstract class  LocaleKeys {
   static const signup_error1 = 'signup_error1';
   static const signup_error2 = 'signup_error2';
   static const download_pdf = 'download_pdf';
+  static const write_notes = 'write_notes';
 
 }

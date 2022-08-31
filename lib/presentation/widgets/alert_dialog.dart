@@ -1,9 +1,13 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:oktoast/oktoast.dart';
 import 'package:weva/presentation/widgets/default_button.dart';
 
+import '../../back/checkConnection.dart';
+import '../../back/loading.dart';
 import '../../constants.dart';
 import '../../translations/locale_keys.g.dart';
 
@@ -76,7 +80,7 @@ showRating({
       ),
     );
 
-Widget rateAlert(context, func) => AlertDialog(
+Widget rateAlert(context, videoID, userID) => AlertDialog(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(25),
       ),
@@ -155,7 +159,45 @@ Widget rateAlert(context, func) => AlertDialog(
             defaultButton(
               color: dodblue,
               text: LocaleKeys.submit.tr(),
-              onpressed: func,
+              onpressed: () async{
+
+                if(await checkConnectionn()){
+
+                  loading(context: context);
+
+                  FirebaseFirestore.instance.collection("Rates").add({
+                    'userID': userID,
+                    'videoID': videoID,
+                    'text': notesController.text,
+                    'rate': rating,
+
+
+                  })
+                      .catchError((error) {
+
+                    showToast("Failed to add: $error");
+                    print("Failed to add: $error");
+
+                  }).then((value) {
+
+                    Navigator.of(context).pop();
+                    Navigator.of(context).pop();
+
+                  });
+
+                }
+                else{
+                  showDialog(
+                      barrierDismissible: false,
+                      context: context,
+                      builder: (context) {
+                        return noInternetAlert(
+                          context,
+                        );
+                      });
+                }
+
+              },
               context: context,
             ),
           ],

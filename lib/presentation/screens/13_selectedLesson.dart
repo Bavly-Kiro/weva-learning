@@ -3,6 +3,7 @@ import 'dart:developer';
 //import 'package:chewie/chewie.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flick_video_player/flick_video_player.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -10,7 +11,9 @@ import 'package:oktoast/oktoast.dart';
 import 'package:video_player/video_player.dart';
 import '../../back/checkConnection.dart';
 import '../../back/loading.dart';
+import '../../back/pdfViewerScreen.dart';
 import '../../translations/locale_keys.g.dart';
+import '../widgets/alert_dialog.dart';
 import '../widgets/default_button.dart';
 import '../widgets/default_text_button.dart';
 import 'Discussion.dart';
@@ -38,6 +41,7 @@ class SelectedLesson extends StatefulWidget {
 }
 
 class _SelectedLessonState extends State<SelectedLesson> {
+
   TextEditingController notesController = TextEditingController();
 
   String URL = "";
@@ -47,6 +51,7 @@ class _SelectedLessonState extends State<SelectedLesson> {
   void initState() {
     // TODO: implement initState
     super.initState();
+
 
     getVideos();
   }
@@ -65,8 +70,6 @@ class _SelectedLessonState extends State<SelectedLesson> {
           imgURL = value.get("imgURL");
         });
 
-        Navigator.of(context).pop();
-
         // _controller = VideoPlayerController.network(URL);
 
         //videoPlayerController = VideoPlayerController.network(URL);
@@ -74,8 +77,28 @@ class _SelectedLessonState extends State<SelectedLesson> {
         //await videoPlayerController.initialize();
 
         flickManager = FlickManager(
+          onVideoEnd: (){
+
+            showDialog(
+                barrierDismissible: false,
+                context: context,
+                builder: (context) {
+                  return rateAlert(
+                    context,
+                    widget.videoID,
+                    FirebaseAuth.instance.currentUser!.uid
+                  );
+                });
+
+          },
           videoPlayerController: VideoPlayerController.network(URL),
         );
+
+        setState(() {
+          loadingg = false;
+        });
+
+        getNotes();
 
         // _controller.initialize();
       }).onError((error, stackTrace) {
@@ -83,9 +106,61 @@ class _SelectedLessonState extends State<SelectedLesson> {
         showToast("Error: $error");
       });
     } else {
-      showToast("Check Internet Connection !");
+      showDialog(
+          barrierDismissible: false,
+          context: context,
+          builder: (context) {
+            return noInternetAlert(
+              context,
+            );
+          });
     }
   }
+
+  String noteID = "";
+
+  void getNotes() async {
+
+    if (await checkConnectionn()) {
+
+      FirebaseFirestore.instance
+          .collection('Notes')
+          .where("userID", isEqualTo: await FirebaseAuth.instance.currentUser!.uid)
+          .where("videoID", isEqualTo: widget.videoID)
+          .get(const GetOptions(source: Source.server))
+          .then((value) async {
+
+
+
+        for (var element in value.docs) {
+
+          setState(() {
+            noteID = element.id;
+            notesController.text = element.data()["text"];
+          });
+
+        }
+
+        Navigator.of(context).pop();
+
+      }).onError((error, stackTrace) {
+        log(error.toString());
+        showToast("Error: $error");
+      });
+    }
+    else {
+      showDialog(
+          barrierDismissible: false,
+          context: context,
+          builder: (context) {
+            return noInternetAlert(
+              context,
+            );
+          });
+    }
+
+  }
+
 
   @override
   void dispose() {
@@ -95,6 +170,8 @@ class _SelectedLessonState extends State<SelectedLesson> {
   }
 
   late FlickManager flickManager;
+
+  bool loadingg = true;
 
   @override
   Widget build(BuildContext context) {
@@ -127,13 +204,35 @@ class _SelectedLessonState extends State<SelectedLesson> {
                     child: SizedBox(
                         height: MediaQuery.of(context).size.width * 0.62,
                         width: MediaQuery.of(context).size.width * 0.92,
-                        child: FlickVideoPlayer(flickManager: flickManager)),
+                        child: loadingg? Center(child: CircularProgressIndicator()) : FlickVideoPlayer(flickManager: flickManager)),
                   ),
                   Row(
                     children: [
                       defaultTextButton(
                         text: LocaleKeys.download_pdf.tr(),
-                        onpressed: () {},
+                        onpressed: () async{
+
+                          if (await checkConnectionn()) {
+
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => pdfScreen()));
+
+
+                          }
+                          else {
+                            showDialog(
+                                barrierDismissible: false,
+                                context: context,
+                                builder: (context) {
+                                  return noInternetAlert(
+                                    context,
+                                  );
+                                });
+                          }
+
+                        },
                         color: Colors.teal,
                       ),
                       Icon(
@@ -145,7 +244,7 @@ class _SelectedLessonState extends State<SelectedLesson> {
                   Row(
                     children: [
                       Text(
-                        'Notes',
+                        LocaleKeys.notes.tr(),
                         style: GoogleFonts.rubik(
                           fontSize: 26.0,
                           fontWeight: FontWeight.bold,
@@ -153,8 +252,64 @@ class _SelectedLessonState extends State<SelectedLesson> {
                       ),
                       Spacer(),
                       defaultTextButton(
-                        text: 'Save Notes',
-                        onpressed: () {},
+                        text: '${LocaleKeys.save.tr()} ${LocaleKeys.notes.tr()}',
+                        onpressed: () async{
+
+                          if(await checkConnectionn()){
+
+                            loading(context: context);
+
+                            if(noteID == ""){
+
+                              FirebaseFirestore.instance.collection("Notes").add({
+                                'userID': await FirebaseAuth.instance.currentUser!.uid,
+                                'videoID': widget.videoID,
+                                'text': notesController.text,
+
+                              })
+                                  .catchError((error) {
+
+                                showToast("Failed to add: $error");
+                                print("Failed to add: $error");
+
+                              }).then((value) {
+
+                                Navigator.of(context).pop();
+
+                              });
+
+                            }else{
+
+                              FirebaseFirestore.instance.collection("Notes").doc(noteID).update({
+                                'text': notesController.text,
+
+                              })
+                                  .catchError((error) {
+
+                                showToast("Failed to add: $error");
+                                print("Failed to add: $error");
+
+                              }).then((value) {
+
+                                Navigator.of(context).pop();
+
+                              });
+
+                            }
+
+                          }
+                          else{
+                            showDialog(
+                                barrierDismissible: false,
+                                context: context,
+                                builder: (context) {
+                                  return noInternetAlert(
+                                    context,
+                                  );
+                                });
+                          }
+
+                        },
                         color: Colors.teal,
                       ),
                     ],
@@ -168,14 +323,14 @@ class _SelectedLessonState extends State<SelectedLesson> {
                       controller: notesController,
                       decoration: InputDecoration(
                         border: InputBorder.none,
-                        hintText: 'Write Notes Here',
+                        hintText: LocaleKeys.write_notes.tr(),
                       ),
                       keyboardType: TextInputType.multiline,
                       maxLines: null,
                     ),
                   ),
                   Text(
-                    'Exam:',
+                    LocaleKeys.exams.tr(),
                     style: GoogleFonts.rubik(
                       fontSize: 18.0,
                       fontWeight: FontWeight.bold,
@@ -190,7 +345,7 @@ class _SelectedLessonState extends State<SelectedLesson> {
                       webdefaultButton(
                         context: context,
                         color: Colors.green,
-                        text: 'Easy',
+                        text: LocaleKeys.easy.tr(),
                         onpressed: () {
                           Navigator.push(context,
                               MaterialPageRoute(builder: (context) => Exam()));
@@ -199,7 +354,7 @@ class _SelectedLessonState extends State<SelectedLesson> {
                       webdefaultButton(
                         context: context,
                         color: Colors.yellow.shade800,
-                        text: 'Medium',
+                        text: LocaleKeys.moderate.tr(),
                         onpressed: () {
                           Navigator.push(
                               context,
@@ -210,7 +365,7 @@ class _SelectedLessonState extends State<SelectedLesson> {
                       webdefaultButton(
                         context: context,
                         color: Colors.red,
-                        text: 'Hard',
+                        text: LocaleKeys.hard.tr(),
                         onpressed: () {},
                       ),
                     ],
@@ -260,13 +415,34 @@ class _SelectedLessonState extends State<SelectedLesson> {
                   ),
                   ClipRRect(
                     borderRadius: BorderRadius.circular(15.0),
-                    child: FlickVideoPlayer(flickManager: flickManager),
+                      child: loadingg? Center(child: CircularProgressIndicator()) : FlickVideoPlayer(flickManager: flickManager),
                   ),
                   Row(
                     children: [
                       defaultTextButton(
-                        text: 'Download PDF',
-                        onpressed: () {},
+                        text: LocaleKeys.download_pdf.tr(),
+                        onpressed: () async{
+
+                          if (await checkConnectionn()) {
+
+                          Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                          builder: (context) => pdfScreen()));
+
+
+                          } else {
+                            showDialog(
+                                barrierDismissible: false,
+                                context: context,
+                                builder: (context) {
+                                  return noInternetAlert(
+                                    context,
+                                  );
+                                });
+                          }
+
+                        },
                         color: Colors.teal,
                       ),
                       Icon(
@@ -278,7 +454,7 @@ class _SelectedLessonState extends State<SelectedLesson> {
                   Row(
                     children: [
                       Text(
-                        'Notes',
+                        LocaleKeys.notes.tr(),
                         style: GoogleFonts.rubik(
                           fontSize: 26.0,
                           fontWeight: FontWeight.bold,
@@ -286,8 +462,64 @@ class _SelectedLessonState extends State<SelectedLesson> {
                       ),
                       Spacer(),
                       defaultTextButton(
-                        text: 'Save Notes',
-                        onpressed: () {},
+                        text: '${LocaleKeys.save.tr()} ${LocaleKeys.notes.tr()}',
+                        onpressed: () async{
+
+                          if(await checkConnectionn()){
+
+                            loading(context: context);
+
+                            if(noteID == ""){
+
+                              FirebaseFirestore.instance.collection("Notes").add({
+                                'userID': await FirebaseAuth.instance.currentUser!.uid,
+                                'videoID': widget.videoID,
+                                'text': notesController.text,
+
+                              })
+                                  .catchError((error) {
+
+                                showToast("Failed to add: $error");
+                                print("Failed to add: $error");
+
+                              }).then((value) {
+
+                                Navigator.of(context).pop();
+
+                              });
+
+                            }else{
+
+                              FirebaseFirestore.instance.collection("Notes").doc(noteID).update({
+                                'text': notesController.text,
+
+                              })
+                                  .catchError((error) {
+
+                                showToast("Failed to add: $error");
+                                print("Failed to add: $error");
+
+                              }).then((value) {
+
+                                Navigator.of(context).pop();
+
+                              });
+
+                            }
+
+                          }
+                          else{
+                            showDialog(
+                                barrierDismissible: false,
+                                context: context,
+                                builder: (context) {
+                                  return noInternetAlert(
+                                    context,
+                                  );
+                                });
+                          }
+
+                        },
                         color: Colors.teal,
                       ),
                     ],
@@ -299,7 +531,7 @@ class _SelectedLessonState extends State<SelectedLesson> {
                     controller: notesController,
                     decoration: InputDecoration(
                       border: InputBorder.none,
-                      hintText: 'Write Notes Here',
+                      hintText: LocaleKeys.write_notes.tr(),
                     ),
                     keyboardType: TextInputType.multiline,
                     maxLines: null,
@@ -308,7 +540,7 @@ class _SelectedLessonState extends State<SelectedLesson> {
                     height: MediaQuery.of(context).size.height * 0.15,
                   ),
                   Text(
-                    'Exam:',
+                    LocaleKeys.exams.tr(),
                     style: GoogleFonts.rubik(
                       fontSize: 18.0,
                       fontWeight: FontWeight.bold,
@@ -323,7 +555,7 @@ class _SelectedLessonState extends State<SelectedLesson> {
                       defaultButton(
                         context: context,
                         color: Colors.green,
-                        text: 'Easy',
+                        text: LocaleKeys.easy.tr(),
                         onpressed: () {
                           Navigator.push(context,
                               MaterialPageRoute(builder: (context) => Exam()));
@@ -332,7 +564,7 @@ class _SelectedLessonState extends State<SelectedLesson> {
                       defaultButton(
                         context: context,
                         color: Colors.yellow.shade800,
-                        text: 'Medium',
+                        text: LocaleKeys.moderate.tr(),
                         onpressed: () {
                           Navigator.push(
                               context,
@@ -343,7 +575,7 @@ class _SelectedLessonState extends State<SelectedLesson> {
                       defaultButton(
                         context: context,
                         color: Colors.red,
-                        text: 'Hard',
+                        text: LocaleKeys.hard.tr(),
                         onpressed: () {},
                       ),
                     ],

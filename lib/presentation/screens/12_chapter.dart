@@ -13,6 +13,8 @@ import '../widgets/registration_button.dart';
 import 'ListofVideos.dart';
 import '13_selectedLesson.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/foundation.dart';
+
 
 // ignore_for_file: prefer_const_constructors
 
@@ -288,7 +290,8 @@ class _ChapterState extends State<Chapter> {
             ),
           ),
         ),
-      );    } else {
+      );    }
+    else {
       return Scaffold(
         appBar: AppBar(
           backgroundColor: Colors.white,

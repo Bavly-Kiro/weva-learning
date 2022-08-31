@@ -78,7 +78,8 @@
   "easy": "سهل",
   "moderate": "متوسط",
   "hard": "صعب",
-  "download_pdf": "تنزيل الPDF",
+  "download_pdf": "فتح الPDF",
+  "write_notes": "اكتب ملاحظاتك الخاصة بهذا الدرس هنا....",
 
 
   "no_internet": "لا يوجد انترنت",

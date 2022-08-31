@@ -123,7 +123,6 @@ Widget rateAlert(context, videoID, userID) => AlertDialog(
           SizedBox(
             height: MediaQuery.of(context).size.height * 0.01,
           ),
-
           Container(
             height: MediaQuery.of(context).size.height * 0.07,
             child: TextField(
@@ -136,8 +135,110 @@ Widget rateAlert(context, videoID, userID) => AlertDialog(
               maxLines: null,
             ),
           ),
-
           buildRating(),
+        ],
+      ),
+      actions: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            defaultButton(
+              context: context,
+              color: Colors.white70,
+              textColor: Colors.black,
+              text: LocaleKeys.cancel.tr(),
+              onpressed: () {
+                Navigator.pop(context);
+
+                rating = 0;
+              },
+            ),
+            SizedBox(
+              width: MediaQuery.of(context).size.width * 0.03,
+            ),
+            defaultButton(
+              color: dodblue,
+              text: LocaleKeys.submit.tr(),
+              onpressed: () async {
+                if (await checkConnectionn()) {
+                  loading(context: context);
+
+                  FirebaseFirestore.instance.collection("Rates").add({
+                    'userID': userID,
+                    'videoID': videoID,
+                    'text': notesController.text,
+                    'rate': rating,
+                  }).catchError((error) {
+                    showToast("Failed to add: $error");
+                    print("Failed to add: $error");
+                  }).then((value) {
+                    Navigator.of(context).pop();
+                    Navigator.of(context).pop();
+                  });
+                } else {
+                  showDialog(
+                      barrierDismissible: false,
+                      context: context,
+                      builder: (context) {
+                        return noInternetAlert(
+                          context,
+                        );
+                      });
+                }
+              },
+              context: context,
+            ),
+          ],
+        ),
+        SizedBox(
+          height: MediaQuery.of(context).size.height * 0.02,
+        ),
+      ],
+    );
+
+Widget noInternetAlert(context) => AlertDialog(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(25),
+      ),
+      title: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              // Image(
+              //   image: AssetImage(
+              //     "assets/images/wave.png",
+              //   ),
+              //   height: 50,
+              //   width: 50,
+              // ),
+              Icon(
+                Icons.signal_wifi_connected_no_internet_4_rounded,
+                color: dodblue,
+                size: 100,
+              ),
+            ],
+          ),
+          Text(
+            LocaleKeys.no_internet.tr(),
+            style: GoogleFonts.rubik(
+              fontSize: 22.0,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          SizedBox(
+            height: MediaQuery.of(context).size.height * 0.01,
+          ),
+          Text(
+            LocaleKeys.please_internet.tr(),
+            style: GoogleFonts.rubik(
+              fontSize: 16.0,
+              color: Colors.grey,
+            ),
+          ),
+          SizedBox(
+            height: MediaQuery.of(context).size.height * 0.01,
+          ),
         ],
       ),
       actions: [
@@ -153,53 +254,6 @@ Widget rateAlert(context, videoID, userID) => AlertDialog(
                 Navigator.pop(context);
               },
             ),
-            SizedBox(
-              width: MediaQuery.of(context).size.width * 0.03,
-            ),
-            defaultButton(
-              color: dodblue,
-              text: LocaleKeys.submit.tr(),
-              onpressed: () async{
-
-                if(await checkConnectionn()){
-
-                  loading(context: context);
-
-                  FirebaseFirestore.instance.collection("Rates").add({
-                    'userID': userID,
-                    'videoID': videoID,
-                    'text': notesController.text,
-                    'rate': rating,
-
-
-                  })
-                      .catchError((error) {
-
-                    showToast("Failed to add: $error");
-                    print("Failed to add: $error");
-
-                  }).then((value) {
-
-                    Navigator.of(context).pop();
-                    Navigator.of(context).pop();
-
-                  });
-
-                }
-                else{
-                  showDialog(
-                      barrierDismissible: false,
-                      context: context,
-                      builder: (context) {
-                        return noInternetAlert(
-                          context,
-                        );
-                      });
-                }
-
-              },
-              context: context,
-            ),
           ],
         ),
         SizedBox(
@@ -208,79 +262,13 @@ Widget rateAlert(context, videoID, userID) => AlertDialog(
       ],
     );
 
-Widget noInternetAlert(context) => AlertDialog(
-  shape: RoundedRectangleBorder(
-    borderRadius: BorderRadius.circular(25),
-  ),
-  title: Column(
-    children: [
-      Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          // Image(
-          //   image: AssetImage(
-          //     "assets/images/wave.png",
-          //   ),
-          //   height: 50,
-          //   width: 50,
-          // ),
-          Icon(
-            Icons.signal_wifi_connected_no_internet_4_rounded,
-            color: dodblue,
-            size: 100,
-          ),
-        ],
-      ),
-      Text(
-        LocaleKeys.no_internet.tr(),
-        style: GoogleFonts.rubik(
-          fontSize: 22.0,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
-      SizedBox(
-        height: MediaQuery.of(context).size.height * 0.01,
-      ),
-      Text(
-        LocaleKeys.please_internet.tr(),
-        style: GoogleFonts.rubik(
-          fontSize: 16.0,
-          color: Colors.grey,
-        ),
-      ),
-      SizedBox(
-        height: MediaQuery.of(context).size.height * 0.01,
-      ),
-    ],
-  ),
-  actions: [
-    Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        defaultButton(
-          context: context,
-          color: Colors.white70,
-          textColor: Colors.black,
-          text: LocaleKeys.cancel.tr(),
-          onpressed: () {
-            Navigator.pop(context);
-          },
-        ),
-      ],
-    ),
-    SizedBox(
-      height: MediaQuery.of(context).size.height * 0.02,
-    ),
-  ],
-);
-
 Widget textAlert(context, String text1, String text2) => AlertDialog(
-  shape: RoundedRectangleBorder(
-    borderRadius: BorderRadius.circular(25),
-  ),
-  title: Column(
-    children: [
-      /*Row(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(25),
+      ),
+      title: Column(
+        children: [
+          /*Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           // Image(
@@ -297,47 +285,45 @@ Widget textAlert(context, String text1, String text2) => AlertDialog(
           ),
         ],
       ),*/
-      Text(
-        text1,
-        style: GoogleFonts.rubik(
-          fontSize: 22.0,
-          fontWeight: FontWeight.bold,
+          Text(
+            text1,
+            style: GoogleFonts.rubik(
+              fontSize: 22.0,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          SizedBox(
+            height: MediaQuery.of(context).size.height * 0.01,
+          ),
+          Text(
+            text2,
+            style: GoogleFonts.rubik(
+              fontSize: 16.0,
+              color: Colors.grey,
+            ),
+          ),
+          SizedBox(
+            height: MediaQuery.of(context).size.height * 0.01,
+          ),
+        ],
+      ),
+      actions: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            defaultButton(
+              context: context,
+              color: Colors.white70,
+              textColor: Colors.black,
+              text: LocaleKeys.cancel.tr(),
+              onpressed: () {
+                Navigator.pop(context);
+              },
+            ),
+          ],
         ),
-      ),
-      SizedBox(
-        height: MediaQuery.of(context).size.height * 0.01,
-      ),
-      Text(
-        text2,
-        style: GoogleFonts.rubik(
-          fontSize: 16.0,
-          color: Colors.grey,
+        SizedBox(
+          height: MediaQuery.of(context).size.height * 0.02,
         ),
-      ),
-      SizedBox(
-        height: MediaQuery.of(context).size.height * 0.01,
-      ),
-    ],
-  ),
-  actions: [
-    Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        defaultButton(
-          context: context,
-          color: Colors.white70,
-          textColor: Colors.black,
-          text: LocaleKeys.cancel.tr(),
-          onpressed: () {
-            Navigator.pop(context);
-          },
-        ),
-
       ],
-    ),
-    SizedBox(
-      height: MediaQuery.of(context).size.height * 0.02,
-    ),
-  ],
-);
-
+    );

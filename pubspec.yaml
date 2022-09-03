@@ -57,6 +57,8 @@ dependencies:
   shared_preferences: ^2.0.15
   flick_video_player: ^0.5.0
   syncfusion_flutter_pdfviewer: ^20.2.46-beta
+  visibility_detector: ^0.3.3
+
 
 dev_dependencies:
   flutter_test:

@@ -38,6 +38,9 @@ class _ChapterState extends State<Chapter> {
 
     getChapters();
 
+    Selectedvalue1 = null;
+    Selectedvalue2 = null;
+
   }
 
   List<chapter> chapters = [];
@@ -80,7 +83,7 @@ class _ChapterState extends State<Chapter> {
 
         }
 
-        loadData.sort((a, b) => a.chNum.compareTo(b.chNum));
+        //loadData.sort((a, b) => a.chNum.compareTo(b.chNum));
 
         setState(() {
           chapters = loadData;
@@ -147,7 +150,7 @@ class _ChapterState extends State<Chapter> {
 
         }
 
-        loadData.sort((a, b) => a.lessNum.compareTo(b.lessNum));
+        //loadData.sort((a, b) => a.lessNum.compareTo(b.lessNum));
 
         setState(() {
           lessons = loadData;
@@ -272,7 +275,7 @@ class _ChapterState extends State<Chapter> {
 
                           if(Selectedvalue1 != null && Selectedvalue2 != null){
 
-                            Navigator.of(context).push(MaterialPageRoute(builder: (context)=> ListofVids(chName: Selectedvalue1!, lessonID: lessons[lessons.indexWhere((f) => (Localizations.localeOf(context).toString() == "en"? f.nameEN : f.nameAr) == Selectedvalue2)].idToEdit, nameAR: lessons[lessons.indexWhere((f) => (Localizations.localeOf(context).toString() == "en"? f.nameEN : f.nameAr) == Selectedvalue2)].nameAr, nameEN: lessons[lessons.indexWhere((f) => (Localizations.localeOf(context).toString() == "en"? f.nameEN : f.nameAr) == Selectedvalue2)].nameEN, lesonNum: lessons[lessons.indexWhere((f) => (Localizations.localeOf(context).toString() == "en"? f.nameEN : f.nameAr) == Selectedvalue2)].lessNum)));
+                            Navigator.of(context).push(MaterialPageRoute(builder: (context)=> ListofVids(chName: Selectedvalue1!, lessonID: lessons[lessons.indexWhere((f) => (Localizations.localeOf(context).toString() == "en"? f.nameEN : f.nameAr) == Selectedvalue2)].idToEdit, nameAR: lessons[lessons.indexWhere((f) => (Localizations.localeOf(context).toString() == "en"? f.nameEN : f.nameAr) == Selectedvalue2)].nameAr, nameEN: lessons[lessons.indexWhere((f) => (Localizations.localeOf(context).toString() == "en"? f.nameEN : f.nameAr) == Selectedvalue2)].nameEN, lesonNum: lessons[lessons.indexWhere((f) => (Localizations.localeOf(context).toString() == "en"? f.nameEN : f.nameAr) == Selectedvalue2)].lessNum,subjectName: widget.name,)));
 
                           }
 
@@ -390,7 +393,7 @@ class _ChapterState extends State<Chapter> {
 
                           if(Selectedvalue1 != null && Selectedvalue2 != null){
 
-                            Navigator.of(context).push(MaterialPageRoute(builder: (context)=> ListofVids(chName: Selectedvalue1!, lessonID: lessons[lessons.indexWhere((f) => (Localizations.localeOf(context).toString() == "en"? f.nameEN : f.nameAr) == Selectedvalue2)].idToEdit, nameAR: lessons[lessons.indexWhere((f) => (Localizations.localeOf(context).toString() == "en"? f.nameEN : f.nameAr) == Selectedvalue2)].nameAr, nameEN: lessons[lessons.indexWhere((f) => (Localizations.localeOf(context).toString() == "en"? f.nameEN : f.nameAr) == Selectedvalue2)].nameEN, lesonNum: lessons[lessons.indexWhere((f) => (Localizations.localeOf(context).toString() == "en"? f.nameEN : f.nameAr) == Selectedvalue2)].lessNum)));
+                            Navigator.of(context).push(MaterialPageRoute(builder: (context)=> ListofVids(chName: Selectedvalue1!, lessonID: lessons[lessons.indexWhere((f) => (Localizations.localeOf(context).toString() == "en"? f.nameEN : f.nameAr) == Selectedvalue2)].idToEdit, nameAR: lessons[lessons.indexWhere((f) => (Localizations.localeOf(context).toString() == "en"? f.nameEN : f.nameAr) == Selectedvalue2)].nameAr, nameEN: lessons[lessons.indexWhere((f) => (Localizations.localeOf(context).toString() == "en"? f.nameEN : f.nameAr) == Selectedvalue2)].nameEN, lesonNum: lessons[lessons.indexWhere((f) => (Localizations.localeOf(context).toString() == "en"? f.nameEN : f.nameAr) == Selectedvalue2)].lessNum, subjectName: widget.name,)));
 
                           }
 

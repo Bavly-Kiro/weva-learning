@@ -10,6 +10,7 @@ import '../../back/checkConnection.dart';
 import '../../back/loading.dart';
 import '../../constants.dart';
 import '../../translations/locale_keys.g.dart';
+import '../screens/Exam.dart';
 
 //
 // Widget ClickAlert({
@@ -327,3 +328,57 @@ Widget textAlert(context, String text1, String text2) => AlertDialog(
         ),
       ],
     );
+
+Widget openExam(context, videoID, userID, type, subjectName) => AlertDialog(
+  shape: RoundedRectangleBorder(
+    borderRadius: BorderRadius.circular(25),
+  ),
+  title: Column(
+    children: [
+      Text(
+        LocaleKeys.be_ready.tr(),
+        style: GoogleFonts.rubik(
+          fontSize: 22.0,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+      SizedBox(
+        height: MediaQuery.of(context).size.height * 0.01,
+      ),
+    ],
+  ),
+  actions: [
+    Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        defaultButton(
+          context: context,
+          color: Colors.white70,
+          textColor: Colors.black,
+          text: LocaleKeys.cancel.tr(),
+          onpressed: () {
+
+            Navigator.pop(context);
+
+          },
+        ),
+        SizedBox(
+          width: MediaQuery.of(context).size.width * 0.03,
+        ),
+        defaultButton(
+          color: Colors.green,
+          text: LocaleKeys.start.tr(),
+          onpressed: () async {
+
+            Navigator.push(context, MaterialPageRoute(builder: (context) => Exam(userID: userID, videoID: videoID, type: type,subjectName: subjectName,)));
+
+          },
+          context: context,
+        ),
+      ],
+    ),
+    SizedBox(
+      height: MediaQuery.of(context).size.height * 0.02,
+    ),
+  ],
+);

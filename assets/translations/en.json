@@ -75,6 +75,7 @@
   "notes": "Notes",
   "save": "Save",
   "exams": "Exams",
+  "exam": "Exam",
   "easy": "easy",
   "moderate": "moderate",
   "hard": "hard",
@@ -134,8 +135,10 @@
   "inv_email1": "Invalid Email",
   "inv_email2": "the email you entered is Invalid, please check it again",
   "signup_error1": "Error",
-  "signup_error2": "Error Occurred please contact us, error code: 301"
+  "signup_error2": "Error Occurred please contact us, error code: 301",
 
+  "start": "Start Now",
+  "be_ready": "be ready, timer will start immediately"
 
 
 }

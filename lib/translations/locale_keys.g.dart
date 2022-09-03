@@ -104,5 +104,8 @@ abstract class  LocaleKeys {
   static const signup_error2 = 'signup_error2';
   static const download_pdf = 'download_pdf';
   static const write_notes = 'write_notes';
+  static const start = 'start';
+  static const be_ready = 'be_ready';
+  static const exam = 'exam';
 
 }

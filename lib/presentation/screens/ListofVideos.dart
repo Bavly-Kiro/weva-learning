@@ -20,6 +20,7 @@ class ListofVids extends StatefulWidget {
       required this.lessonID,
       required this.nameAR,
       required this.nameEN,
+      required this.subjectName,
       required this.lesonNum})
       : super(key: key);
 
@@ -27,6 +28,7 @@ class ListofVids extends StatefulWidget {
   String lessonID;
   String nameAR;
   String nameEN;
+  String subjectName;
   int lesonNum;
 
   @override
@@ -236,7 +238,8 @@ class _ListofVidsState extends State<ListofVids> {
                                                 .toString() ==
                                             "en"
                                         ? videos[index].nameEN
-                                        : videos[index].nameAr)));
+                                        : videos[index].nameAr,
+                                subjectName: widget.subjectName,)));
                       },
                       title: Text(
                         Localizations.localeOf(context).toString() == "en"

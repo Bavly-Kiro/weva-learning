@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:oktoast/oktoast.dart';
 import 'package:video_player/video_player.dart';
+import 'package:visibility_detector/visibility_detector.dart';
 import '../../back/checkConnection.dart';
 import '../../back/loading.dart';
 import '../../back/pdfViewerScreen.dart';
@@ -28,12 +29,14 @@ class SelectedLesson extends StatefulWidget {
       required this.videoID,
       required this.chaName,
       required this.lessonName,
+      required this.subjectName,
       required this.videoName})
       : super(key: key);
 
   String videoID;
   String chaName;
   String lessonName;
+  String subjectName;
   String videoName;
 
   @override
@@ -45,6 +48,7 @@ class _SelectedLessonState extends State<SelectedLesson> {
 
   String URL = "";
   String imgURL = "";
+  String PDFURL = "";
 
   @override
   void initState() {
@@ -66,6 +70,8 @@ class _SelectedLessonState extends State<SelectedLesson> {
         setState(() {
           URL = value.get("URL");
           imgURL = value.get("imgURL");
+          PDFURL = value.get("documentURL");
+
         });
 
         // _controller = VideoPlayerController.network(URL);
@@ -205,7 +211,15 @@ class _SelectedLessonState extends State<SelectedLesson> {
                             width: MediaQuery.of(context).size.width * 0.8,
                             child: loadingg
                                 ? Center(child: CircularProgressIndicator())
-                                : FlickVideoPlayer(flickManager: flickManager)),
+                                : VisibilityDetector(key: ObjectKey(flickManager),
+                                onVisibilityChanged: (visibility){
+                                  log("3333333333333aaaaaaaaaaaaaaaaaaaa");
+                                  if (visibility.visibleFraction == 0 && this.mounted) {
+                                    flickManager.flickControlManager?.pause();//pausing  functionality
+                                  }
+
+                                },
+                                child: FlickVideoPlayer(flickManager: flickManager))),
                       ),
                     ],
                   ),
@@ -221,7 +235,7 @@ class _SelectedLessonState extends State<SelectedLesson> {
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => pdfScreen()));
+                                    builder: (context) => pdfScreen(PDFURL: 'https://cdn.syncfusion.com/content/PDFViewer/flutter-succinctly.pdf',)));
                           } else {
                             showDialog(
                                 barrierDismissible: false,
@@ -333,8 +347,19 @@ class _SelectedLessonState extends State<SelectedLesson> {
                         color: Colors.green,
                         text: LocaleKeys.easy.tr(),
                         onpressed: () {
-                          Navigator.push(context,
-                              MaterialPageRoute(builder: (context) => Exam()));
+
+                          showDialog(
+                              barrierDismissible: false,
+                              context: context,
+                              builder: (context) {
+                                return openExam(
+                                    context,
+                                    widget.videoID,
+                                    FirebaseAuth.instance.currentUser!.uid,
+                                    "Easy",
+                                  widget.subjectName
+                                );
+                              });
                         },
                       ),
                       webdefaultButton(
@@ -342,17 +367,44 @@ class _SelectedLessonState extends State<SelectedLesson> {
                         color: Colors.yellow.shade800,
                         text: LocaleKeys.moderate.tr(),
                         onpressed: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => Discussion()));
+
+                         // Navigator.push(context, MaterialPageRoute(builder: (context) => Discussion()));
+
+                          showDialog(
+                              barrierDismissible: false,
+                              context: context,
+                              builder: (context) {
+                                return openExam(
+                                    context,
+                                    widget.videoID,
+                                    FirebaseAuth.instance.currentUser!.uid,
+                                    "Average",
+                                    widget.subjectName
+                                );
+                              });
+
                         },
                       ),
                       webdefaultButton(
                         context: context,
                         color: Colors.red,
                         text: LocaleKeys.hard.tr(),
-                        onpressed: () {},
+                        onpressed: () {
+
+                          showDialog(
+                              barrierDismissible: false,
+                              context: context,
+                              builder: (context) {
+                                return openExam(
+                                    context,
+                                    widget.videoID,
+                                    FirebaseAuth.instance.currentUser!.uid,
+                                    "Hard",
+                                    widget.subjectName
+                                );
+                              });
+
+                        },
                       ),
                     ],
                   ),
@@ -403,7 +455,15 @@ class _SelectedLessonState extends State<SelectedLesson> {
                     borderRadius: BorderRadius.circular(15.0),
                     child: loadingg
                         ? Center(child: CircularProgressIndicator())
-                        : FlickVideoPlayer(flickManager: flickManager),
+                        : VisibilityDetector(key: ObjectKey(flickManager),
+                        onVisibilityChanged: (visibility){
+                          log("3333333333333aaaaaaaaaaaaaaaaaaaa");
+                          if (visibility.visibleFraction == 0 && this.mounted) {
+                            flickManager.flickControlManager?.pause();//pausing  functionality
+                          }
+
+                        },
+                        child: FlickVideoPlayer(flickManager: flickManager)),
                   ),
                   Row(
                     children: [
@@ -414,7 +474,7 @@ class _SelectedLessonState extends State<SelectedLesson> {
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => pdfScreen()));
+                                    builder: (context) => pdfScreen(PDFURL: 'https://cdn.syncfusion.com/content/PDFViewer/flutter-succinctly.pdf',)));
                           } else {
                             showDialog(
                                 barrierDismissible: false,
@@ -526,8 +586,20 @@ class _SelectedLessonState extends State<SelectedLesson> {
                         color: Colors.green,
                         text: LocaleKeys.easy.tr(),
                         onpressed: () {
-                          Navigator.push(context,
-                              MaterialPageRoute(builder: (context) => Exam()));
+
+                          showDialog(
+                              barrierDismissible: false,
+                              context: context,
+                              builder: (context) {
+                                return openExam(
+                                  context,
+                                  widget.videoID,
+                                    FirebaseAuth.instance.currentUser!.uid,
+                                  "Easy",
+                                  widget.subjectName
+                                );
+                              });
+
                         },
                       ),
                       defaultButton(
@@ -535,17 +607,45 @@ class _SelectedLessonState extends State<SelectedLesson> {
                         color: Colors.yellow.shade800,
                         text: LocaleKeys.moderate.tr(),
                         onpressed: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => Discussion()));
+
+                          //Navigator.push(context, MaterialPageRoute(builder: (context) => Discussion()));
+
+                          showDialog(
+                              barrierDismissible: false,
+                              context: context,
+                              builder: (context) {
+                                return openExam(
+                                    context,
+                                    widget.videoID,
+                                    FirebaseAuth.instance.currentUser!.uid,
+                                    "Average",
+                                    widget.subjectName
+                                );
+                              });
+
                         },
                       ),
                       defaultButton(
                         context: context,
                         color: Colors.red,
                         text: LocaleKeys.hard.tr(),
-                        onpressed: () {},
+                        onpressed: () {
+
+                          showDialog(
+                              barrierDismissible: false,
+                              context: context,
+                              builder: (context) {
+                                return openExam(
+                                    context,
+                                    widget.videoID,
+                                    FirebaseAuth.instance.currentUser!.uid,
+                                    "Hard",
+                                    widget.subjectName
+                                );
+                              });
+
+
+                        },
                       ),
                     ],
                   ),

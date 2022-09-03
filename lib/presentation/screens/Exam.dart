@@ -1,15 +1,31 @@
 import 'dart:async';
+import 'dart:developer';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:oktoast/oktoast.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
 import 'package:weva/presentation/widgets/default_button.dart';
 
+import '../../back/checkConnection.dart';
+import '../../back/loading.dart';
+import '../../back/models/subject.dart';
 import '../../constants.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 
+import '../../translations/locale_keys.g.dart';
+
 // ignore_for_file: prefer_const_constructors
 class Exam extends StatefulWidget {
+  Exam({Key? key, required this.videoID, required this.userID, required this.type, required this.subjectName}) : super(key: key);
+
+  String videoID;
+  String userID;
+  String type;
+  String subjectName;
+
   @override
   State<Exam> createState() => _ExamState();
 }
@@ -18,6 +34,7 @@ class _ExamState extends State<Exam> {
   Color linearColor = Colors.green;
   Timer? countdownTimer;
   Duration myDuration = Duration(seconds: 120);
+
   void setCountDown() {
     final reduceSecondsBy = 1;
     final seconds = myDuration.inSeconds - reduceSecondsBy;
@@ -78,6 +95,7 @@ class _ExamState extends State<Exam> {
     }
   }
 
+
   Widget buildTimer() {
     final secondsMonitor = myDuration.inSeconds;
     return Column(
@@ -97,25 +115,141 @@ class _ExamState extends State<Exam> {
   void TimeFinished() {
     // myDuration.inSeconds==0?
   }
+
+
   @override
   void initState() {
     super.initState();
-    startTimer();
+    //startTimer();
+
+    getQuestions();
+
   }
 
   int questionNumber = 1;
 
-  int x = 0;
+  List x = [0, 0, 0, 0];
+
   bool greenBorderandShadow = false;
-  String question = '';
+
+  String questionn = '';
+
   bool answerPressed = false;
   bool rightAnswerPressed = false;
   bool wrongAnswerPressed = false;
 
+
+  List<question> questions = [];
+
+  bool loadingg = true;
+
+  void getQuestions()async{
+
+    //log(widget.chOrVidID);
+
+    questions = [];
+
+    if(await checkConnectionn()){
+
+      loading(context: context);
+      setState((){
+        loadingg = true;
+      });
+
+      FirebaseFirestore.instance.collection(widget.type).where("chOrVidID", isEqualTo: widget.videoID).get(const GetOptions(source: Source.server))
+          .then((value) {
+
+
+        final List<question> loadData = [];
+
+        for (var element in value.docs) {
+          //element.data();
+          //log(element.data()['nameAr'].toString());
+
+          loadData.add(question(
+            idToEdit: element.id,
+            questionText: element.data()['questionText'] ?? "",
+            ansOne: element.data()['ansOne'] ?? "",
+            ansTwo: element.data()['ansTwo'] ?? "",
+            ansThree: element.data()['ansThree'] ?? "",
+            ansFour: element.data()['ansFour'] ?? "",
+            correctAns: element.data()['correctAns'] ?? 0,
+            subjectID: element.data()['subjectID'] ?? "",
+            chOrVidID: element.data()['chOrVidID'] ?? "",
+            qNum: element.data()['qNum'] ?? 0,
+
+
+            userDoneAction: "",
+            LastUserDoneAction: "",
+            status: element.data()['status'] ?? "",
+
+          ));
+        }
+
+        loadData.sort((a, b) => a.qNum.compareTo(b.qNum));
+
+        setState(() {
+          questions = loadData;
+        });
+
+        log(questions.length.toString());
+
+        Navigator.of(context).pop();
+
+        setState((){
+          loadingg = false;
+        });
+
+        startTimer();
+
+      }).onError((error, stackTrace) {
+
+        log(error.toString());
+        showToast("Error: $error");
+
+      });
+
+    }else{
+
+      showToast("Check Internet Connection !");
+
+    }
+
+  }
+
+
+
+  void checkAns(studentAns, correctAns){
+    log(studentAns.toString());
+    log(correctAns.toString());
+
+    if(studentAns == correctAns - 1){
+      //right answer
+      x[correctAns - 2] = 1;
+
+    }else{
+      //wrong answer
+
+      for (int i = 1; i <= x.length+1; i++) {
+        if (i == correctAns - 1){
+          x[i - 1] = 3;
+        }else if (i == studentAns){
+          x[i - 1] = 2;
+        }
+
+      }
+
+    }
+
+
+  }
+
+
   @override
   Widget build(BuildContext context) {
     if (kIsWeb) {
-      return Scaffold(
+      return loadingg? Container()
+      : Scaffold(
         backgroundColor: Colors.white,
         body: SafeArea(
           child: Column(
@@ -149,7 +283,7 @@ class _ExamState extends State<Exam> {
                     width: MediaQuery.of(context).size.width * 0.02,
                   ),
                   Text(
-                    '${myDuration.inSeconds.toString()}s remaining',
+                    '${myDuration.inSeconds.toString()}${LocaleKeys.s_remaining.tr()}',
                     style: GoogleFonts.rubik(
                       fontSize: 18.0,
                       color: linearColor,
@@ -179,7 +313,7 @@ class _ExamState extends State<Exam> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'QUESTION 20 OF 40  for u   $questionNumber / questions.length',
+                        '${LocaleKeys.question.tr()} $questionNumber ${LocaleKeys.of.tr()} ${questions.length}',
                         style: GoogleFonts.rubik(
                           fontSize: 14.0,
                           color: Colors.grey,
@@ -190,7 +324,7 @@ class _ExamState extends State<Exam> {
                       ),
                       Text(
                         //$question
-                        'Which of the following influence the gravitational force?',
+                        questions[questionNumber-1].questionText,
                         style: GoogleFonts.rubik(
                           fontSize: 18.0,
                           fontWeight: FontWeight.bold,
@@ -210,11 +344,11 @@ class _ExamState extends State<Exam> {
                           borderRadius: BorderRadius.circular(10),
                           elevation: 2,
                           shadowColor: Colors.grey,
-                          color: x == 0
+                          color: x[index] == 0
                               ? Colors.white
-                              : x == 1
+                              : x[index] == 1
                                   ? Color(0xff45CB6A)
-                                  : x == 2
+                                  : x[index] == 2
                                       ? Colors.red.shade700
                                       : Colors.white,
                           child: Container(
@@ -229,15 +363,19 @@ class _ExamState extends State<Exam> {
                                 : BoxDecoration(),
                             child: ListTile(
                               title: Text(
-                                'and',
+                                index == 0 ? questions[questionNumber-1].ansOne : index == 1? questions[questionNumber-1].ansTwo : index == 2? questions[questionNumber-1].ansThree : questions[questionNumber-1].ansFour,
                                 style: GoogleFonts.rubik(
-                                  color: x == 0 ? Colors.black : Colors.white,
+                                  color: x[index] == 0 ? Colors.black : Colors.white,
                                   fontSize: 17.0,
                                 ),
                               ),
                               leading: IconButton(
-                                onPressed: () {},
-                                icon: x == 0
+                                onPressed: () {
+
+                                  checkAns(index+1, questions[questionNumber].correctAns);
+
+                                },
+                                icon: x[index] == 0
                                     ? Icon(
                                         greenBorderandShadow
                                             ? Icons.panorama_fish_eye
@@ -246,12 +384,12 @@ class _ExamState extends State<Exam> {
                                             ? Color(0xff45CB6A)
                                             : Colors.grey,
                                       )
-                                    : x == 1
+                                    : x[index] == 1
                                         ? Icon(
                                             Icons.done,
                                             color: Colors.white,
                                           )
-                                        : x == 2
+                                        : x[index] == 2
                                             ? Icon(
                                                 Icons.close,
                                                 color: Colors.white,
@@ -263,8 +401,9 @@ class _ExamState extends State<Exam> {
                               ),
                               onTap: () {
                                 setState(() {
-                                  //x=1;
-                                  greenBorderandShadow = true;
+
+                                  checkAns(index+1, questions[questionNumber].correctAns);
+
                                 });
                               },
                             ),
@@ -297,13 +436,13 @@ class _ExamState extends State<Exam> {
                     children: [
                       Text(
                         //$question
-                        'Science Exam',
+                        '${widget.subjectName} ${LocaleKeys.exam.tr()}',
                         style: GoogleFonts.rubik(
                           fontSize: 18.0,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      SizedBox(
+                     /* SizedBox(
                         height: MediaQuery.of(context).size.height * 0.06,
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.end,
@@ -333,7 +472,7 @@ class _ExamState extends State<Exam> {
                                 context: context),
                           ],
                         ),
-                      ),
+                      ),*/
                     ],
                   ),
                 ),
@@ -342,8 +481,10 @@ class _ExamState extends State<Exam> {
           ),
         ),
       );
-    } else {
-      return Scaffold(
+    }
+    else {
+      return loadingg? Container()
+          : Scaffold(
         backgroundColor: Colors.white,
         body: SafeArea(
           child: Column(
@@ -377,7 +518,7 @@ class _ExamState extends State<Exam> {
                     width: MediaQuery.of(context).size.width * 0.02,
                   ),
                   Text(
-                    '${myDuration.inSeconds.toString()}s remaining',
+                    '${myDuration.inSeconds.toString()}${LocaleKeys.s_remaining.tr()}',
                     style: GoogleFonts.rubik(
                       fontSize: 18.0,
                       color: linearColor,
@@ -407,7 +548,7 @@ class _ExamState extends State<Exam> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'QUESTION 20 OF 40  for u   $questionNumber / questions.length',
+                        '${LocaleKeys.question.tr()} $questionNumber ${LocaleKeys.of.tr()} ${questions.length}',
                         style: GoogleFonts.rubik(
                           fontSize: 14.0,
                           color: Colors.grey,
@@ -418,7 +559,7 @@ class _ExamState extends State<Exam> {
                       ),
                       Text(
                         //$question
-                        'Which of the following influence the gravitational force?',
+                        questions[questionNumber-1].questionText,
                         style: GoogleFonts.rubik(
                           fontSize: 18.0,
                           fontWeight: FontWeight.bold,
@@ -438,11 +579,11 @@ class _ExamState extends State<Exam> {
                           borderRadius: BorderRadius.circular(10),
                           elevation: 2,
                           shadowColor: Colors.grey,
-                          color: x == 0
+                          color: x[index] == 0
                               ? Colors.white
-                              : x == 1
+                              : x[index] == 1
                                   ? Color(0xff45CB6A)
-                                  : x == 2
+                                  : x[index] == 2
                                       ? Colors.red.shade700
                                       : Colors.white,
                           child: Container(
@@ -457,15 +598,19 @@ class _ExamState extends State<Exam> {
                                 : BoxDecoration(),
                             child: ListTile(
                               title: Text(
-                                'and',
+                                index == 0 ? questions[questionNumber-1].ansOne : index == 1? questions[questionNumber-1].ansTwo : index == 2? questions[questionNumber-1].ansThree : questions[questionNumber-1].ansFour,
                                 style: GoogleFonts.rubik(
-                                  color: x == 0 ? Colors.black : Colors.white,
+                                  color: x[index] == 0 ? Colors.black : Colors.white,
                                   fontSize: 17.0,
                                 ),
                               ),
                               leading: IconButton(
-                                onPressed: () {},
-                                icon: x == 0
+                                onPressed: () {
+
+                                  checkAns(index+1, questions[questionNumber].correctAns);
+
+                                },
+                                icon: x[index] == 0
                                     ? Icon(
                                         greenBorderandShadow
                                             ? Icons.panorama_fish_eye
@@ -474,12 +619,12 @@ class _ExamState extends State<Exam> {
                                             ? Color(0xff45CB6A)
                                             : Colors.grey,
                                       )
-                                    : x == 1
+                                    : x[index] == 1
                                         ? Icon(
                                             Icons.done,
                                             color: Colors.white,
                                           )
-                                        : x == 2
+                                        : x[index] == 2
                                             ? Icon(
                                                 Icons.close,
                                                 color: Colors.white,
@@ -491,8 +636,9 @@ class _ExamState extends State<Exam> {
                               ),
                               onTap: () {
                                 setState(() {
-                                  //x=1;
-                                  greenBorderandShadow = true;
+
+                                  checkAns(index+1, questions[questionNumber].correctAns);
+
                                 });
                               },
                             ),
@@ -525,13 +671,13 @@ class _ExamState extends State<Exam> {
                     children: [
                       Text(
                         //$question
-                        'Science Exam',
+                        '${widget.subjectName} ${LocaleKeys.exam.tr()}',
                         style: GoogleFonts.rubik(
                           fontSize: 18.0,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      SizedBox(
+                     /* SizedBox(
                         height: MediaQuery.of(context).size.height * 0.06,
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.end,
@@ -561,7 +707,7 @@ class _ExamState extends State<Exam> {
                                 context: context),
                           ],
                         ),
-                      ),
+                      ),*/
                     ],
                   ),
                 ),
@@ -573,128 +719,3 @@ class _ExamState extends State<Exam> {
     }
   }
 }
-
-// Widget buildQuestion({
-//   required String Question,
-// }) {
-//   return Column(
-//     crossAxisAlignment: CrossAxisAlignment.start,
-//     children: [
-//       Text(
-//         'question.text',
-//         style: GoogleFonts.rubik(
-//           color: Colors.black,
-//           fontSize: 17.0,
-//         ),
-//
-//         // ListView.separated(
-//         //               physics: NeverScrollableScrollPhysics(),
-//         //               separatorBuilder: (context, index) => SizedBox(
-//         //                 height: MediaQuery.of(context).size.height * 0.02,
-//         //               ),
-//         //               shrinkWrap: true,
-//         //               itemCount: 4,
-//         //               itemBuilder: (context, index) => Material(
-//         //                 borderRadius: BorderRadius.circular(10),
-//         //                 elevation: 2,
-//         //                 shadowColor: Colors.grey,
-//         //                 child: ListTile(
-//         //                   selectedTileColor: Colors.black,
-//         //                   title: Text(
-//         //                     'and',
-//         //                     style: GoogleFonts.rubik(
-//         //                       color: Colors.black,
-//         //                       fontSize: 17.0,
-//         //                     ),
-//         //                   ),
-//         //                   leading: IconButton(
-//         //                     onPressed: () {},
-//         //                     icon: answerPressed == false
-//         //                         ? Icon(
-//         //                             Icons.circle,
-//         //                             color: Colors.grey,
-//         //                           )
-//         //                         : Icon(Icons.done),
-//         //                   ),
-//         //                   onTap: () {
-//         //                     setState(() {
-//         //                       answerPressed = true;
-//         //                     });
-//         //                   },
-//         //                 ),
-//         //               ),
-//         //             ),
-//       ),
-//     ],
-//   );
-// }
-// child: PageView.builder(
-//   itemCount: 10, //questions.lenth
-//   physics: NeverScrollableScrollPhysics(),
-//   itemBuilder: (context, index) {
-//     // final question =questions[index];
-//     return Column(
-//       crossAxisAlignment: CrossAxisAlignment.start,
-//       children: [
-//         SizedBox(
-//           height: MediaQuery.of(context).size.height * 0.02,
-//         ),
-//         Row(
-//           mainAxisAlignment: MainAxisAlignment.start,
-//           children: [
-//             IconButton(
-//               onPressed: () {
-//                 Navigator.pop(context);
-//                 stopTimer();
-//                 resetTimer();
-//               },
-//               icon: Icon(
-//                 Icons.close,
-//                 color: Colors.black,
-//               ),
-//             ),
-//             SizedBox(
-//               width: MediaQuery.of(context).size.width * 0.2,
-//             ),
-//             Icon(
-//               Icons.timer_outlined,
-//               size: 30.0,
-//             ),
-//             SizedBox(
-//               width: MediaQuery.of(context).size.width * 0.02,
-//             ),
-//             Text(
-//               '${myDuration.inSeconds.toString()}s remaining',
-//               style: GoogleFonts.rubik(
-//                 fontSize: 18.0,
-//                 color: linearColor,
-//                 fontWeight: FontWeight.w500,
-//               ),
-//             ),
-//           ],
-//         ),
-//         SizedBox(
-//           height: MediaQuery.of(context).size.height * 0.03,
-//         ),
-//         Container(
-//           child: LinearPercentIndicator(
-//             padding: EdgeInsets.all(0.0),
-//             width: MediaQuery.of(context).size.width,
-//             percent: myDuration.inSeconds / 120,
-//             barRadius: Radius.circular(20),
-//             // animation: true,
-//             // animationDuration: 1500,
-//             progressColor: linearColor,
-//           ),
-//         ),
-//         SizedBox(
-//           height: MediaQuery.of(context).size.height * 0.02,
-//         ),
-//         Padding(
-//           padding: const EdgeInsets.all(15.0),
-//           child: buildQuestion(Question: 'question'),
-//         ),
-//       ],
-//     );
-//   },
-// ),

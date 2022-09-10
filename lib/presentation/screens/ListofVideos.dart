@@ -180,7 +180,7 @@ class _ListofVidsState extends State<ListofVids> {
                         ),
                         Container(
                           child: LinearPercentIndicator(
-                            width: MediaQuery.of(context).size.width * 0.9,
+                            width: MediaQuery.of(context).size.width * 0.8,
                             percent: 60 / 100,
                             barRadius: Radius.circular(20),
                             // animation: true,
@@ -227,19 +227,21 @@ class _ListofVidsState extends State<ListofVids> {
                             context,
                             MaterialPageRoute(
                                 builder: (context) => SelectedLesson(
-                                    videoID: videos[index].idToEdit,
-                                    chaName: widget.chName,
-                                    lessonName: Localizations.localeOf(context)
-                                                .toString() ==
-                                            "en"
-                                        ? widget.nameEN
-                                        : widget.nameAR,
-                                    videoName: Localizations.localeOf(context)
-                                                .toString() ==
-                                            "en"
-                                        ? videos[index].nameEN
-                                        : videos[index].nameAr,
-                                subjectName: widget.subjectName,)));
+                                      videoID: videos[index].idToEdit,
+                                      chaName: widget.chName,
+                                      lessonName:
+                                          Localizations.localeOf(context)
+                                                      .toString() ==
+                                                  "en"
+                                              ? widget.nameEN
+                                              : widget.nameAR,
+                                      videoName: Localizations.localeOf(context)
+                                                  .toString() ==
+                                              "en"
+                                          ? videos[index].nameEN
+                                          : videos[index].nameAr,
+                                      subjectName: widget.subjectName,
+                                    )));
                       },
                       title: Text(
                         Localizations.localeOf(context).toString() == "en"

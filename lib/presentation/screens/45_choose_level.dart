@@ -39,7 +39,8 @@ class _ChooseLevelState extends State<ChooseLevel> {
 
     getLevels();
 
-    getOffer();
+    log("3");
+
   }
 
   void getLevels() async {
@@ -47,6 +48,7 @@ class _ChooseLevelState extends State<ChooseLevel> {
 
     if (await checkConnectionn()) {
       loading(context: context);
+      log("4");
 
       FirebaseFirestore.instance
           .collection('levels')
@@ -76,8 +78,10 @@ class _ChooseLevelState extends State<ChooseLevel> {
         setState(() {
           levels = loadData;
         });
+        log("5");
 
-        Navigator.of(context).pop();
+        getOffer();
+
       }).onError((error, stackTrace) {
         log(error.toString());
         showToast("Error: $error");
@@ -89,7 +93,7 @@ class _ChooseLevelState extends State<ChooseLevel> {
 
   void getOffer() async {
     if (await checkConnectionn()) {
-      loading(context: context);
+      log("6");
 
       FirebaseFirestore.instance
           .collection('students')
@@ -103,10 +107,11 @@ class _ChooseLevelState extends State<ChooseLevel> {
         } else {
           setState(() {
             offerTrial = false;
+            Navigator.of(context).pop();
           });
         }
+        log("7");
 
-        Navigator.of(context).pop();
       }).onError((error, stackTrace) {
         log(error.toString());
         showToast("Error: $error");
@@ -172,6 +177,8 @@ class _ChooseLevelState extends State<ChooseLevel> {
                                   'status': "trial",
                                   'trialStartingDate': DateTime.now(),
                                 }).then((value) {
+                                  log("8");
+
                                   Navigator.of(context).pop();
 
                                   Navigator.of(context).push(MaterialPageRoute(

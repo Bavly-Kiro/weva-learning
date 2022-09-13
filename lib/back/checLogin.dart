@@ -4,11 +4,14 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_ringtone_player/flutter_ringtone_player.dart';
 import 'package:oktoast/oktoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../presentation/screens/1.dart';
+import '../presentation/screens/empty.dart';
 import '../presentation/screens/main_screen.dart';
+import '../presentation/widgets/alert_dialog.dart';
 import 'checkConnection.dart';
 import 'loading.dart';
 import 'loadingScreen.dart';
@@ -88,6 +91,7 @@ class _checkLoginState extends State<checkLogin> {
     if(await checkConnectionn()){
 
       loading(context: context);
+      log("9");
 
       FirebaseFirestore.instance.collection('students').doc(FirebaseAuth.instance.currentUser!.uid).get(const GetOptions(source: Source.server))
           .then((value) async{
@@ -105,6 +109,9 @@ class _checkLoginState extends State<checkLogin> {
         log("5555555555555555555555555");
 
         Navigator.of(context).pop();
+        log("10");
+
+        listenToCalls();
 
       }).onError((error, stackTrace) {
 
@@ -119,6 +126,63 @@ class _checkLoginState extends State<checkLogin> {
       showToast("Check Internet Connection !");
 
     }
+
+  }
+
+
+  //1 ringing
+  //2 msh8ol (y3ny gwa al room)
+
+  void listenToCalls(){
+
+
+    FirebaseFirestore.instance.collection('students').doc(FirebaseAuth.instance.currentUser!.uid).snapshots().listen((snapshot) {
+
+      //print(snapshot.data());
+      if(snapshot.exists){
+
+        if(snapshot.data()!['call'] == 1){
+
+          //ringing
+
+          showDialog(
+              barrierDismissible: false,
+              context: context,
+              builder: (context) {
+                return recievedCall(
+                    context,
+                    "تيست 2",
+                    snapshot.data()!['callerID']
+                );
+              });
+
+          FlutterRingtonePlayer.play(
+            android: AndroidSounds.ringtone,
+            ios: IosSounds.electronic,
+            looping: true, // Android only - API >= 28
+            asAlarm: false, // Android only - all APIs
+          );
+
+
+        }else if(snapshot.data()!['call'] == 3){
+
+          Navigator.of(context)
+              .push(MaterialPageRoute(
+              builder: (context) => empty())
+          );
+
+        }else{
+
+          FlutterRingtonePlayer.stop();
+
+        }
+
+      }
+
+
+
+    });
+
 
   }
 

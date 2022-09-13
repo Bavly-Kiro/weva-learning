@@ -1,16 +1,89 @@
 import 'dart:developer';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:oktoast/oktoast.dart';
 
+import '../../back/checkConnection.dart';
+import '../../back/loading.dart';
+import '../../back/models/levels.dart';
 import '../../translations/locale_keys.g.dart';
 import '../widgets/aTXTFld.dart';
 import '../widgets/friend_card.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 
-class FriendsScreen extends StatelessWidget {
+class FriendsScreen extends StatefulWidget {
+  @override
+  State<FriendsScreen> createState() => _FriendsScreenState();
+}
+
+class _FriendsScreenState extends State<FriendsScreen> {
   TextEditingController searchController = TextEditingController();
+
+
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+
+    getFriends();
+
+  }
+
+
+  List<friend> friends = [];
+
+  void getFriends() async {
+    friends = [];
+
+    if (await checkConnectionn()) {
+      loading(context: context);
+
+      FirebaseFirestore.instance
+          .collection('friends')
+          .where("userID", isEqualTo: FirebaseAuth.instance.currentUser!.uid)
+          .get(const GetOptions(source: Source.server))
+          .then((value) {
+
+        final List<friend> loadData = [];
+
+        for (var element in value.docs) {
+          //element.data();
+          //log(element.data()['nameAr'].toString());
+
+          loadData.add(friend(
+            idToEdit: element.id,
+            name: element.data()['name'] ?? "",
+            number: element.data()['number'] ?? "",
+            imageURL: element.data()['imageURL'] ?? "",
+            userID: element.data()['userID'] ?? "",
+            friendID: element.data()['friendID'] ?? "",
+
+          ));
+        }
+
+        loadData.sort((a, b) => a.name.compareTo(b.name));
+
+        setState(() {
+          friends = loadData;
+        });
+
+        Navigator.of(context).pop();
+      }).onError((error, stackTrace) {
+        log(error.toString());
+        showToast("Error: $error");
+      });
+    } else {
+      showToast("Check Internet Connection !");
+    }
+  }
+
+
+
+
   @override
   Widget build(BuildContext context) {
     if (kIsWeb) {
@@ -32,7 +105,7 @@ class FriendsScreen extends StatelessWidget {
               ),
             ),
             ListView.builder(
-                itemCount: 15,
+                itemCount: friends.length,
                 shrinkWrap: true,
                 physics: NeverScrollableScrollPhysics(),
                 itemBuilder: (context, index) {
@@ -40,12 +113,15 @@ class FriendsScreen extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(horizontal: 30.0),
                     child: webfriendCard(
                       context,
-                      'Friend ${index + 1}',
-                      'https://thumbs.dreamstime.com/b/male-student-portrait-handsome-man-enjoy-study-home-schooling-concept-education-knowledge-work-as-office-assistant-178491145.jpg',
-                      "012",
+                      friends[index].name,
+                      friends[index].imageURL,
+                      friends[index].number,
+                      friends[index].friendID,
+                        1
                     ),
                   );
-                }),
+                }
+                ),
           ],
         ),
       );
@@ -68,7 +144,7 @@ class FriendsScreen extends StatelessWidget {
               ),
             ),
             ListView.builder(
-                itemCount: 15,
+                itemCount: friends.length,
                 shrinkWrap: true,
                 physics: NeverScrollableScrollPhysics(),
                 itemBuilder: (context, index) {
@@ -76,9 +152,11 @@ class FriendsScreen extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(horizontal: 10.0),
                     child: friendCard(
                       context,
-                      'Friend ${index + 1}',
-                      'https://thumbs.dreamstime.com/b/male-student-portrait-handsome-man-enjoy-study-home-schooling-concept-education-knowledge-work-as-office-assistant-178491145.jpg',
-                      "012",
+                      friends[index].name,
+                      friends[index].imageURL,
+                      friends[index].number,
+                      friends[index].idToEdit,
+                        1
                     ),
                   );
                 }),

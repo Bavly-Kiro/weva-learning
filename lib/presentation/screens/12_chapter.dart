@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:oktoast/oktoast.dart';
@@ -8,6 +9,8 @@ import 'package:oktoast/oktoast.dart';
 import '../../back/checkConnection.dart';
 import '../../back/loading.dart';
 import '../../back/models/subject.dart';
+import '../widgets/alert_dialog.dart';
+import '../widgets/default_button.dart';
 import '../widgets/dropdown_textField.dart';
 import '../widgets/registration_button.dart';
 import 'ListofVideos.dart';
@@ -174,6 +177,11 @@ class _ChapterState extends State<Chapter> {
   }
 
 
+
+  String value = "";
+
+
+
   @override
   Widget build(BuildContext context) {
     if (kIsWeb) {
@@ -227,15 +235,76 @@ class _ChapterState extends State<Chapter> {
                         ),
                       ],
                     ),
+
                     SizedBox(
                       height: MediaQuery.of(context).size.height * 0.04,
                     ),
+
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+
+                        webdefaultButton(
+                          context: context,
+                          color: Colors.green,
+                          text: "Live Schedules",
+                          onpressed: () {
+
+                            showDialog(
+                                barrierDismissible: false,
+                                context: context,
+                                builder: (context) {
+                                  return startExam(
+                                      context,
+                                      "${widget.name} Lives",
+                                      "Monday: 5 PM");
+                                });
+                          },
+                        ),
+                        webdefaultButton(
+                          context: context,
+                          color: Colors.yellow.shade800,
+                          text: "Exam",
+                          onpressed: () {
+
+
+                            if(value.isNotEmpty){
+
+                              showDialog(
+                                  barrierDismissible: false,
+                                  context: context,
+                                  builder: (context) {
+                                    return openExam(
+                                        context,
+                                        chapters[chapters.indexWhere((f) => (Localizations.localeOf(context).toString() == "en"? f.nameEN : f.nameAr) == value)].idToEdit,
+                                        FirebaseAuth.instance.currentUser!.uid,
+                                        "daysQuestions",
+                                        value
+                                    );
+                                  });
+
+                            }
+
+
+
+                          },
+                        ),
+
+
+                      ],
+                    ),
+
+                    SizedBox(
+                      height: MediaQuery.of(context).size.height * 0.04,
+                    ),
+
                     webDropDown(
                       Selecteditems: chapterss.map(buildMenuitem).toList(),
                       SelectedValue: Selectedvalue1,
-                      onChanged: (value) {
+                      onChanged: (valuee) {
                         setState(() {
-                          Selectedvalue1 = value;
+                          Selectedvalue1 = valuee;
+                          value = valuee;
 
                           log(value);
 
@@ -348,14 +417,76 @@ class _ChapterState extends State<Chapter> {
                     SizedBox(
                       height: MediaQuery.of(context).size.height * 0.04,
                     ),
+
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+
+                        defaultButton(
+                          context: context,
+                          color: Colors.green,
+                          text: "Live Schedules",
+                          onpressed: () {
+
+                            showDialog(
+                                barrierDismissible: false,
+                                context: context,
+                                builder: (context) {
+                                  return startExam(
+                                      context,
+                                      "${widget.name} Lives",
+                                      "Monday: 5 PM");
+                                });
+                          },
+                        ),
+                        defaultButton(
+                          context: context,
+                          color: Colors.yellow.shade800,
+                          text: "Exam",
+                          onpressed: () {
+
+
+                            if(value.isNotEmpty){
+
+                              showDialog(
+                                  barrierDismissible: false,
+                                  context: context,
+                                  builder: (context) {
+                                    return openExam(
+                                        context,
+                                        chapters[chapters.indexWhere((f) => (Localizations.localeOf(context).toString() == "en"? f.nameEN : f.nameAr) == value)].idToEdit,
+                                        FirebaseAuth.instance.currentUser!.uid,
+                                        "daysQuestions",
+                                        value
+                                    );
+                                  });
+
+                            }
+
+
+
+                          },
+                        ),
+
+
+                      ],
+                    ),
+
+                    SizedBox(
+                      height: MediaQuery.of(context).size.height * 0.04,
+                    ),
+
+
                     DropDown(
                       Selecteditems: chapterss.map(buildMenuitem).toList(),
                       SelectedValue: Selectedvalue1,
-                      onChanged: (value) {
+                      onChanged: (valuee) {
                         setState(() {
-                          Selectedvalue1 = value;
+                          Selectedvalue1 = valuee;
+                          value = valuee;
 
                           log(value);
+
 
                           log(chapters[chapters.indexWhere((f) => (Localizations.localeOf(context).toString() == "en"? f.nameEN : f.nameAr) == value)].idToEdit);
 

@@ -107,5 +107,7 @@ abstract class  LocaleKeys {
   static const start = 'start';
   static const be_ready = 'be_ready';
   static const exam = 'exam';
+  static const number = 'number';
+  static const schoolName = 'schoolName';
 
 }

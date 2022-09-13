@@ -43,6 +43,10 @@ class _PersonalInformationState extends State<PersonalInformation> {
 
   TextEditingController fullNameController = TextEditingController();
 
+  TextEditingController numberController = TextEditingController();
+
+  TextEditingController schoolNameController = TextEditingController();
+
   @override
   void initState() {
     super.initState();
@@ -274,6 +278,41 @@ class _PersonalInformationState extends State<PersonalInformation> {
                             SizedBox(
                               height: MediaQuery.of(context).size.height * 0.04,
                             ),
+
+
+                            TxtFld(
+                              picon: Icon(Icons.phone),
+                              controller: numberController,
+                              label: LocaleKeys.number.tr(),
+                              validator: (value) {
+                                if (value.isEmpty) {
+                                  return 'Please enter phone number';
+                                }
+                                return null;
+                              },
+                            ),
+                            SizedBox(
+                              height: MediaQuery.of(context).size.height * 0.04,
+                            ),
+
+                            TxtFld(
+                              picon: Icon(Icons.school),
+                              controller: schoolNameController,
+                              label: LocaleKeys.schoolName.tr(),
+                              validator: (value) {
+                                if (value.isEmpty) {
+                                  return 'Please enter your school Name';
+                                }
+                                return null;
+                              },
+                            ),
+                            SizedBox(
+                              height: MediaQuery.of(context).size.height * 0.04,
+                            ),
+
+
+
+
                             TxtFld(
                               picon: Icon(Icons.date_range),
                               controller: DateController,
@@ -458,6 +497,10 @@ class _PersonalInformationState extends State<PersonalInformation> {
                                   //navigate b2a hna
 
                                   if (fullNameController.text.isNotEmpty &&
+
+                                      numberController.text.isNotEmpty &&
+                                      schoolNameController.text.isNotEmpty &&
+
                                       GenderValue != null &&
                                       selectedDate.toString().isNotEmpty &&
                                       countryValue != null &&
@@ -491,6 +534,10 @@ class _PersonalInformationState extends State<PersonalInformation> {
                                                     .instance.currentUser!.uid)
                                                 .set({
                                               'name': fullNameController.text,
+
+                                              'number': numberController.text,
+                                              'schoolName': schoolNameController.text,
+
                                               'gender': GenderValue == "Male" ||
                                                       GenderValue == "ذكر"
                                                   ? 1
@@ -535,8 +582,11 @@ class _PersonalInformationState extends State<PersonalInformation> {
                                                       .currentUser!.uid,
                                               'dateCreated': DateTime.now(),
                                             }).then((value) {
+                                              log("1");
                                               Navigator.of(context).pop();
                                               Navigator.of(context).pop();
+                                              log("2");
+
                                               Navigator.of(context).push(
                                                   MaterialPageRoute(
                                                       builder: (context) =>

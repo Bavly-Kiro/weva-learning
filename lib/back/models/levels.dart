@@ -18,3 +18,20 @@ class level {
     , required this.price, required this.checkBox, required this.checkBoxValue
     , required this.text, required this.isExpanded, required this.status});
 }
+
+
+class friend {
+
+  final String idToEdit;
+  final String name;
+  final String number;
+  final String imageURL;
+  final String userID;
+  final String friendID;
+
+
+
+
+  friend({required this.idToEdit, required this.name, required this.number
+    , required this.imageURL, required this.userID, required this.friendID});
+}

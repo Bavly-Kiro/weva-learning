@@ -13,11 +13,13 @@ import 'package:weva/presentation/widgets/score_stack.dart';
 
 import '../../back/checkConnection.dart';
 import '../../back/loading.dart';
+import '../../back/models/levels.dart';
 import '../../back/models/subject.dart';
 import '../../cubit/home_cubit/home_cubit_bloc.dart';
 import '../../cubit/home_cubit/home_cubit_state.dart';
 import '../../translations/locale_keys.g.dart';
 import '../widgets/aTXTFld.dart';
+import '../widgets/alert_dialog.dart';
 import '../widgets/catecory_card.dart';
 import '../widgets/game_card.dart';
 import '12_chapter.dart';
@@ -38,6 +40,12 @@ class _HomeScreenState extends State<HomeScreen> {
   String url = "";
   String gradeID = "";
 
+
+  String subName = "";
+  int rightAns = 0;
+  int totalAns = 0;
+  double lastTestPercentage = 0;
+  
   @override
   void initState() {
     // TODO: implement initState
@@ -55,6 +63,7 @@ class _HomeScreenState extends State<HomeScreen> {
           .doc(FirebaseAuth.instance.currentUser!.uid)
           .get(const GetOptions(source: Source.server))
           .then((value) async {
+            
         name = value.get("name");
         email = value.get("email");
         url = value.get("imageURL");
@@ -67,7 +76,37 @@ class _HomeScreenState extends State<HomeScreen> {
         prefs.setString('url', value.get("imageURL"));
         prefs.setString('gradeID', value.get("gradeID"));
 
-        getSubjects();
+
+        FirebaseFirestore.instance
+            .collection('lastTestScore')
+            .doc(FirebaseAuth.instance.currentUser!.uid)
+            .get(const GetOptions(source: Source.server))
+            .then((valuee) async {
+
+
+              if(valuee.exists){
+
+                log("exist");
+
+                setState(() {
+                  subName = valuee.get("subjectName") ?? "";
+                  rightAns = valuee.get("rightAns") ?? 0;
+                  totalAns = valuee.get("totalAns") ?? 0;
+                  lastTestPercentage = 100 * (rightAns) / (totalAns);
+                });
+
+              }
+
+
+
+          getSubjects();
+        }).onError((error, stackTrace) {
+          log(error.toString());
+          showToast("Error: $error");
+        });
+        
+        
+        
       }).onError((error, stackTrace) {
         log(error.toString());
         showToast("Error: $error");
@@ -124,323 +163,382 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-        create: (context) => HomeCubitBloc(),
-        child: BlocConsumer<HomeCubitBloc, HomeCubitState>(
-            listener: (context, state) {},
-            builder: (context, state) {
-              HomeCubitBloc cubit = HomeCubitBloc.get(context);
-              if (kIsWeb) {
-                return RefreshIndicator(
-                  onRefresh: () => getUserData(),
-                  child: SingleChildScrollView(
-                    child: Padding(
-                      padding: const EdgeInsets.all(20.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          TxtFld(
-                            onSubmit: (v) {
-                              log("dsfsacsdcsadcsadcsdac sad bs web");
-                            },
-                            controller: searchController,
-                            label: LocaleKeys.search_num.tr(),
-                            picon: Icon(
-                              Icons.search,
-                              size: MediaQuery.of(context).size.width * 0.01,
-                            ),
-                          ),
-                          SizedBox(
-                            height: MediaQuery.of(context).size.height * 0.02,
-                          ),
-                          Text(LocaleKeys.subjects.tr(),
-                              style: GoogleFonts.rubik(
-                                fontSize: 16,
-                                color: Colors.black,
-                                fontWeight: FontWeight.w600,
-                              )),
-                          SizedBox(
-                            height: MediaQuery.of(context).size.height * 0.01,
-                          ),
-                          SizedBox(
-                            height: MediaQuery.of(context).size.height * 0.25,
-                            child: ListView.builder(
-                              shrinkWrap: true,
-                              scrollDirection: Axis.horizontal,
-                              itemCount: subjects.length,
-                              itemBuilder: (context, index) {
-                                return webcategoryCard(
-                                    imagePath: subjects[index].imageURL,
-                                    title: Localizations.localeOf(context)
-                                                .toString() ==
-                                            "en"
-                                        ? subjects[index].nameEN
-                                        : subjects[index].nameAr,
-                                    context: context,
-                                    onTap: () {
-                                      Navigator.of(context)
-                                          .push(MaterialPageRoute(
-                                              builder: (context) => Chapter(
-                                                    subjectID: subjects[index]
-                                                        .idToEdit,
-                                                    name: Localizations
-                                                                    .localeOf(
-                                                                        context)
-                                                                .toString() ==
-                                                            "en"
-                                                        ? subjects[index].nameEN
-                                                        : subjects[index]
-                                                            .nameAr,
-                                                  )));
-                                    });
-                              },
-                            ),
-                          ),
-                          SizedBox(
-                            height: MediaQuery.of(context).size.height * 0.01,
-                          ),
-                          Text(
-                            LocaleKeys.new_games.tr(),
-                            style: GoogleFonts.rubik(
-                              fontSize: 16,
-                              color: Colors.black,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                          SizedBox(
-                            height: MediaQuery.of(context).size.height * 0.01,
-                          ),
-                          SizedBox(
-                            height: MediaQuery.of(context).size.width * 0.25,
-                            child: ListView(
-                              shrinkWrap: true,
-                              scrollDirection: Axis.horizontal,
-                              children: [
-                                webgameCard(
-                                  imagePath:
-                                      "assets/images/games/Group 624573.png",
-                                  discussionTitle: LocaleKeys.discussion.tr(),
-                                  discussion: LocaleKeys.about_discussion.tr(),
-                                  context: context,
-                                ),
-                                webgameCard(
-                                  imagePath:
-                                      "assets/images/games/Group 20127.png",
-                                  discussionTitle:
-                                      LocaleKeys.five_days_chall.tr(),
-                                  discussion:
-                                      LocaleKeys.about_5_days_chall.tr(),
-                                  context: context,
-                                ),
-                                webgameCard(
-                                  imagePath:
-                                      "assets/images/games/Group 624572.png",
-                                  discussionTitle: LocaleKeys.challenge.tr(),
-                                  discussion: LocaleKeys.about_chall.tr(),
-                                  context: context,
-                                ),
-                              ],
-                            ),
-                          ),
-                          webscoreStack(
-                            subject: "Subject: science",
-                            score: LocaleKeys.last_test_score.tr(),
-                            context: context,
-                            percent: 62,
-                            foregroundColor: Colors.blue.shade400,
-                            direction:
-                                Localizations.localeOf(context).toString() ==
-                                        "en"
-                                    ? Direction.rtl
-                                    : Direction.ltr,
-                            backgroundColor: Colors.blueAccent.shade700,
-                          ),
-                          SizedBox(
-                            height: MediaQuery.of(context).size.height * 0.02,
-                          ),
-                          webscoreStack(
-                            subject: "Subject: Math",
-                            score: LocaleKeys.last_game_score.tr(),
-                            context: context,
-                            percent: 42,
-                            foregroundColor: Colors.pink.shade300,
-                            direction:
-                                Localizations.localeOf(context).toString() ==
-                                        "en"
-                                    ? Direction.rtl
-                                    : Direction.ltr,
-                            backgroundColor: Colors.pink.shade800,
-                          ),
-                        ],
+     if (kIsWeb) {
+      return RefreshIndicator(
+        onRefresh: () => getUserData(),
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                TxtFld(
+                  onSubmit: (v) async{
+
+                    if(v.isNotEmpty) {
+
+                      List<friend> friends = [];
+
+
+                        if (await checkConnectionn()) {
+                          loading(context: context);
+
+                          FirebaseFirestore.instance
+                              .collection('students')
+                              .where("number", isEqualTo: v)
+                              .get(const GetOptions(source: Source.server))
+                              .then((value) {
+
+                            final List<friend> loadData = [];
+
+                            for (var element in value.docs) {
+
+                              loadData.add(friend(
+                                idToEdit: element.id,
+                                name: element.data()['name'] ?? "",
+                                number: element.data()['number'] ?? "",
+                                imageURL: element.data()['imageURL'] ?? "",
+                                userID: element.data()['userID'] ?? "",
+                                friendID: element.data()['friendID'] ?? "",
+
+                              ));
+                            }
+
+                            loadData.sort((a, b) => a.name.compareTo(b.name));
+
+                            setState(() {
+                              friends = loadData;
+                            });
+
+                            Navigator.of(context).pop();
+
+                            showDialog(
+                                barrierDismissible: false,
+                                context: context,
+                                builder: (context) {
+                                  return findFriends(
+                                      context,
+                                      "",
+                                    "",
+                                    friends
+                                  );
+                                });
+
+
+                          }).onError((error, stackTrace) {
+                            log(error.toString());
+                            showToast("Error: $error");
+                          });
+                        } else {
+                          showToast("Check Internet Connection !");
+                        }
+
+
+
+
+
+
+                    }
+
+                  },
+                  controller: searchController,
+                  label: LocaleKeys.search_num.tr(),
+                  picon: Icon(
+                    Icons.search,
+                    size: MediaQuery.of(context).size.width * 0.01,
+                  ),
+                ),
+                SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.02,
+                ),
+                Text(LocaleKeys.subjects.tr(),
+                    style: GoogleFonts.rubik(
+                      fontSize: 16,
+                      color: Colors.black,
+                      fontWeight: FontWeight.w600,
+                    )),
+                SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.01,
+                ),
+                SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.25,
+                  child: ListView.builder(
+                    shrinkWrap: true,
+                    scrollDirection: Axis.horizontal,
+                    itemCount: subjects.length,
+                    itemBuilder: (context, index) {
+                      return webcategoryCard(
+                          imagePath: subjects[index].imageURL,
+                          title: Localizations.localeOf(context)
+                              .toString() ==
+                              "en"
+                              ? subjects[index].nameEN
+                              : subjects[index].nameAr,
+                          context: context,
+                          onTap: () {
+                            Navigator.of(context)
+                                .push(MaterialPageRoute(
+                                builder: (context) => Chapter(
+                                  subjectID: subjects[index]
+                                      .idToEdit,
+                                  name: Localizations
+                                      .localeOf(
+                                      context)
+                                      .toString() ==
+                                      "en"
+                                      ? subjects[index].nameEN
+                                      : subjects[index]
+                                      .nameAr,
+                                )));
+                          });
+                    },
+                  ),
+                ),
+                SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.01,
+                ),
+                Text(
+                  LocaleKeys.new_games.tr(),
+                  style: GoogleFonts.rubik(
+                    fontSize: 16,
+                    color: Colors.black,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.01,
+                ),
+                SizedBox(
+                  height: MediaQuery.of(context).size.width * 0.25,
+                  child: ListView(
+                    shrinkWrap: true,
+                    scrollDirection: Axis.horizontal,
+                    children: [
+                      webgameCard(
+                        imagePath:
+                        "assets/images/games/Group 624573.png",
+                        discussionTitle: LocaleKeys.discussion.tr(),
+                        discussion: LocaleKeys.about_discussion.tr(),
+                        context: context,
                       ),
+                      webgameCard(
+                        imagePath:
+                        "assets/images/games/Group 20127.png",
+                        discussionTitle:
+                        LocaleKeys.five_days_chall.tr(),
+                        discussion:
+                        LocaleKeys.about_5_days_chall.tr(),
+                        context: context,
+                      ),
+                      webgameCard(
+                        imagePath:
+                        "assets/images/games/Group 624572.png",
+                        discussionTitle: LocaleKeys.challenge.tr(),
+                        discussion: LocaleKeys.about_chall.tr(),
+                        context: context,
+                      ),
+                    ],
+                  ),
+                ),
+                webscoreStack(
+                  subject: "Subject: $subName",
+                  score: LocaleKeys.last_test_score.tr(),
+                  context: context,
+                  percent: lastTestPercentage.toInt(),
+                  foregroundColor: Colors.blue.shade400,
+                  direction:
+                  Localizations.localeOf(context).toString() ==
+                      "en"
+                      ? Direction.rtl
+                      : Direction.ltr,
+                  backgroundColor: Colors.blueAccent.shade700,
+                ),
+                SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.02,
+                ),
+                webscoreStack(
+                  subject: "Subject: Math",
+                  score: LocaleKeys.last_game_score.tr(),
+                  context: context,
+                  percent: 42,
+                  foregroundColor: Colors.pink.shade300,
+                  direction:
+                  Localizations.localeOf(context).toString() ==
+                      "en"
+                      ? Direction.rtl
+                      : Direction.ltr,
+                  backgroundColor: Colors.pink.shade800,
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+    else {
+      return RefreshIndicator(
+        onRefresh: () => getUserData(),
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(12.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Card(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: TxtFld(
+                    onSubmit: (v) {
+                      log("dsfsacsdcsadcsadcsdac sad");
+                    },
+                    controller: searchController,
+                    label: LocaleKeys.search_num.tr(),
+                    picon: Icon(
+                      Icons.search,
+                      size: MediaQuery.of(context).size.width * 0.08,
                     ),
                   ),
-                );
-              } else {
-                return RefreshIndicator(
-                  onRefresh: () => getUserData(),
-                  child: SingleChildScrollView(
-                    child: Padding(
-                      padding: const EdgeInsets.all(12.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Card(
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: TxtFld(
-                              onSubmit: (v) {
-                                log("dsfsacsdcsadcsadcsdac sad");
-                              },
-                              controller: searchController,
-                              label: LocaleKeys.search_num.tr(),
-                              picon: Icon(
-                                Icons.search,
-                                size: MediaQuery.of(context).size.width * 0.08,
-                              ),
-                            ),
-                          ),
-                          SizedBox(
-                            height: MediaQuery.of(context).size.height * 0.02,
-                          ),
-                          Text(LocaleKeys.subjects.tr(),
-                              style: GoogleFonts.rubik(
-                                fontSize: 16,
-                                color: Colors.black,
-                                fontWeight: FontWeight.w600,
-                              )),
-                          SizedBox(
-                            height: MediaQuery.of(context).size.height * 0.02,
-                          ),
-                          SizedBox(
-                            height: MediaQuery.of(context).size.height * 0.18,
-                            child: ListView.builder(
-                              shrinkWrap: true,
-                              scrollDirection: Axis.horizontal,
-                              itemCount: subjects.length,
-                              itemBuilder: (context, index) {
-                                return categoryCard(
-                                    imagePath: subjects[index].imageURL,
-                                    title: Localizations.localeOf(context)
-                                                .toString() ==
-                                            "en"
-                                        ? subjects[index].nameEN
-                                        : subjects[index].nameAr,
-                                    context: context,
-                                    onTap: () {
-                                      Navigator.of(context)
-                                          .push(MaterialPageRoute(
-                                              builder: (context) => Chapter(
-                                                    subjectID: subjects[index]
-                                                        .idToEdit,
-                                                    name: Localizations
-                                                                    .localeOf(
-                                                                        context)
-                                                                .toString() ==
-                                                            "en"
-                                                        ? subjects[index].nameEN
-                                                        : subjects[index]
-                                                            .nameAr,
-                                                  )));
-                                    });
-                              },
-                            ),
-                          ),
-                          SizedBox(
-                            height: MediaQuery.of(context).size.height * 0.02,
-                          ),
-                          Text(LocaleKeys.new_games.tr(),
-                              style: GoogleFonts.rubik(
-                                fontSize: 16,
-                                color: Colors.black,
-                                fontWeight: FontWeight.w600,
-                              )),
-                          SizedBox(
-                            height: MediaQuery.of(context).size.height * 0.02,
-                          ),
-                          SizedBox(
-                            height: MediaQuery.of(context).size.width * 0.50,
-                            child: ListView(
-                              shrinkWrap: true,
-                              scrollDirection: Axis.horizontal,
-                              children: [
-                                SizedBox(
-                                  width:
-                                      MediaQuery.of(context).size.width * 0.01,
-                                ),
-                                gameCard(
-                                  imagePath:
-                                      "assets/images/games/Group 624573.png",
-                                  discussionTitle: LocaleKeys.discussion.tr(),
-                                  discussion: LocaleKeys.about_discussion.tr(),
-                                  context: context,
-                                ),
-                                SizedBox(
-                                  width:
-                                      MediaQuery.of(context).size.width * 0.02,
-                                ),
-                                gameCard(
-                                  imagePath:
-                                      "assets/images/games/Group 20127.png",
-                                  discussionTitle:
-                                      LocaleKeys.five_days_chall.tr(),
-                                  discussion:
-                                      LocaleKeys.about_5_days_chall.tr(),
-                                  context: context,
-                                ),
-                                SizedBox(
-                                  width:
-                                      MediaQuery.of(context).size.width * 0.02,
-                                ),
-                                gameCard(
-                                  imagePath:
-                                      "assets/images/games/Group 624572.png",
-                                  discussionTitle: LocaleKeys.challenge.tr(),
-                                  discussion: LocaleKeys.about_chall.tr(),
-                                  context: context,
-                                ),
-                              ],
-                            ),
-                          ),
-                          SizedBox(
-                            height: MediaQuery.of(context).size.height * 0.02,
-                          ),
-                          scoreStack(
-                            subject: "Subject: science",
-                            score: LocaleKeys.last_test_score.tr(),
-                            context: context,
-                            percent: 62,
-                            foregroundColor: Colors.blue.shade400,
-                            direction:
-                                Localizations.localeOf(context).toString() ==
-                                        "en"
-                                    ? Direction.rtl
-                                    : Direction.ltr,
-                            backgroundColor: Colors.blueAccent.shade700,
-                          ),
-                          SizedBox(
-                            height: MediaQuery.of(context).size.height * 0.02,
-                          ),
-                          scoreStack(
-                            subject: "Subject: Math",
-                            score: LocaleKeys.last_game_score.tr(),
-                            context: context,
-                            percent: 42,
-                            foregroundColor: Colors.pink.shade300,
-                            direction:
-                                Localizations.localeOf(context).toString() ==
-                                        "en"
-                                    ? Direction.rtl
-                                    : Direction.ltr,
-                            backgroundColor: Colors.pink.shade800,
-                          ),
-                        ],
-                      ),
-                    ),
+                ),
+                SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.02,
+                ),
+                Text(LocaleKeys.subjects.tr(),
+                    style: GoogleFonts.rubik(
+                      fontSize: 16,
+                      color: Colors.black,
+                      fontWeight: FontWeight.w600,
+                    )),
+                SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.02,
+                ),
+                SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.18,
+                  child: ListView.builder(
+                    shrinkWrap: true,
+                    scrollDirection: Axis.horizontal,
+                    itemCount: subjects.length,
+                    itemBuilder: (context, index) {
+                      return categoryCard(
+                          imagePath: subjects[index].imageURL,
+                          title: Localizations.localeOf(context)
+                              .toString() ==
+                              "en"
+                              ? subjects[index].nameEN
+                              : subjects[index].nameAr,
+                          context: context,
+                          onTap: () {
+                            Navigator.of(context)
+                                .push(MaterialPageRoute(
+                                builder: (context) => Chapter(
+                                  subjectID: subjects[index]
+                                      .idToEdit,
+                                  name: Localizations
+                                      .localeOf(
+                                      context)
+                                      .toString() ==
+                                      "en"
+                                      ? subjects[index].nameEN
+                                      : subjects[index]
+                                      .nameAr,
+                                )));
+                          });
+                    },
                   ),
-                );
-              }
-            }));
+                ),
+                SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.02,
+                ),
+                Text(LocaleKeys.new_games.tr(),
+                    style: GoogleFonts.rubik(
+                      fontSize: 16,
+                      color: Colors.black,
+                      fontWeight: FontWeight.w600,
+                    )),
+                SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.02,
+                ),
+                SizedBox(
+                  height: MediaQuery.of(context).size.width * 0.50,
+                  child: ListView(
+                    shrinkWrap: true,
+                    scrollDirection: Axis.horizontal,
+                    children: [
+                      SizedBox(
+                        width:
+                        MediaQuery.of(context).size.width * 0.01,
+                      ),
+                      gameCard(
+                        imagePath:
+                        "assets/images/games/Group 624573.png",
+                        discussionTitle: LocaleKeys.discussion.tr(),
+                        discussion: LocaleKeys.about_discussion.tr(),
+                        context: context,
+                      ),
+                      SizedBox(
+                        width:
+                        MediaQuery.of(context).size.width * 0.02,
+                      ),
+                      gameCard(
+                        imagePath:
+                        "assets/images/games/Group 20127.png",
+                        discussionTitle:
+                        LocaleKeys.five_days_chall.tr(),
+                        discussion:
+                        LocaleKeys.about_5_days_chall.tr(),
+                        context: context,
+                      ),
+                      SizedBox(
+                        width:
+                        MediaQuery.of(context).size.width * 0.02,
+                      ),
+                      gameCard(
+                        imagePath:
+                        "assets/images/games/Group 624572.png",
+                        discussionTitle: LocaleKeys.challenge.tr(),
+                        discussion: LocaleKeys.about_chall.tr(),
+                        context: context,
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.02,
+                ),
+                scoreStack(
+                  subject: "Subject: $subName",
+                  score: LocaleKeys.last_test_score.tr(),
+                  context: context,
+                  percent: lastTestPercentage.toInt(),
+                  foregroundColor: Colors.blue.shade400,
+                  direction:
+                  Localizations.localeOf(context).toString() ==
+                      "en"
+                      ? Direction.rtl
+                      : Direction.ltr,
+                  backgroundColor: Colors.blueAccent.shade700,
+                ),
+                SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.02,
+                ),
+                scoreStack(
+                  subject: "Subject: Math",
+                  score: LocaleKeys.last_game_score.tr(),
+                  context: context,
+                  percent: 42,
+                  foregroundColor: Colors.pink.shade300,
+                  direction:
+                  Localizations.localeOf(context).toString() ==
+                      "en"
+                      ? Direction.rtl
+                      : Direction.ltr,
+                  backgroundColor: Colors.pink.shade800,
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
   }
 }

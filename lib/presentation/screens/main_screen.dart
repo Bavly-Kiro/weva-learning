@@ -140,7 +140,8 @@ class _MainScreenState extends State<MainScreen> {
                                 : Colors.black,
                           ),
                           title: Text('Friends'),
-                          activeColor: Colors.blue),
+                          activeColor: Colors.blue
+                      ),
                       BottomNavyBarItem(
                           textAlign: TextAlign.center,
                           icon: Icon(

@@ -471,10 +471,13 @@ class _SelectedLessonState extends State<SelectedLesson> {
                         text: LocaleKeys.download_pdf.tr(),
                         onpressed: () async {
                           if (await checkConnectionn()) {
+
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => pdfScreen(PDFURL: 'https://cdn.syncfusion.com/content/PDFViewer/flutter-succinctly.pdf',)));
+                                    builder: (context) => pdfScreen(PDFURL: 'https://cdn.syncfusion.com/content/PDFViewer/flutter-succinctly.pdf',))
+                            );
+
                           } else {
                             showDialog(
                                 barrierDismissible: false,

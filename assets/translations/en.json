@@ -27,6 +27,9 @@
   "email": "E-mail",
   "pass": "Password",
   "confirm_pass": "confirm Password",
+  "full_name": "Full Name",
+  "number": "Mobile Number",
+  "schoolName": "your school name",
 
 
   "sign_in_face": "Sign in with Facebook",
@@ -36,7 +39,7 @@
 
 
   "hello": "Hello",
-  "what_do_you": "what do you learn today ?",
+  "what_do_you": "what do you want to learn today ?",
   "search_num": "Search for your Friends by number",
   "new_games": "New Games",
   "discussion": "Discussion",

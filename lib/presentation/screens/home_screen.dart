@@ -15,12 +15,15 @@ import '../../back/checkConnection.dart';
 import '../../back/loading.dart';
 import '../../back/models/levels.dart';
 import '../../back/models/subject.dart';
+import '../../constants.dart';
 import '../../cubit/home_cubit/home_cubit_bloc.dart';
 import '../../cubit/home_cubit/home_cubit_state.dart';
 import '../../translations/locale_keys.g.dart';
 import '../widgets/aTXTFld.dart';
 import '../widgets/alert_dialog.dart';
 import '../widgets/catecory_card.dart';
+import '../widgets/default_button.dart';
+import '../widgets/dropdown_textField.dart';
 import '../widgets/game_card.dart';
 import '12_chapter.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
@@ -40,19 +43,157 @@ class _HomeScreenState extends State<HomeScreen> {
   String url = "";
   String gradeID = "";
 
-
   String subName = "";
   int rightAns = 0;
   int totalAns = 0;
   double lastTestPercentage = 0;
-  
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-
+    // getChapters();
+    //
+    Selectedvalue1 = null;
+    Selectedvalue2 = null;
     getUserData();
   }
+
+  List<lesson> lessons = [];
+  List<String> lessonss = [];
+  //
+  // List<chapter> chapters = [];
+  // List<String> chapterss = [];
+
+  //
+  // void getChapters(subjectID) async{
+  //
+  //   chapters = [];
+  //   chapterss = [];
+  //
+  //   if(await checkConnectionn()){
+  //
+  //     loading(context: context);
+  //
+  //     FirebaseFirestore.instance.collection('chapters').where("subjectID", isEqualTo: widget.subjectID).get(const GetOptions(source: Source.server))
+  //         .then((value) {
+  //
+  //
+  //       final List<chapter> loadData = [];
+  //
+  //       for (var element in value.docs) {
+  //         //element.data();
+  //         //log(element.data()['nameAr'].toString());
+  //
+  //         loadData.add(chapter(
+  //           idToEdit: element.id,
+  //           nameAr: element.data()['nameAr'] ?? "",
+  //           nameEN: element.data()['nameEN'] ?? "",
+  //           subjectID: element.data()['subjectID'] ?? "",
+  //           mrID: element.data()['mrID'] ?? "",
+  //           chNum: element.data()['chNum'] ?? "",
+  //
+  //           userDoneAction: element.data()['userDoneAction'] ?? "",
+  //           LastUserDoneAction: element.data()['LastUserDoneAction'] ?? "",
+  //           status: element.data()['status'] ?? "",
+  //
+  //         ));
+  //
+  //         chapterss.add(Localizations.localeOf(context).toString() == "en" ? element.data()['nameEN'] : element.data()['nameAr']);
+  //
+  //       }
+  //
+  //       //loadData.sort((a, b) => a.chNum.compareTo(b.chNum));
+  //
+  //       setState(() {
+  //         chapters = loadData;
+  //       });
+  //
+  //       Navigator.of(context).pop();
+  //
+  //       //getLessons();
+  //
+  //     }).onError((error, stackTrace) {
+  //
+  //       log(error.toString());
+  //       showToast("Error: $error");
+  //
+  //     });
+  //
+  //   }else{
+  //
+  //     showToast("Check Internet Connection !");
+  //
+  //   }
+  //
+  // }
+  //
+  //
+  // List<lesson> lessons = [];
+  // List<String> lessonss = [];
+  //
+  // void getLessons(chapterID) async{
+  //
+  //   lessons = [];
+  //   lessonss = [];
+  //
+  //   if(await checkConnectionn()){
+  //
+  //     loading(context: context);
+  //
+  //     FirebaseFirestore.instance.collection('lessons').where("chapterID", isEqualTo: chapterID).get(const GetOptions(source: Source.server))
+  //         .then((value) {
+  //
+  //
+  //       final List<lesson> loadData = [];
+  //
+  //       for (var element in value.docs) {
+  //         //element.data();
+  //         //log(element.data()['nameAr'].toString());
+  //
+  //         loadData.add(lesson(
+  //           idToEdit: element.id,
+  //           nameAr: element.data()['nameAr'] ?? "",
+  //           nameEN: element.data()['nameEN'] ?? "",
+  //           subjectID: element.data()['subjectID'] ?? "",
+  //           chapterID: element.data()['chapterID'] ?? "",
+  //           mrID: element.data()['mrID'] ?? "",
+  //           lessNum: element.data()['lessNum'] ?? "",
+  //
+  //           userDoneAction: element.data()['userDoneAction'] ?? "",
+  //           LastUserDoneAction: element.data()['LastUserDoneAction'] ?? "",
+  //           status: element.data()['status'] ?? "",
+  //
+  //         ));
+  //
+  //         lessonss.add(Localizations.localeOf(context).toString() == "en" ? element.data()['nameEN'] : element.data()['nameAr']);
+  //
+  //       }
+  //
+  //       //loadData.sort((a, b) => a.lessNum.compareTo(b.lessNum));
+  //
+  //       setState(() {
+  //         lessons = loadData;
+  //       });
+  //
+  //       Navigator.of(context).pop();
+  //
+  //     }).onError((error, stackTrace) {
+  //
+  //       log(error.toString());
+  //       showToast("Error: $error");
+  //
+  //     });
+  //
+  //   }else{
+  //
+  //     showToast("Check Internet Connection !");
+  //
+  //   }
+  //
+  // }
+
+  String value = "";
 
   Future<void> getUserData() async {
     if (await checkConnectionn()) {
@@ -63,7 +204,6 @@ class _HomeScreenState extends State<HomeScreen> {
           .doc(FirebaseAuth.instance.currentUser!.uid)
           .get(const GetOptions(source: Source.server))
           .then((value) async {
-            
         name = value.get("name");
         email = value.get("email");
         url = value.get("imageURL");
@@ -76,37 +216,27 @@ class _HomeScreenState extends State<HomeScreen> {
         prefs.setString('url', value.get("imageURL"));
         prefs.setString('gradeID', value.get("gradeID"));
 
-
         FirebaseFirestore.instance
             .collection('lastTestScore')
             .doc(FirebaseAuth.instance.currentUser!.uid)
             .get(const GetOptions(source: Source.server))
             .then((valuee) async {
+          if (valuee.exists) {
+            log("exist");
 
-
-              if(valuee.exists){
-
-                log("exist");
-
-                setState(() {
-                  subName = valuee.get("subjectName") ?? "";
-                  rightAns = valuee.get("rightAns") ?? 0;
-                  totalAns = valuee.get("totalAns") ?? 0;
-                  lastTestPercentage = 100 * (rightAns) / (totalAns);
-                });
-
-              }
-
-
+            setState(() {
+              subName = valuee.get("subjectName") ?? "";
+              rightAns = valuee.get("rightAns") ?? 0;
+              totalAns = valuee.get("totalAns") ?? 0;
+              lastTestPercentage = 100 * (rightAns) / (totalAns);
+            });
+          }
 
           getSubjects();
         }).onError((error, stackTrace) {
           log(error.toString());
           showToast("Error: $error");
         });
-        
-        
-        
       }).onError((error, stackTrace) {
         log(error.toString());
         showToast("Error: $error");
@@ -163,7 +293,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-     if (kIsWeb) {
+    if (kIsWeb) {
       return RefreshIndicator(
         onRefresh: () => getUserData(),
         child: SingleChildScrollView(
@@ -173,73 +303,53 @@ class _HomeScreenState extends State<HomeScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 TxtFld(
-                  onSubmit: (v) async{
-
-                    if(v.isNotEmpty) {
-
+                  onSubmit: (v) async {
+                    if (v.isNotEmpty) {
                       List<friend> friends = [];
 
+                      if (await checkConnectionn()) {
+                        loading(context: context);
 
-                        if (await checkConnectionn()) {
-                          loading(context: context);
+                        FirebaseFirestore.instance
+                            .collection('students')
+                            .where("number", isEqualTo: v)
+                            .get(const GetOptions(source: Source.server))
+                            .then((value) {
+                          final List<friend> loadData = [];
 
-                          FirebaseFirestore.instance
-                              .collection('students')
-                              .where("number", isEqualTo: v)
-                              .get(const GetOptions(source: Source.server))
-                              .then((value) {
+                          for (var element in value.docs) {
+                            loadData.add(friend(
+                              idToEdit: element.id,
+                              name: element.data()['name'] ?? "",
+                              number: element.data()['number'] ?? "",
+                              imageURL: element.data()['imageURL'] ?? "",
+                              userID: element.data()['userID'] ?? "",
+                              friendID: element.data()['friendID'] ?? "",
+                            ));
+                          }
 
-                            final List<friend> loadData = [];
+                          loadData.sort((a, b) => a.name.compareTo(b.name));
 
-                            for (var element in value.docs) {
-
-                              loadData.add(friend(
-                                idToEdit: element.id,
-                                name: element.data()['name'] ?? "",
-                                number: element.data()['number'] ?? "",
-                                imageURL: element.data()['imageURL'] ?? "",
-                                userID: element.data()['userID'] ?? "",
-                                friendID: element.data()['friendID'] ?? "",
-
-                              ));
-                            }
-
-                            loadData.sort((a, b) => a.name.compareTo(b.name));
-
-                            setState(() {
-                              friends = loadData;
-                            });
-
-                            Navigator.of(context).pop();
-
-                            showDialog(
-                                barrierDismissible: false,
-                                context: context,
-                                builder: (context) {
-                                  return findFriends(
-                                      context,
-                                      "",
-                                    "",
-                                    friends
-                                  );
-                                });
-
-
-                          }).onError((error, stackTrace) {
-                            log(error.toString());
-                            showToast("Error: $error");
+                          setState(() {
+                            friends = loadData;
                           });
-                        } else {
-                          showToast("Check Internet Connection !");
-                        }
 
+                          Navigator.of(context).pop();
 
-
-
-
-
+                          showDialog(
+                              barrierDismissible: false,
+                              context: context,
+                              builder: (context) {
+                                return findFriends(context, "", "", friends);
+                              });
+                        }).onError((error, stackTrace) {
+                          log(error.toString());
+                          showToast("Error: $error");
+                        });
+                      } else {
+                        showToast("Check Internet Connection !");
+                      }
                     }
-
                   },
                   controller: searchController,
                   label: LocaleKeys.search_num.tr(),
@@ -269,27 +379,21 @@ class _HomeScreenState extends State<HomeScreen> {
                     itemBuilder: (context, index) {
                       return webcategoryCard(
                           imagePath: subjects[index].imageURL,
-                          title: Localizations.localeOf(context)
-                              .toString() ==
-                              "en"
-                              ? subjects[index].nameEN
-                              : subjects[index].nameAr,
+                          title:
+                              Localizations.localeOf(context).toString() == "en"
+                                  ? subjects[index].nameEN
+                                  : subjects[index].nameAr,
                           context: context,
                           onTap: () {
-                            Navigator.of(context)
-                                .push(MaterialPageRoute(
+                            Navigator.of(context).push(MaterialPageRoute(
                                 builder: (context) => Chapter(
-                                  subjectID: subjects[index]
-                                      .idToEdit,
-                                  name: Localizations
-                                      .localeOf(
-                                      context)
-                                      .toString() ==
-                                      "en"
-                                      ? subjects[index].nameEN
-                                      : subjects[index]
-                                      .nameAr,
-                                )));
+                                      subjectID: subjects[index].idToEdit,
+                                      name: Localizations.localeOf(context)
+                                                  .toString() ==
+                                              "en"
+                                          ? subjects[index].nameEN
+                                          : subjects[index].nameAr,
+                                    )));
                           });
                     },
                   ),
@@ -315,24 +419,131 @@ class _HomeScreenState extends State<HomeScreen> {
                     scrollDirection: Axis.horizontal,
                     children: [
                       webgameCard(
-                        imagePath:
-                        "assets/images/games/Group 624573.png",
+                        imagePath: "assets/images/games/Group 624573.png",
                         discussionTitle: LocaleKeys.discussion.tr(),
                         discussion: LocaleKeys.about_discussion.tr(),
                         context: context,
                       ),
                       webgameCard(
-                        imagePath:
-                        "assets/images/games/Group 20127.png",
-                        discussionTitle:
-                        LocaleKeys.five_days_chall.tr(),
-                        discussion:
-                        LocaleKeys.about_5_days_chall.tr(),
-                        context: context,
-                      ),
+                          imagePath: "assets/images/games/Group 20127.png",
+                          discussionTitle: LocaleKeys.five_days_chall.tr(),
+                          discussion: LocaleKeys.about_5_days_chall.tr(),
+                          context: context,
+                          onTap: () {
+                            showDialog(
+                              context: context,
+                              builder: (context) {
+                                var height = MediaQuery.of(context).size.height;
+                                var width = MediaQuery.of(context).size.width;
+                                return Container(
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.45,
+                                  child: AlertDialog(
+                                    insetPadding: EdgeInsets.symmetric(
+                                        horizontal: 200, vertical: 200),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(25),
+                                    ),
+                                    title: Center(
+                                      child: Text('Choose Chapter and lesson'),
+                                    ),
+                                    content: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        webDropDown(
+                                          // Selecteditems: [
+                                          //   'a7a',
+                                          //   'sha5ra',
+                                          //   'sha5ra b a7a'
+                                          // ],
+                                          Selecteditems: lessonss
+                                              .map(buildMenuitem)
+                                              .toList(),
+                                          SelectedValue: Selectedvalue2,
+                                          onChanged: (valuee) {
+                                            setState(() {
+                                              Selectedvalue1 = valuee;
+                                              value = valuee;
+
+                                              // log(value);
+                                              //
+                                              // log(chapters[chapters.indexWhere((f) => (Localizations.localeOf(context).toString() == "en"? f.nameEN : f.nameAr) == value)].idToEdit);
+                                              //
+                                              //
+                                              // getLessons(chapters[chapters.indexWhere((f) => (Localizations.localeOf(context).toString() == "en"? f.nameEN : f.nameAr) == value)].idToEdit);
+                                            });
+                                          },
+                                          context: context,
+                                          hint: 'Chapter',
+                                        ),
+                                        SizedBox(
+                                          height: MediaQuery.of(context)
+                                                  .size
+                                                  .height *
+                                              0.03,
+                                        ),
+                                        webDropDown(
+                                          // Selecteditems: [
+                                          //   'nfs el a7a',
+                                          //   'nfs el sha5ra',
+                                          //   'nfs el sha5ra b a7a',
+                                          // ],
+                                          Selecteditems: lessonss
+                                              .map(buildMenuitem)
+                                              .toList(),
+                                          SelectedValue: Selectedvalue2,
+                                          onChanged: (value) {
+                                            setState(() {
+                                              Selectedvalue2 = value;
+                                            });
+                                          },
+                                          context: context,
+                                          hint: 'Lesson',
+                                        ),
+                                      ],
+                                    ),
+                                    actions: [
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          smalldefaultButton(
+                                            context: context,
+                                            color: Colors.white70,
+                                            textColor: Colors.black,
+                                            text: LocaleKeys.cancel.tr(),
+                                            onpressed: () {
+                                              Navigator.pop(context);
+                                            },
+                                          ),
+                                          SizedBox(
+                                            width: MediaQuery.of(context)
+                                                    .size
+                                                    .width *
+                                                0.03,
+                                          ),
+                                          smalldefaultButton(
+                                            color: dodblue,
+                                            text: LocaleKeys.submit.tr(),
+                                            onpressed: () {},
+                                            context: context,
+                                          ),
+                                        ],
+                                      ),
+                                      SizedBox(
+                                        height:
+                                            MediaQuery.of(context).size.height *
+                                                0.02,
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
+                            );
+                          }),
                       webgameCard(
-                        imagePath:
-                        "assets/images/games/Group 624572.png",
+                        imagePath: "assets/images/games/Group 624572.png",
                         discussionTitle: LocaleKeys.challenge.tr(),
                         discussion: LocaleKeys.about_chall.tr(),
                         context: context,
@@ -346,9 +557,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   context: context,
                   percent: lastTestPercentage.toInt(),
                   foregroundColor: Colors.blue.shade400,
-                  direction:
-                  Localizations.localeOf(context).toString() ==
-                      "en"
+                  direction: Localizations.localeOf(context).toString() == "en"
                       ? Direction.rtl
                       : Direction.ltr,
                   backgroundColor: Colors.blueAccent.shade700,
@@ -362,9 +571,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   context: context,
                   percent: 42,
                   foregroundColor: Colors.pink.shade300,
-                  direction:
-                  Localizations.localeOf(context).toString() ==
-                      "en"
+                  direction: Localizations.localeOf(context).toString() == "en"
                       ? Direction.rtl
                       : Direction.ltr,
                   backgroundColor: Colors.pink.shade800,
@@ -374,8 +581,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
       );
-    }
-    else {
+    } else {
       return RefreshIndicator(
         onRefresh: () => getUserData(),
         child: SingleChildScrollView(
@@ -421,27 +627,21 @@ class _HomeScreenState extends State<HomeScreen> {
                     itemBuilder: (context, index) {
                       return categoryCard(
                           imagePath: subjects[index].imageURL,
-                          title: Localizations.localeOf(context)
-                              .toString() ==
-                              "en"
-                              ? subjects[index].nameEN
-                              : subjects[index].nameAr,
+                          title:
+                              Localizations.localeOf(context).toString() == "en"
+                                  ? subjects[index].nameEN
+                                  : subjects[index].nameAr,
                           context: context,
                           onTap: () {
-                            Navigator.of(context)
-                                .push(MaterialPageRoute(
+                            Navigator.of(context).push(MaterialPageRoute(
                                 builder: (context) => Chapter(
-                                  subjectID: subjects[index]
-                                      .idToEdit,
-                                  name: Localizations
-                                      .localeOf(
-                                      context)
-                                      .toString() ==
-                                      "en"
-                                      ? subjects[index].nameEN
-                                      : subjects[index]
-                                      .nameAr,
-                                )));
+                                      subjectID: subjects[index].idToEdit,
+                                      name: Localizations.localeOf(context)
+                                                  .toString() ==
+                                              "en"
+                                          ? subjects[index].nameEN
+                                          : subjects[index].nameAr,
+                                    )));
                           });
                     },
                   ),
@@ -465,36 +665,140 @@ class _HomeScreenState extends State<HomeScreen> {
                     scrollDirection: Axis.horizontal,
                     children: [
                       SizedBox(
-                        width:
-                        MediaQuery.of(context).size.width * 0.01,
+                        width: MediaQuery.of(context).size.width * 0.01,
                       ),
                       gameCard(
-                        imagePath:
-                        "assets/images/games/Group 624573.png",
+                        imagePath: "assets/images/games/Group 624573.png",
                         discussionTitle: LocaleKeys.discussion.tr(),
                         discussion: LocaleKeys.about_discussion.tr(),
                         context: context,
                       ),
                       SizedBox(
-                        width:
-                        MediaQuery.of(context).size.width * 0.02,
+                        width: MediaQuery.of(context).size.width * 0.02,
                       ),
                       gameCard(
-                        imagePath:
-                        "assets/images/games/Group 20127.png",
-                        discussionTitle:
-                        LocaleKeys.five_days_chall.tr(),
-                        discussion:
-                        LocaleKeys.about_5_days_chall.tr(),
-                        context: context,
-                      ),
+                          imagePath: "assets/images/games/Group 20127.png",
+                          discussionTitle: LocaleKeys.five_days_chall.tr(),
+                          discussion: LocaleKeys.about_5_days_chall.tr(),
+                          context: context,
+                          onTap: () {
+                            showDialog(
+                              context: context,
+                              builder: (context) {
+                                var height = MediaQuery.of(context).size.height;
+                                var width = MediaQuery.of(context).size.width;
+                                return Container(
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.45,
+                                  child: AlertDialog(
+                                    insetPadding: EdgeInsets.symmetric(
+                                        horizontal: 200, vertical: 200),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(25),
+                                    ),
+                                    title: Center(
+                                      child: Text('Choose Chapter and lesson'),
+                                    ),
+                                    content: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        DropDown(
+                                          // Selecteditems: [
+                                          //   'a7a',
+                                          //   'sha5ra',
+                                          //   'sha5ra b a7a'
+                                          // ],
+                                          Selecteditems: lessonss
+                                              .map(buildMenuitem)
+                                              .toList(),
+                                          SelectedValue: Selectedvalue2,
+                                          onChanged: (valuee) {
+                                            setState(() {
+                                              Selectedvalue1 = valuee;
+                                              value = valuee;
+
+                                              // log(value);
+                                              //
+                                              // log(chapters[chapters.indexWhere((f) => (Localizations.localeOf(context).toString() == "en"? f.nameEN : f.nameAr) == value)].idToEdit);
+                                              //
+                                              //
+                                              // getLessons(chapters[chapters.indexWhere((f) => (Localizations.localeOf(context).toString() == "en"? f.nameEN : f.nameAr) == value)].idToEdit);
+                                            });
+                                          },
+                                          context: context,
+                                          hint: 'Chapter',
+                                        ),
+                                        SizedBox(
+                                          height: MediaQuery.of(context)
+                                                  .size
+                                                  .height *
+                                              0.03,
+                                        ),
+                                        DropDown(
+                                          // Selecteditems: [
+                                          //   'nfs el a7a',
+                                          //   'nfs el sha5ra',
+                                          //   'nfs el sha5ra b a7a',
+                                          // ],
+                                          Selecteditems: lessonss
+                                              .map(buildMenuitem)
+                                              .toList(),
+                                          SelectedValue: Selectedvalue2,
+                                          onChanged: (value) {
+                                            setState(() {
+                                              Selectedvalue2 = value;
+                                            });
+                                          },
+                                          context: context,
+                                          hint: 'Lesson',
+                                        ),
+                                      ],
+                                    ),
+                                    actions: [
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          smalldefaultButton(
+                                            context: context,
+                                            color: Colors.white70,
+                                            textColor: Colors.black,
+                                            text: LocaleKeys.cancel.tr(),
+                                            onpressed: () {
+                                              Navigator.pop(context);
+                                            },
+                                          ),
+                                          SizedBox(
+                                            width: MediaQuery.of(context)
+                                                    .size
+                                                    .width *
+                                                0.03,
+                                          ),
+                                          smalldefaultButton(
+                                            color: dodblue,
+                                            text: LocaleKeys.submit.tr(),
+                                            onpressed: () {},
+                                            context: context,
+                                          ),
+                                        ],
+                                      ),
+                                      SizedBox(
+                                        height:
+                                            MediaQuery.of(context).size.height *
+                                                0.02,
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
+                            );
+                          }),
                       SizedBox(
-                        width:
-                        MediaQuery.of(context).size.width * 0.02,
+                        width: MediaQuery.of(context).size.width * 0.02,
                       ),
                       gameCard(
-                        imagePath:
-                        "assets/images/games/Group 624572.png",
+                        imagePath: "assets/images/games/Group 624572.png",
                         discussionTitle: LocaleKeys.challenge.tr(),
                         discussion: LocaleKeys.about_chall.tr(),
                         context: context,
@@ -511,9 +815,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   context: context,
                   percent: lastTestPercentage.toInt(),
                   foregroundColor: Colors.blue.shade400,
-                  direction:
-                  Localizations.localeOf(context).toString() ==
-                      "en"
+                  direction: Localizations.localeOf(context).toString() == "en"
                       ? Direction.rtl
                       : Direction.ltr,
                   backgroundColor: Colors.blueAccent.shade700,
@@ -527,9 +829,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   context: context,
                   percent: 42,
                   foregroundColor: Colors.pink.shade300,
-                  direction:
-                  Localizations.localeOf(context).toString() ==
-                      "en"
+                  direction: Localizations.localeOf(context).toString() == "en"
                       ? Direction.rtl
                       : Direction.ltr,
                   backgroundColor: Colors.pink.shade800,

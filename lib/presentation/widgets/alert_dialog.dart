@@ -13,9 +13,9 @@ import '../../back/loading.dart';
 import '../../back/models/levels.dart';
 import '../../constants.dart';
 import '../../translations/locale_keys.g.dart';
+import '../screens/6 sign in.dart';
 import '../screens/Exam.dart';
 import '../screens/Live.dart';
-import '../screens/empty.dart';
 import 'friend_card.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 
@@ -320,381 +320,386 @@ Widget textAlert(context, String text1, String text2) => AlertDialog(
     );
 
 Widget openExam(context, videoID, userID, type, subjectName) => AlertDialog(
-  shape: RoundedRectangleBorder(
-    borderRadius: BorderRadius.circular(25),
-  ),
-  title: Column(
-    children: [
-      Text(
-        LocaleKeys.be_ready.tr(),
-        style: GoogleFonts.rubik(
-          fontSize: 22.0,
-          fontWeight: FontWeight.bold,
-        ),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(25),
       ),
-      SizedBox(
-        height: MediaQuery.of(context).size.height * 0.01,
+      title: Column(
+        children: [
+          Text(
+            LocaleKeys.be_ready.tr(),
+            style: GoogleFonts.rubik(
+              fontSize: 22.0,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          SizedBox(
+            height: MediaQuery.of(context).size.height * 0.01,
+          ),
+        ],
       ),
-    ],
-  ),
-  actions: [
-    Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        defaultButton(
-          context: context,
-          color: Colors.white70,
-          textColor: Colors.black,
-          text: LocaleKeys.cancel.tr(),
-          onpressed: () {
-
-            Navigator.pop(context);
-
-          },
+      actions: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            defaultButton(
+              context: context,
+              color: Colors.white70,
+              textColor: Colors.black,
+              text: LocaleKeys.cancel.tr(),
+              onpressed: () {
+                Navigator.pop(context);
+              },
+            ),
+            SizedBox(
+              width: MediaQuery.of(context).size.width * 0.03,
+            ),
+            defaultButton(
+              color: Colors.green,
+              text: LocaleKeys.start.tr(),
+              onpressed: () async {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => Exam(
+                              userID: userID,
+                              videoID: videoID,
+                              type: type,
+                              subjectName: subjectName,
+                            )));
+              },
+              context: context,
+            ),
+          ],
         ),
         SizedBox(
-          width: MediaQuery.of(context).size.width * 0.03,
-        ),
-        defaultButton(
-          color: Colors.green,
-          text: LocaleKeys.start.tr(),
-          onpressed: () async {
-
-            Navigator.push(context, MaterialPageRoute(builder: (context) => Exam(userID: userID, videoID: videoID, type: type,subjectName: subjectName,)));
-
-          },
-          context: context,
+          height: MediaQuery.of(context).size.height * 0.02,
         ),
       ],
-    ),
-    SizedBox(
-      height: MediaQuery.of(context).size.height * 0.02,
-    ),
-  ],
-);
+    );
 
 Widget startExam(context, String text1, String text2) => AlertDialog(
-  shape: RoundedRectangleBorder(
-    borderRadius: BorderRadius.circular(25),
-  ),
-  title: Column(
-    children: [
-      Text(
-        text1,
-        style: GoogleFonts.rubik(
-          fontSize: 22.0,
-          fontWeight: FontWeight.bold,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(25),
+      ),
+      title: Column(
+        children: [
+          Text(
+            text1,
+            style: GoogleFonts.rubik(
+              fontSize: 22.0,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          SizedBox(
+            height: MediaQuery.of(context).size.height * 0.01,
+          ),
+          Text(
+            text2,
+            style: GoogleFonts.rubik(
+              fontSize: 16.0,
+              color: Colors.grey,
+            ),
+          ),
+          SizedBox(
+            height: MediaQuery.of(context).size.height * 0.01,
+          ),
+        ],
+      ),
+      actions: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            defaultButton(
+              context: context,
+              color: Colors.white70,
+              textColor: Colors.black,
+              text: LocaleKeys.cancel.tr(),
+              onpressed: () {
+                Navigator.pop(context);
+              },
+            ),
+            SizedBox(
+              width: MediaQuery.of(context).size.width * 0.03,
+            ),
+            defaultButton(
+              color: Colors.green,
+              text: "Enter Live",
+              onpressed: () async {
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => LiveComments()));
+              },
+              context: context,
+            ),
+          ],
         ),
-      ),
-      SizedBox(
-        height: MediaQuery.of(context).size.height * 0.01,
-      ),
-      Text(
-        text2,
-        style: GoogleFonts.rubik(
-          fontSize: 16.0,
-          color: Colors.grey,
-        ),
-      ),
-      SizedBox(
-        height: MediaQuery.of(context).size.height * 0.01,
-      ),
-    ],
-  ),
-  actions: [
-    Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        defaultButton(
-          context: context,
-          color: Colors.white70,
-          textColor: Colors.black,
-          text: LocaleKeys.cancel.tr(),
-          onpressed: () {
-            Navigator.pop(context);
-          },
-        ),
-
         SizedBox(
-          width: MediaQuery.of(context).size.width * 0.03,
-        ),
-        defaultButton(
-          color: Colors.green,
-          text: "Enter Live",
-          onpressed: () async {
-
-            Navigator.push(context, MaterialPageRoute(builder: (context) => LiveComments()));
-
-          },
-          context: context,
+          height: MediaQuery.of(context).size.height * 0.02,
         ),
       ],
-    ),
-    SizedBox(
-      height: MediaQuery.of(context).size.height * 0.02,
-    ),
-  ],
-);
+    );
 
-
-Widget findFriends(context, String text1, String text2, List<friend> friends) => AlertDialog(
-  shape: RoundedRectangleBorder(
-    borderRadius: BorderRadius.circular(25),
-  ),
-  title: Column(
-    children: [
-      Text(
-        text1,
-        style: GoogleFonts.rubik(
-          fontSize: 22.0,
-          fontWeight: FontWeight.bold,
+Widget findFriends(context, String text1, String text2, List<friend> friends) =>
+    AlertDialog(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(25),
+      ),
+      title: Column(
+        children: [
+          Text(
+            text1,
+            style: GoogleFonts.rubik(
+              fontSize: 22.0,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          SizedBox(
+            height: MediaQuery.of(context).size.height * 0.01,
+          ),
+          SizedBox(
+            width: 400,
+            height: 200,
+            child: ListView.builder(
+                itemCount: friends.length,
+                shrinkWrap: true,
+                physics: NeverScrollableScrollPhysics(),
+                itemBuilder: (context, index) {
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 30.0),
+                    child: kIsWeb
+                        ? webfriendCard(
+                            context,
+                            friends[index].name,
+                            friends[index].imageURL,
+                            friends[index].number,
+                            friends[index].idToEdit,
+                            2)
+                        : friendCard(
+                            context,
+                            friends[index].name,
+                            friends[index].imageURL,
+                            friends[index].number,
+                            friends[index].idToEdit,
+                            2),
+                  );
+                }),
+          ),
+          SizedBox(
+            height: MediaQuery.of(context).size.height * 0.01,
+          ),
+        ],
+      ),
+      actions: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            defaultButton(
+              context: context,
+              color: Colors.white70,
+              textColor: Colors.black,
+              text: LocaleKeys.cancel.tr(),
+              onpressed: () {
+                Navigator.pop(context);
+              },
+            ),
+          ],
         ),
-      ),
-      SizedBox(
-        height: MediaQuery.of(context).size.height * 0.01,
-      ),
-
-      SizedBox(
-        width: 400,
-        height: 200,
-        child: ListView.builder(
-            itemCount: friends.length,
-            shrinkWrap: true,
-            physics: NeverScrollableScrollPhysics(),
-            itemBuilder: (context, index) {
-              return Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 30.0),
-                child: kIsWeb?
-                webfriendCard(
-                  context,
-                  friends[index].name,
-                  friends[index].imageURL,
-                  friends[index].number,
-                  friends[index].idToEdit,
-                  2
-                )
-                :
-                friendCard(
-                  context,
-                  friends[index].name,
-                  friends[index].imageURL,
-                  friends[index].number,
-                  friends[index].idToEdit,
-                    2
-                ),
-              );
-            }
+        SizedBox(
+          height: MediaQuery.of(context).size.height * 0.02,
         ),
-      ),
-
-      SizedBox(
-        height: MediaQuery.of(context).size.height * 0.01,
-      ),
-    ],
-  ),
-  actions: [
-    Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        defaultButton(
-          context: context,
-          color: Colors.white70,
-          textColor: Colors.black,
-          text: LocaleKeys.cancel.tr(),
-          onpressed: () {
-            Navigator.pop(context);
-          },
-        ),
-
       ],
-    ),
-    SizedBox(
-      height: MediaQuery.of(context).size.height * 0.02,
-    ),
-  ],
-);
-
+    );
 
 Widget recievedCall(context, String name, String callerID) => AlertDialog(
-  shape: RoundedRectangleBorder(
-    borderRadius: BorderRadius.circular(25),
-  ),
-  title: Column(
-    children: [
-      Text(
-        "$name want to start a room with You",
-        style: GoogleFonts.rubik(
-          fontSize: 22.0,
-          fontWeight: FontWeight.bold,
-        ),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(25),
       ),
-      SizedBox(
-        height: MediaQuery.of(context).size.height * 0.01,
+      title: Column(
+        children: [
+          Text(
+            "$name want to start a room with You",
+            style: GoogleFonts.rubik(
+              fontSize: 22.0,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          SizedBox(
+            height: MediaQuery.of(context).size.height * 0.01,
+          ),
+          Text(
+            "Accept.... ??",
+            style: GoogleFonts.rubik(
+              fontSize: 22.0,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          SizedBox(
+            height: MediaQuery.of(context).size.height * 0.01,
+          ),
+        ],
       ),
+      actions: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            kIsWeb
+                ? webdefaultButton(
+                    context: context,
+                    color: Colors.white70,
+                    textColor: Colors.black,
+                    text: LocaleKeys.cancel.tr(),
+                    onpressed: () {
+                      Navigator.pop(context);
 
-      Text(
-        "Accept.... ??",
-        style: GoogleFonts.rubik(
-          fontSize: 22.0,
-          fontWeight: FontWeight.bold,
+                      FlutterRingtonePlayer.stop();
+
+                      //wa a8yar al value bta3t caller
+                    },
+                  )
+                : defaultButton(
+                    context: context,
+                    color: Colors.white70,
+                    textColor: Colors.black,
+                    text: LocaleKeys.cancel.tr(),
+                    onpressed: () {
+                      Navigator.pop(context);
+
+                      FlutterRingtonePlayer.stop();
+
+                      //wa a8yar al value bta3t caller
+                    },
+                  ),
+            kIsWeb
+                ? webdefaultButton(
+                    context: context,
+                    color: Colors.white70,
+                    textColor: Colors.black,
+                    text: "Accept",
+                    onpressed: () async {
+                      FlutterRingtonePlayer.stop();
+
+                      if (await checkConnectionn()) {
+                        loading(context: context);
+
+                        FirebaseFirestore.instance
+                            .collection('students')
+                            .doc(callerID)
+                            .update({
+                          'call': 3,
+                          'callerID': FirebaseAuth.instance.currentUser!.uid,
+                        }).then((value) {
+                          Navigator.pop(context);
+                          Navigator.pop(context);
+
+                          Navigator.of(context).push(MaterialPageRoute(
+                              builder: (context) => SignIn()));
+                        }).catchError((error) {
+                          showToast("Failed to add: $error");
+                          print("Failed to add: $error");
+                        });
+                      } else {
+                        showToast("Check Internet Connection !");
+                      }
+                    },
+                  )
+                : defaultButton(
+                    context: context,
+                    color: Colors.white70,
+                    textColor: Colors.black,
+                    text: "Accept",
+                    onpressed: () async {
+                      FlutterRingtonePlayer.stop();
+
+                      if (await checkConnectionn()) {
+                        loading(context: context);
+
+                        FirebaseFirestore.instance
+                            .collection('students')
+                            .doc(callerID)
+                            .update({
+                          'call': 3,
+                          'callerID': FirebaseAuth.instance.currentUser!.uid,
+                        }).then((value) {
+                          Navigator.pop(context);
+                          Navigator.pop(context);
+
+                          Navigator.of(context).push(MaterialPageRoute(
+                              builder: (context) => SignIn()));
+                        }).catchError((error) {
+                          showToast("Failed to add: $error");
+                          print("Failed to add: $error");
+                        });
+                      } else {
+                        showToast("Check Internet Connection !");
+                      }
+                    },
+                  ),
+          ],
         ),
-      ),
-
-
-      SizedBox(
-        height: MediaQuery.of(context).size.height * 0.01,
-      ),
-    ],
-  ),
-  actions: [
-    Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        defaultButton(
-          context: context,
-          color: Colors.white70,
-          textColor: Colors.black,
-          text: LocaleKeys.cancel.tr(),
-          onpressed: () {
-
-            Navigator.pop(context);
-
-            FlutterRingtonePlayer.stop();
-
-            //wa a8yar al value bta3t caller
-
-          },
+        SizedBox(
+          height: MediaQuery.of(context).size.height * 0.02,
         ),
-
-
-        defaultButton(
-          context: context,
-          color: Colors.white70,
-          textColor: Colors.black,
-          text: "Accept",
-          onpressed: () async{
-
-            FlutterRingtonePlayer.stop();
-
-            if(await checkConnectionn()){
-
-              loading(context: context);
-
-            FirebaseFirestore.instance.collection('students').doc(callerID).update({
-            'call': 3,
-            'callerID': FirebaseAuth.instance.currentUser!.uid,
-
-
-
-            })
-                .then((value) {
-
-              Navigator.pop(context);
-              Navigator.pop(context);
-
-              Navigator.of(context)
-                  .push(MaterialPageRoute(
-                  builder: (context) => empty())
-              );
-
-            })
-                .catchError((error) {
-
-            showToast("Failed to add: $error");
-            print("Failed to add: $error");
-
-            });
-
-            }else{
-
-            showToast("Check Internet Connection !");
-
-            }
-
-
-          },
-        ),
-
       ],
-    ),
-    SizedBox(
-      height: MediaQuery.of(context).size.height * 0.02,
-    ),
-  ],
-);
-
+    );
 
 Widget callingg(context, String text1, String text2) => AlertDialog(
-  shape: RoundedRectangleBorder(
-    borderRadius: BorderRadius.circular(25),
-  ),
-  title: Column(
-    children: [
-      Text(
-        text1,
-        style: GoogleFonts.rubik(
-          fontSize: 22.0,
-          fontWeight: FontWeight.bold,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(25),
+      ),
+      title: Column(
+        children: [
+          Text(
+            text1,
+            style: GoogleFonts.rubik(
+              fontSize: 22.0,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          SizedBox(
+            height: MediaQuery.of(context).size.height * 0.01,
+          ),
+          Text(
+            "",
+            style: GoogleFonts.rubik(
+              fontSize: 16.0,
+              color: Colors.grey,
+            ),
+          ),
+          SizedBox(
+            height: MediaQuery.of(context).size.height * 0.01,
+          ),
+        ],
+      ),
+      actions: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            defaultButton(
+              context: context,
+              color: Colors.white70,
+              textColor: Colors.black,
+              text: "Hang Up",
+              onpressed: () async {
+                if (await checkConnectionn()) {
+                  FirebaseFirestore.instance
+                      .collection('students')
+                      .doc(text2)
+                      .update({
+                    'call': 0,
+                  }).then((value) {
+                    Navigator.pop(context);
+                  }).catchError((error) {
+                    showToast("Failed to add: $error");
+                    print("Failed to add: $error");
+                  });
+                } else {
+                  showToast("Check Internet Connection !");
+                }
+              },
+            ),
+          ],
         ),
-      ),
-      SizedBox(
-        height: MediaQuery.of(context).size.height * 0.01,
-      ),
-      Text(
-        "",
-        style: GoogleFonts.rubik(
-          fontSize: 16.0,
-          color: Colors.grey,
-        ),
-      ),
-      SizedBox(
-        height: MediaQuery.of(context).size.height * 0.01,
-      ),
-    ],
-  ),
-  actions: [
-    Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        defaultButton(
-          context: context,
-          color: Colors.white70,
-          textColor: Colors.black,
-          text: "Hang Up",
-          onpressed: () async{
-
-
-            if(await checkConnectionn()){
-
-            FirebaseFirestore.instance.collection('students').doc(text2).update({
-            'call': 0,
-
-            })
-                .then((value) {
-
-            Navigator.pop(context);
-
-            })
-                .catchError((error) {
-
-            showToast("Failed to add: $error");
-            print("Failed to add: $error");
-
-            });
-
-            }else{
-
-            showToast("Check Internet Connection !");
-
-            }
-
-
-          },
+        SizedBox(
+          height: MediaQuery.of(context).size.height * 0.02,
         ),
       ],
-    ),
-    SizedBox(
-      height: MediaQuery.of(context).size.height * 0.02,
-    ),
-  ],
-);
+    );

@@ -40,7 +40,6 @@ class _ChooseLevelState extends State<ChooseLevel> {
     getLevels();
 
     log("3");
-
   }
 
   void getLevels() async {
@@ -81,7 +80,6 @@ class _ChooseLevelState extends State<ChooseLevel> {
         log("5");
 
         getOffer();
-
       }).onError((error, stackTrace) {
         log(error.toString());
         showToast("Error: $error");
@@ -111,7 +109,6 @@ class _ChooseLevelState extends State<ChooseLevel> {
           });
         }
         log("7");
-
       }).onError((error, stackTrace) {
         log(error.toString());
         showToast("Error: $error");
@@ -158,12 +155,6 @@ class _ChooseLevelState extends State<ChooseLevel> {
                       ),
                     ),
                     Spacer(),
-                    smalldefaultButton(
-                      onpressed: () {},
-                      context: context,
-                      color: dodblue,
-                      text: 'Free Trial',
-                    ),
                     offerTrial
                         ? GestureDetector(
                             onTap: () async {
@@ -193,7 +184,7 @@ class _ChooseLevelState extends State<ChooseLevel> {
                             },
                             child: Container(
                               alignment: Alignment.center,
-                              height: MediaQuery.of(context).size.height * 0.07,
+                              height: MediaQuery.of(context).size.height * 0.05,
                               decoration: BoxDecoration(
                                 color: Color(0XFF3787ff),
                                 borderRadius: BorderRadius.circular(20),

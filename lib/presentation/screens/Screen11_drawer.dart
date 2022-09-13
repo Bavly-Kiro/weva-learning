@@ -8,6 +8,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:oktoast/oktoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:weva/cubit/drawer_cubit/drawer_cubit_state.dart';
+import 'package:weva/presentation/screens/home_screen.dart';
 
 import '../../back/checkConnection.dart';
 import '../../cubit/drawer_cubit/drawer_cubit_bloc.dart';
@@ -191,7 +192,13 @@ class _Drawer11State extends State<Drawer11> {
                           context: context,
                           icon: Icons.dashboard_outlined,
                           title: LocaleKeys.dashboard.tr(),
-                          onTap: () {}),
+                          onTap: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => HomeScreen(),
+                                ));
+                          }),
                       drawerRow(
                           context: context,
                           icon: Icons.local_offer_outlined,

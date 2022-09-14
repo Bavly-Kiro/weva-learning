@@ -459,8 +459,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                 var height = MediaQuery.of(context).size.height;
                                 var width = MediaQuery.of(context).size.width;
                                 return Container(
-                                  width:
-                                      MediaQuery.of(context).size.width * 0.45,
+                                  // width:
+                                  //     MediaQuery.of(context).size.width * 0.45,
                                   child: AlertDialog(
                                     insetPadding: EdgeInsets.symmetric(
                                         horizontal: 150, vertical: 150),
@@ -600,11 +600,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                 var height = MediaQuery.of(context).size.height;
                                 var width = MediaQuery.of(context).size.width;
                                 return Container(
-                                  width:
-                                      MediaQuery.of(context).size.width * 0.45,
+                                  // width:
+                                  //     MediaQuery.of(context).size.width * 0.45,
                                   child: AlertDialog(
-                                    insetPadding: EdgeInsets.symmetric(
-                                        horizontal: 200, vertical: 200),
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(25),
                                     ),

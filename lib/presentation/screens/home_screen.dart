@@ -50,14 +50,12 @@ class _HomeScreenState extends State<HomeScreen> {
   int totalAns = 0;
   double lastTestPercentage = 0;
 
-
   @override
   void setState(fn) {
-    if(mounted) {
+    if (mounted) {
       super.setState(fn);
     }
   }
-
 
   @override
   void initState() {
@@ -72,6 +70,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
   List<lesson> lessons = [];
   List<String> lessonss = [];
+  List<String> Genders = [
+    'Male',
+    'Female',
+  ];
   //
   // List<chapter> chapters = [];
   // List<String> chapterss = [];
@@ -262,7 +264,7 @@ class _HomeScreenState extends State<HomeScreen> {
   void getSubjects() async {
     subjects = [];
 
-    if(mounted){
+    if (mounted) {
       if (await checkConnectionn()) {
         log("home 3 1");
         FirebaseFirestore.instance
@@ -305,17 +307,16 @@ class _HomeScreenState extends State<HomeScreen> {
           print("home 3 $error");
           showToast("Error: $error");
         });
-      }
-      else {
+      } else {
         showToast("Check Internet Connection !");
       }
     }
-
   }
 
   @override
   Widget build(BuildContext context) {
-    if(Platformm.Platform.I.operatingSystem.isAndroid || Platformm.Platform.I.operatingSystem.isIOS){
+    if (Platformm.Platform.I.operatingSystem.isAndroid ||
+        Platformm.Platform.I.operatingSystem.isIOS) {
       return RefreshIndicator(
         onRefresh: () => getUserData(),
         child: SingleChildScrollView(
@@ -407,20 +408,20 @@ class _HomeScreenState extends State<HomeScreen> {
                       return categoryCard(
                           imagePath: subjects[index].imageURL,
                           title:
-                          Localizations.localeOf(context).toString() == "en"
-                              ? subjects[index].nameEN
-                              : subjects[index].nameAr,
+                              Localizations.localeOf(context).toString() == "en"
+                                  ? subjects[index].nameEN
+                                  : subjects[index].nameAr,
                           context: context,
                           onTap: () {
                             Navigator.of(context).push(MaterialPageRoute(
                                 builder: (context) => Chapter(
-                                  subjectID: subjects[index].idToEdit,
-                                  name: Localizations.localeOf(context)
-                                      .toString() ==
-                                      "en"
-                                      ? subjects[index].nameEN
-                                      : subjects[index].nameAr,
-                                )));
+                                      subjectID: subjects[index].idToEdit,
+                                      name: Localizations.localeOf(context)
+                                                  .toString() ==
+                                              "en"
+                                          ? subjects[index].nameEN
+                                          : subjects[index].nameAr,
+                                    )));
                           });
                     },
                   ),
@@ -447,11 +448,143 @@ class _HomeScreenState extends State<HomeScreen> {
                         width: MediaQuery.of(context).size.width * 0.01,
                       ),
                       gameCard(
-                        imagePath: "assets/images/games/Group 624573.png",
-                        discussionTitle: LocaleKeys.discussion.tr(),
-                        discussion: LocaleKeys.about_discussion.tr(),
-                        context: context,
-                      ),
+                          imagePath: "assets/images/games/Group 624573.png",
+                          discussionTitle: LocaleKeys.discussion.tr(),
+                          discussion: LocaleKeys.about_discussion.tr(),
+                          context: context,
+                          onTap: () {
+                            showDialog(
+                              context: context,
+                              builder: (context) {
+                                var height = MediaQuery.of(context).size.height;
+                                var width = MediaQuery.of(context).size.width;
+                                return Container(
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.45,
+                                  child: AlertDialog(
+                                    insetPadding: EdgeInsets.symmetric(
+                                        horizontal: 150, vertical: 150),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(25),
+                                    ),
+                                    title: Center(
+                                      child: Text('Choose Chapter and lesson'),
+                                    ),
+                                    content: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        DropDown(
+                                          // Selecteditems: [
+                                          //   'a7a',
+                                          //   'sha5ra',
+                                          //   'sha5ra b a7a'
+                                          // ],
+                                          Selecteditems: lessonss
+                                              .map(buildMenuitem)
+                                              .toList(),
+                                          SelectedValue: Selectedvalue2,
+
+                                          onChanged: (valuee) {
+                                            setState(() {
+                                              Selectedvalue1 = valuee;
+                                              value = valuee;
+
+                                              // log(value);
+                                              //
+                                              // log(chapters[chapters.indexWhere((f) => (Localizations.localeOf(context).toString() == "en"? f.nameEN : f.nameAr) == value)].idToEdit);
+                                              //
+                                              //
+                                              // getLessons(chapters[chapters.indexWhere((f) => (Localizations.localeOf(context).toString() == "en"? f.nameEN : f.nameAr) == value)].idToEdit);
+                                            });
+                                          },
+                                          context: context,
+                                          hint: 'Chapter',
+                                        ),
+                                        SizedBox(
+                                          height: MediaQuery.of(context)
+                                                  .size
+                                                  .height *
+                                              0.03,
+                                        ),
+                                        DropDown(
+                                          // Selecteditems: [
+                                          //   'nfs el a7a',
+                                          //   'nfs el sha5ra',
+                                          //   'nfs el sha5ra b a7a',
+                                          // ],
+                                          Selecteditems: lessonss
+                                              .map(buildMenuitem)
+                                              .toList(),
+                                          SelectedValue: Selectedvalue2,
+                                          onChanged: (value) {
+                                            setState(() {
+                                              Selectedvalue2 = value;
+                                            });
+                                          },
+                                          context: context,
+                                          hint: 'Lesson',
+                                        ),
+                                        SizedBox(
+                                          height: MediaQuery.of(context)
+                                                  .size
+                                                  .height *
+                                              0.03,
+                                        ),
+                                        DropDown(
+                                          Selecteditems:
+                                              Genders.map(buildMenuitem)
+                                                  .toList(),
+                                          SelectedValue: Selectedvalue2,
+                                          onChanged: (value) {
+                                            setState(() {
+                                              Selectedvalue2 = value;
+                                            });
+                                          },
+                                          context: context,
+                                          hint: 'Gender',
+                                        ),
+                                      ],
+                                    ),
+                                    actions: [
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          defaultButton(
+                                            context: context,
+                                            color: Colors.white70,
+                                            textColor: Colors.black,
+                                            text: LocaleKeys.cancel.tr(),
+                                            onpressed: () {
+                                              Navigator.pop(context);
+                                            },
+                                          ),
+                                          SizedBox(
+                                            width: MediaQuery.of(context)
+                                                    .size
+                                                    .width *
+                                                0.03,
+                                          ),
+                                          defaultButton(
+                                            color: dodblue,
+                                            text: LocaleKeys.submit.tr(),
+                                            onpressed: () {},
+                                            context: context,
+                                          ),
+                                        ],
+                                      ),
+                                      SizedBox(
+                                        height:
+                                            MediaQuery.of(context).size.height *
+                                                0.02,
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
+                            );
+                          }),
                       SizedBox(
                         width: MediaQuery.of(context).size.width * 0.02,
                       ),
@@ -468,7 +601,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 var width = MediaQuery.of(context).size.width;
                                 return Container(
                                   width:
-                                  MediaQuery.of(context).size.width * 0.45,
+                                      MediaQuery.of(context).size.width * 0.45,
                                   child: AlertDialog(
                                     insetPadding: EdgeInsets.symmetric(
                                         horizontal: 200, vertical: 200),
@@ -480,7 +613,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     ),
                                     content: Column(
                                       mainAxisAlignment:
-                                      MainAxisAlignment.center,
+                                          MainAxisAlignment.center,
                                       children: [
                                         DropDown(
                                           // Selecteditems: [
@@ -510,8 +643,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                         ),
                                         SizedBox(
                                           height: MediaQuery.of(context)
-                                              .size
-                                              .height *
+                                                  .size
+                                                  .height *
                                               0.03,
                                         ),
                                         DropDown(
@@ -537,9 +670,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                     actions: [
                                       Row(
                                         mainAxisAlignment:
-                                        MainAxisAlignment.center,
+                                            MainAxisAlignment.center,
                                         children: [
-                                          smalldefaultButton(
+                                          defaultButton(
                                             context: context,
                                             color: Colors.white70,
                                             textColor: Colors.black,
@@ -550,11 +683,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                           ),
                                           SizedBox(
                                             width: MediaQuery.of(context)
-                                                .size
-                                                .width *
+                                                    .size
+                                                    .width *
                                                 0.03,
                                           ),
-                                          smalldefaultButton(
+                                          defaultButton(
                                             color: dodblue,
                                             text: LocaleKeys.submit.tr(),
                                             onpressed: () {},
@@ -564,8 +697,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                       ),
                                       SizedBox(
                                         height:
-                                        MediaQuery.of(context).size.height *
-                                            0.02,
+                                            MediaQuery.of(context).size.height *
+                                                0.02,
                                       ),
                                     ],
                                   ),
@@ -581,6 +714,134 @@ class _HomeScreenState extends State<HomeScreen> {
                         discussionTitle: LocaleKeys.challenge.tr(),
                         discussion: LocaleKeys.about_chall.tr(),
                         context: context,
+                        onTap: () {
+                          showDialog(
+                            context: context,
+                            builder: (context) {
+                              var height = MediaQuery.of(context).size.height;
+                              var width = MediaQuery.of(context).size.width;
+                              return Container(
+                                width: MediaQuery.of(context).size.width * 0.45,
+                                child: AlertDialog(
+                                  insetPadding: EdgeInsets.symmetric(
+                                      horizontal: 150, vertical: 150),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(25),
+                                  ),
+                                  title: Center(
+                                    child: Text('Choose Chapter and lesson'),
+                                  ),
+                                  content: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      DropDown(
+                                        // Selecteditems: [
+                                        //   'a7a',
+                                        //   'sha5ra',
+                                        //   'sha5ra b a7a'
+                                        // ],
+                                        Selecteditems: lessonss
+                                            .map(buildMenuitem)
+                                            .toList(),
+                                        SelectedValue: Selectedvalue2,
+
+                                        onChanged: (valuee) {
+                                          setState(() {
+                                            Selectedvalue1 = valuee;
+                                            value = valuee;
+
+                                            // log(value);
+                                            //
+                                            // log(chapters[chapters.indexWhere((f) => (Localizations.localeOf(context).toString() == "en"? f.nameEN : f.nameAr) == value)].idToEdit);
+                                            //
+                                            //
+                                            // getLessons(chapters[chapters.indexWhere((f) => (Localizations.localeOf(context).toString() == "en"? f.nameEN : f.nameAr) == value)].idToEdit);
+                                          });
+                                        },
+                                        context: context,
+                                        hint: 'Chapter',
+                                      ),
+                                      SizedBox(
+                                        height:
+                                            MediaQuery.of(context).size.height *
+                                                0.03,
+                                      ),
+                                      DropDown(
+                                        // Selecteditems: [
+                                        //   'nfs el a7a',
+                                        //   'nfs el sha5ra',
+                                        //   'nfs el sha5ra b a7a',
+                                        // ],
+                                        Selecteditems: lessonss
+                                            .map(buildMenuitem)
+                                            .toList(),
+                                        SelectedValue: Selectedvalue2,
+                                        onChanged: (value) {
+                                          setState(() {
+                                            Selectedvalue2 = value;
+                                          });
+                                        },
+                                        context: context,
+                                        hint: 'Lesson',
+                                      ),
+                                      SizedBox(
+                                        height:
+                                            MediaQuery.of(context).size.height *
+                                                0.03,
+                                      ),
+                                      DropDown(
+                                        Selecteditems:
+                                            Genders.map(buildMenuitem).toList(),
+                                        SelectedValue: Selectedvalue2,
+                                        onChanged: (value) {
+                                          setState(() {
+                                            Selectedvalue2 = value;
+                                          });
+                                        },
+                                        context: context,
+                                        hint: 'Gender',
+                                      ),
+                                    ],
+                                  ),
+                                  actions: [
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        defaultButton(
+                                          context: context,
+                                          color: Colors.white70,
+                                          textColor: Colors.black,
+                                          text: LocaleKeys.cancel.tr(),
+                                          onpressed: () {
+                                            Navigator.pop(context);
+                                          },
+                                        ),
+                                        SizedBox(
+                                          width: MediaQuery.of(context)
+                                                  .size
+                                                  .width *
+                                              0.03,
+                                        ),
+                                        defaultButton(
+                                          color: dodblue,
+                                          text: LocaleKeys.submit.tr(),
+                                          onpressed: () {},
+                                          context: context,
+                                        ),
+                                      ],
+                                    ),
+                                    SizedBox(
+                                      height:
+                                          MediaQuery.of(context).size.height *
+                                              0.02,
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
+                          );
+                        },
                       ),
                     ],
                   ),
@@ -618,8 +879,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
       );
-    }
-    else {
+    } else {
       return RefreshIndicator(
         onRefresh: () => getUserData(),
         child: SingleChildScrollView(
@@ -745,11 +1005,143 @@ class _HomeScreenState extends State<HomeScreen> {
                     scrollDirection: Axis.horizontal,
                     children: [
                       webgameCard(
-                        imagePath: "assets/images/games/Group 624573.png",
-                        discussionTitle: LocaleKeys.discussion.tr(),
-                        discussion: LocaleKeys.about_discussion.tr(),
-                        context: context,
-                      ),
+                          imagePath: "assets/images/games/Group 624573.png",
+                          discussionTitle: LocaleKeys.discussion.tr(),
+                          discussion: LocaleKeys.about_discussion.tr(),
+                          context: context,
+                          onTap: () {
+                            showDialog(
+                              context: context,
+                              builder: (context) {
+                                var height = MediaQuery.of(context).size.height;
+                                var width = MediaQuery.of(context).size.width;
+                                return Container(
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.45,
+                                  child: AlertDialog(
+                                    insetPadding: EdgeInsets.symmetric(
+                                        horizontal: 150, vertical: 150),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(25),
+                                    ),
+                                    title: Center(
+                                      child: Text('Choose Chapter and lesson'),
+                                    ),
+                                    content: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        webDropDown(
+                                          // Selecteditems: [
+                                          //   'a7a',
+                                          //   'sha5ra',
+                                          //   'sha5ra b a7a'
+                                          // ],
+                                          Selecteditems: lessonss
+                                              .map(buildMenuitem)
+                                              .toList(),
+                                          SelectedValue: Selectedvalue2,
+
+                                          onChanged: (valuee) {
+                                            setState(() {
+                                              Selectedvalue1 = valuee;
+                                              value = valuee;
+
+                                              // log(value);
+                                              //
+                                              // log(chapters[chapters.indexWhere((f) => (Localizations.localeOf(context).toString() == "en"? f.nameEN : f.nameAr) == value)].idToEdit);
+                                              //
+                                              //
+                                              // getLessons(chapters[chapters.indexWhere((f) => (Localizations.localeOf(context).toString() == "en"? f.nameEN : f.nameAr) == value)].idToEdit);
+                                            });
+                                          },
+                                          context: context,
+                                          hint: 'Chapter',
+                                        ),
+                                        SizedBox(
+                                          height: MediaQuery.of(context)
+                                                  .size
+                                                  .height *
+                                              0.03,
+                                        ),
+                                        webDropDown(
+                                          // Selecteditems: [
+                                          //   'nfs el a7a',
+                                          //   'nfs el sha5ra',
+                                          //   'nfs el sha5ra b a7a',
+                                          // ],
+                                          Selecteditems: lessonss
+                                              .map(buildMenuitem)
+                                              .toList(),
+                                          SelectedValue: Selectedvalue2,
+                                          onChanged: (value) {
+                                            setState(() {
+                                              Selectedvalue2 = value;
+                                            });
+                                          },
+                                          context: context,
+                                          hint: 'Lesson',
+                                        ),
+                                        SizedBox(
+                                          height: MediaQuery.of(context)
+                                                  .size
+                                                  .height *
+                                              0.03,
+                                        ),
+                                        webDropDown(
+                                          Selecteditems:
+                                              Genders.map(buildMenuitem)
+                                                  .toList(),
+                                          SelectedValue: Selectedvalue2,
+                                          onChanged: (value) {
+                                            setState(() {
+                                              Selectedvalue2 = value;
+                                            });
+                                          },
+                                          context: context,
+                                          hint: 'Gender',
+                                        ),
+                                      ],
+                                    ),
+                                    actions: [
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          smalldefaultButton(
+                                            context: context,
+                                            color: Colors.white70,
+                                            textColor: Colors.black,
+                                            text: LocaleKeys.cancel.tr(),
+                                            onpressed: () {
+                                              Navigator.pop(context);
+                                            },
+                                          ),
+                                          SizedBox(
+                                            width: MediaQuery.of(context)
+                                                    .size
+                                                    .width *
+                                                0.03,
+                                          ),
+                                          smalldefaultButton(
+                                            color: dodblue,
+                                            text: LocaleKeys.submit.tr(),
+                                            onpressed: () {},
+                                            context: context,
+                                          ),
+                                        ],
+                                      ),
+                                      SizedBox(
+                                        height:
+                                            MediaQuery.of(context).size.height *
+                                                0.02,
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
+                            );
+                          }),
                       webgameCard(
                           imagePath: "assets/images/games/Group 20127.png",
                           discussionTitle: LocaleKeys.five_days_chall.tr(),
@@ -869,11 +1261,143 @@ class _HomeScreenState extends State<HomeScreen> {
                             );
                           }),
                       webgameCard(
-                        imagePath: "assets/images/games/Group 624572.png",
-                        discussionTitle: LocaleKeys.challenge.tr(),
-                        discussion: LocaleKeys.about_chall.tr(),
-                        context: context,
-                      ),
+                          imagePath: "assets/images/games/Group 624572.png",
+                          discussionTitle: LocaleKeys.challenge.tr(),
+                          discussion: LocaleKeys.about_chall.tr(),
+                          context: context,
+                          onTap: () {
+                            showDialog(
+                              context: context,
+                              builder: (context) {
+                                var height = MediaQuery.of(context).size.height;
+                                var width = MediaQuery.of(context).size.width;
+                                return Container(
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.45,
+                                  child: AlertDialog(
+                                    insetPadding: EdgeInsets.symmetric(
+                                        horizontal: 150, vertical: 150),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(25),
+                                    ),
+                                    title: Center(
+                                      child: Text('Choose Chapter and lesson'),
+                                    ),
+                                    content: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        webDropDown(
+                                          // Selecteditems: [
+                                          //   'a7a',
+                                          //   'sha5ra',
+                                          //   'sha5ra b a7a'
+                                          // ],
+                                          Selecteditems: lessonss
+                                              .map(buildMenuitem)
+                                              .toList(),
+                                          SelectedValue: Selectedvalue2,
+
+                                          onChanged: (valuee) {
+                                            setState(() {
+                                              Selectedvalue1 = valuee;
+                                              value = valuee;
+
+                                              // log(value);
+                                              //
+                                              // log(chapters[chapters.indexWhere((f) => (Localizations.localeOf(context).toString() == "en"? f.nameEN : f.nameAr) == value)].idToEdit);
+                                              //
+                                              //
+                                              // getLessons(chapters[chapters.indexWhere((f) => (Localizations.localeOf(context).toString() == "en"? f.nameEN : f.nameAr) == value)].idToEdit);
+                                            });
+                                          },
+                                          context: context,
+                                          hint: 'Chapter',
+                                        ),
+                                        SizedBox(
+                                          height: MediaQuery.of(context)
+                                                  .size
+                                                  .height *
+                                              0.03,
+                                        ),
+                                        webDropDown(
+                                          // Selecteditems: [
+                                          //   'nfs el a7a',
+                                          //   'nfs el sha5ra',
+                                          //   'nfs el sha5ra b a7a',
+                                          // ],
+                                          Selecteditems: lessonss
+                                              .map(buildMenuitem)
+                                              .toList(),
+                                          SelectedValue: Selectedvalue2,
+                                          onChanged: (value) {
+                                            setState(() {
+                                              Selectedvalue2 = value;
+                                            });
+                                          },
+                                          context: context,
+                                          hint: 'Lesson',
+                                        ),
+                                        SizedBox(
+                                          height: MediaQuery.of(context)
+                                                  .size
+                                                  .height *
+                                              0.03,
+                                        ),
+                                        webDropDown(
+                                          Selecteditems:
+                                              Genders.map(buildMenuitem)
+                                                  .toList(),
+                                          SelectedValue: Selectedvalue2,
+                                          onChanged: (value) {
+                                            setState(() {
+                                              Selectedvalue2 = value;
+                                            });
+                                          },
+                                          context: context,
+                                          hint: 'Gender',
+                                        ),
+                                      ],
+                                    ),
+                                    actions: [
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          smalldefaultButton(
+                                            context: context,
+                                            color: Colors.white70,
+                                            textColor: Colors.black,
+                                            text: LocaleKeys.cancel.tr(),
+                                            onpressed: () {
+                                              Navigator.pop(context);
+                                            },
+                                          ),
+                                          SizedBox(
+                                            width: MediaQuery.of(context)
+                                                    .size
+                                                    .width *
+                                                0.03,
+                                          ),
+                                          smalldefaultButton(
+                                            color: dodblue,
+                                            text: LocaleKeys.submit.tr(),
+                                            onpressed: () {},
+                                            context: context,
+                                          ),
+                                        ],
+                                      ),
+                                      SizedBox(
+                                        height:
+                                            MediaQuery.of(context).size.height *
+                                                0.02,
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
+                            );
+                          }),
                     ],
                   ),
                 ),

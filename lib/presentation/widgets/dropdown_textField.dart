@@ -31,7 +31,6 @@ var arabicGenders = [
 
 //Localizations.localeOf(context).toString() == "en"? "Male" : "ذكر",
 
-
 List<String> Subjects = [
   "Math",
   "3rbi",
@@ -91,7 +90,6 @@ Widget webDropDown({
       child: Container(
         padding: EdgeInsets.only(left: 10.0),
         width: MediaQuery.of(context).size.width * 0.4,
-
         height: MediaQuery.of(context).size.height * 0.075,
         decoration: BoxDecoration(
           border: Border.all(color: Color(0xffbebab3), width: 1),
@@ -99,6 +97,7 @@ Widget webDropDown({
         ),
         child: DropdownButton<String>(
           value: SelectedValue,
+
           style: GoogleFonts.rubik(
             color: Colors.black,
           ),
@@ -122,12 +121,12 @@ Widget webDropDown({
     );
 
 DropdownMenuItem<String> buildMenuitem(String item) => DropdownMenuItem(
-  value: item,
-  child: Text(
-    item,
-    maxLines: null,
-    style: TextStyle(
-      fontSize: 16.0,
-    ),
-  ),
-);
+      value: item,
+      child: Text(
+        item,
+        maxLines: null,
+        style: TextStyle(
+          fontSize: 16.0,
+        ),
+      ),
+    );

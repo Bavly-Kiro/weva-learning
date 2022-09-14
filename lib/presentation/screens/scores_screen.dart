@@ -9,7 +9,8 @@ class ScoreScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if(Platform.I.operatingSystem.isAndroid || Platform.I.operatingSystem.isIOS){
+    if (Platform.I.operatingSystem.isAndroid ||
+        Platform.I.operatingSystem.isIOS) {
       return SingleChildScrollView(
         child: Column(
           children: [
@@ -20,7 +21,7 @@ class ScoreScreen extends StatelessWidget {
                 itemBuilder: (context, index) {
                   return Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                    child: friendCard(
+                    child: ScoreCard(
                         context,
                         // friends[index].name,
                         // friends[index].imageURL,
@@ -30,14 +31,14 @@ class ScoreScreen extends StatelessWidget {
                         'http://placekitten.com/g/200/300',
                         'number',
                         'id bayen',
-                        1),
+                        1,
+                        '${index + 1}'),
                   );
                 }),
           ],
         ),
       );
-    }
-    else{
+    } else {
       return SingleChildScrollView(
         child: Column(
           children: [
@@ -48,17 +49,19 @@ class ScoreScreen extends StatelessWidget {
                 itemBuilder: (context, index) {
                   return Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 30.0),
-                    child: webfriendCard(
-                        context,
-                        'Name',
-                        'http://placekitten.com/g/200/300',
-                        'number',
-                        'id bayen',
-                        // friends[index].name,
-                        // friends[index].imageURL,
-                        // friends[index].number,
-                        // friends[index].friendID,
-                        1),
+                    child: webScoreCard(
+                      context,
+                      'Name',
+                      'http://placekitten.com/g/200/300',
+                      'number',
+                      'id bayen',
+                      // friends[index].name,
+                      // friends[index].imageURL,
+                      // friends[index].number,
+                      // friends[index].friendID,
+                      1,
+                      '${index + 1}',
+                    ),
                   );
                 }),
           ],

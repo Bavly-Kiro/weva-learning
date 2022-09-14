@@ -5,6 +5,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:oktoast/oktoast.dart';
+import 'package:platform_info/platform_info.dart';
 
 import '../../back/checkConnection.dart';
 import '../../back/loading.dart';
@@ -86,7 +87,46 @@ class _FriendsScreenState extends State<FriendsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    if (kIsWeb) {
+    if(Platform.I.operatingSystem.isAndroid || Platform.I.operatingSystem.isIOS){
+      return SingleChildScrollView(
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(15.0),
+              child: TxtFld(
+                onSubmit: (v) {
+                  log("dsfsacsdcsadcsadcsdac sad2222222");
+                },
+                controller: searchController,
+                label: LocaleKeys.search_num.tr(),
+                picon: Icon(
+                  Icons.search,
+                  size: MediaQuery.of(context).size.width * 0.08,
+                ),
+              ),
+            ),
+            ListView.builder(
+                itemCount: friends.length,
+                shrinkWrap: true,
+                physics: NeverScrollableScrollPhysics(),
+                itemBuilder: (context, index) {
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                    child: friendCard(
+                        context,
+                        friends[index].name,
+                        friends[index].imageURL,
+                        friends[index].number,
+                        friends[index].friendID,
+                        1
+                    ),
+                  );
+                }),
+          ],
+        ),
+      );
+    }
+    else {
       return SingleChildScrollView(
         child: Column(
           children: [
@@ -122,44 +162,6 @@ class _FriendsScreenState extends State<FriendsScreen> {
                   );
                 }
                 ),
-          ],
-        ),
-      );
-    } else {
-      return SingleChildScrollView(
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(15.0),
-              child: TxtFld(
-                onSubmit: (v) {
-                  log("dsfsacsdcsadcsadcsdac sad2222222");
-                },
-                controller: searchController,
-                label: LocaleKeys.search_num.tr(),
-                picon: Icon(
-                  Icons.search,
-                  size: MediaQuery.of(context).size.width * 0.08,
-                ),
-              ),
-            ),
-            ListView.builder(
-                itemCount: friends.length,
-                shrinkWrap: true,
-                physics: NeverScrollableScrollPhysics(),
-                itemBuilder: (context, index) {
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                    child: friendCard(
-                      context,
-                      friends[index].name,
-                      friends[index].imageURL,
-                      friends[index].number,
-                      friends[index].idToEdit,
-                        1
-                    ),
-                  );
-                }),
           ],
         ),
       );

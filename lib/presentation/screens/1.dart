@@ -1,6 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:platform_info/platform_info.dart';
 import 'package:weva/cubit/registration_cubit_bloc.dart';
 import 'package:weva/cubit/registration_cubit_state.dart';
 
@@ -21,7 +22,7 @@ class Screen1 extends StatelessWidget {
           listener: (BuildContext context, RegistrationCubitState state) {},
           builder: (BuildContext context, RegistrationCubitState state) {
             RegistrationCubitBloc cub = RegistrationCubitBloc.get(context);
-            if (kIsWeb) {
+            if(Platform.I.operatingSystem.isAndroid || Platform.I.operatingSystem.isIOS){
               return Scaffold(
                   backgroundColor: const Color(0XFFe4f1f8),
                   body: SizedBox(
@@ -39,8 +40,8 @@ class Screen1 extends StatelessWidget {
                                     children: [
                                       SizedBox(
                                         height:
-                                            MediaQuery.of(context).size.height *
-                                                0.21,
+                                        MediaQuery.of(context).size.height *
+                                            0.21,
                                       ),
                                       const Image(
                                         image: AssetImage(
@@ -54,12 +55,12 @@ class Screen1 extends StatelessWidget {
                             padding: EdgeInsets.only(
                                 left: MediaQuery.of(context).size.width * 0.05,
                                 right:
-                                    MediaQuery.of(context).size.width * 0.05),
+                                MediaQuery.of(context).size.width * 0.05),
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.end,
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
-                                webregistrationButton(
+                                registrationButton(
                                   text: LocaleKeys.sign_up_face.tr(),
                                   context: context,
                                   imagePath: 'assets/images/Facebook F.png',
@@ -70,9 +71,9 @@ class Screen1 extends StatelessWidget {
                                 ),
                                 SizedBox(
                                   height:
-                                      MediaQuery.of(context).size.height * 0.05,
+                                  MediaQuery.of(context).size.height * 0.05,
                                 ),
-                                webregistrationButton(
+                                registrationButton(
                                   text: LocaleKeys.sign_up_google.tr(),
                                   context: context,
                                   imagePath: 'assets/images/Google.png',
@@ -83,7 +84,7 @@ class Screen1 extends StatelessWidget {
                                 ),
                                 SizedBox(
                                   height:
-                                      MediaQuery.of(context).size.height * 0.05,
+                                  MediaQuery.of(context).size.height * 0.05,
                                   child: Text(
                                     LocaleKeys.or.tr(),
                                     style: const TextStyle(
@@ -92,7 +93,7 @@ class Screen1 extends StatelessWidget {
                                     ),
                                   ),
                                 ),
-                                webregistrationButton(
+                                registrationButton(
                                   text: LocaleKeys.sign_up_email.tr(),
                                   context: context,
                                   onTap: () {
@@ -101,7 +102,7 @@ class Screen1 extends StatelessWidget {
                                 ),
                                 SizedBox(
                                   height:
-                                      MediaQuery.of(context).size.height * 0.05,
+                                  MediaQuery.of(context).size.height * 0.05,
                                 ),
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
@@ -127,14 +128,15 @@ class Screen1 extends StatelessWidget {
                                 ),
                                 SizedBox(
                                   height:
-                                      MediaQuery.of(context).size.height * 0.03,
+                                  MediaQuery.of(context).size.height * 0.01,
                                 ),
                               ],
                             ),
                           ),
                         ],
                       )));
-            } else {
+            }
+            else{
               return Scaffold(
                   backgroundColor: const Color(0XFFe4f1f8),
                   body: SizedBox(
@@ -152,8 +154,8 @@ class Screen1 extends StatelessWidget {
                                     children: [
                                       SizedBox(
                                         height:
-                                            MediaQuery.of(context).size.height *
-                                                0.21,
+                                        MediaQuery.of(context).size.height *
+                                            0.21,
                                       ),
                                       const Image(
                                         image: AssetImage(
@@ -167,12 +169,12 @@ class Screen1 extends StatelessWidget {
                             padding: EdgeInsets.only(
                                 left: MediaQuery.of(context).size.width * 0.05,
                                 right:
-                                    MediaQuery.of(context).size.width * 0.05),
+                                MediaQuery.of(context).size.width * 0.05),
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.end,
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
-                                registrationButton(
+                                webregistrationButton(
                                   text: LocaleKeys.sign_up_face.tr(),
                                   context: context,
                                   imagePath: 'assets/images/Facebook F.png',
@@ -183,9 +185,9 @@ class Screen1 extends StatelessWidget {
                                 ),
                                 SizedBox(
                                   height:
-                                      MediaQuery.of(context).size.height * 0.05,
+                                  MediaQuery.of(context).size.height * 0.05,
                                 ),
-                                registrationButton(
+                                webregistrationButton(
                                   text: LocaleKeys.sign_up_google.tr(),
                                   context: context,
                                   imagePath: 'assets/images/Google.png',
@@ -196,7 +198,7 @@ class Screen1 extends StatelessWidget {
                                 ),
                                 SizedBox(
                                   height:
-                                      MediaQuery.of(context).size.height * 0.05,
+                                  MediaQuery.of(context).size.height * 0.05,
                                   child: Text(
                                     LocaleKeys.or.tr(),
                                     style: const TextStyle(
@@ -205,7 +207,7 @@ class Screen1 extends StatelessWidget {
                                     ),
                                   ),
                                 ),
-                                registrationButton(
+                                webregistrationButton(
                                   text: LocaleKeys.sign_up_email.tr(),
                                   context: context,
                                   onTap: () {
@@ -214,7 +216,7 @@ class Screen1 extends StatelessWidget {
                                 ),
                                 SizedBox(
                                   height:
-                                      MediaQuery.of(context).size.height * 0.05,
+                                  MediaQuery.of(context).size.height * 0.05,
                                 ),
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
@@ -240,7 +242,7 @@ class Screen1 extends StatelessWidget {
                                 ),
                                 SizedBox(
                                   height:
-                                      MediaQuery.of(context).size.height * 0.01,
+                                  MediaQuery.of(context).size.height * 0.03,
                                 ),
                               ],
                             ),

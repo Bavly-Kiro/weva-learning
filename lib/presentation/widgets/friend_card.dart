@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -6,6 +9,7 @@ import 'package:oktoast/oktoast.dart';
 
 import '../../back/checkConnection.dart';
 import '../../back/loading.dart';
+import '../../translations/locale_keys.g.dart';
 import '../screens/friend_profile.dart';
 import 'alert_dialog.dart';
 
@@ -13,11 +17,11 @@ Widget friendCard(
     BuildContext context, String name, String imageUrl, String phone, String idToEdit, int type) {
   return InkWell(
     onTap: () {
-      Navigator.push(
+/*      Navigator.push(
           context,
           MaterialPageRoute(
             builder: (context) => FriendProfile(),
-          ));
+          ));*/
     },
     child: Padding(
         padding: EdgeInsets.all(12),
@@ -74,7 +78,8 @@ Widget friendCard(
                     InkWell(
                       onTap: () async{
 
-                        showDialog(
+
+/*                        showDialog(
                             barrierDismissible: false,
                             context: context,
                             builder: (context) {
@@ -92,8 +97,6 @@ Widget friendCard(
                             'call': 1,
                             'callerID': FirebaseAuth.instance.currentUser!.uid,
 
-
-
                           })
                               .then((value) {
 
@@ -107,11 +110,10 @@ Widget friendCard(
 
                           });
 
-                        }else{
-
-                          showToast("Check Internet Connection !");
-
                         }
+                        else{
+                          showToast("Check Internet Connection !");
+                        }*/
 
                       },
                       child: Row(
@@ -235,68 +237,186 @@ Widget webfriendCard(
                 ),
                 child: Padding(
                   padding: EdgeInsets.all(10),
+
+
                   child: type == 1 ?
-                  InkWell(
-                    onTap: () async{
-
-                      showDialog(
-                          barrierDismissible: false,
-                          context: context,
-                          builder: (context) {
-                            return callingg(
-                                context,
-                                "Ringing......",
-                              idToEdit,
-                            );
-                          });
+                  Row(
+                    children: [
+                      InkWell(
+                        onTap: () async{
+                          //web
 
 
-                      if(await checkConnectionn()){
+                          if(await checkConnectionn()){
 
-                        FirebaseFirestore.instance.collection('students').doc(idToEdit).update({
-                          'call': 1,
-                          'callerID': FirebaseAuth.instance.currentUser!.uid,
+                            loading(context: context);
+
+                            FirebaseFirestore.instance.collection('students').doc(idToEdit).update({
+                              'call': 1,
+                              'callerID': FirebaseAuth.instance.currentUser!.uid,
+                              'gameType': 1,
+
+                            })
+                                .then((value) {
 
 
+                              Timer(const Duration(seconds: 5), () {
 
-                        })
-                            .then((value) {
+                                FirebaseFirestore.instance
+                                    .collection('students')
+                                    .doc(idToEdit)
+                                    .get()
+                                    .then((value) async{
+
+                                  if(value.data()!['online'] == 1){
+
+                                    //online
+
+                                    Navigator.of(context).pop();
+
+                                    showDialog(
+                                        barrierDismissible: false,
+                                        context: context,
+                                        builder: (context) {
+                                          return callingg(
+                                              context,
+                                              "Ringing......",
+                                              idToEdit,
+                                              1
+                                          );
+                                        });
+
+                                  }
+                                  else{
+
+                                    if (await checkConnectionn()) {
+                                      FirebaseFirestore.instance
+                                          .collection('students')
+                                          .doc(idToEdit)
+                                          .update({
+                                        'call': 0,
+                                      }).then(( value) {
+
+                                        Navigator.of(context).pop();
+
+                                        showToast("that User is Offline");
+
+                                      }).catchError((error) {
+                                        showToast("Failed to add: $error");
+                                        print("Failed to add: $error");
+                                      });
+                                    } else {
+                                      showToast("Check Internet Connection !");
+                                    }
+
+                                  }
+
+                                });
+
+                              });
 
 
+                            })
+                                .catchError((error) {
 
-                        })
-                            .catchError((error) {
+                              showToast("Failed to add: $error");
+                              print("Failed to add: $error");
 
-                          showToast("Failed to add: $error");
-                          print("Failed to add: $error");
+                            });
 
-                        });
+                          }else{
 
-                      }else{
+                            showToast("Check Internet Connection !");
 
-                        showToast("Check Internet Connection !");
+                          }
 
-                      }
-
-                    },
-                    child: Row(
-                      children: <Widget>[
-                        Icon(
-                          Icons.ac_unit,
-                          color: Colors.black,
+                        },
+                        child: Row(
+                          children: <Widget>[
+                            Icon(
+                              Icons.ac_unit,
+                              color: Colors.black,
+                            ),
+                            SizedBox(
+                              width: MediaQuery.of(context).size.width * 0.01,
+                            ),
+                            Text(
+                              LocaleKeys.discussion.tr(),
+                              style: GoogleFonts.rubik(
+                                fontSize: 12,
+                                color: Colors.black,
+                              ),
+                            ),
+                          ],
                         ),
-                        SizedBox(
-                          width: MediaQuery.of(context).size.width * 0.01,
+                      ),
+                      SizedBox(
+                        width: MediaQuery.of(context).size.width * 0.1,
+                      ),
+                      InkWell(
+                        onTap: () async{
+                          //web
+
+
+
+                          if(await checkConnectionn()){
+
+                            FirebaseFirestore.instance.collection('students').doc(idToEdit).update({
+                              'call': 1,
+                              'callerID': FirebaseAuth.instance.currentUser!.uid,
+                              'gameType': 2,
+
+
+                            })
+                                .then((value) {
+
+                              showDialog(
+                                  barrierDismissible: false,
+                                  context: context,
+                                  builder: (context) {
+                                    return callingg(
+                                        context,
+                                        "Ringing......",
+                                        idToEdit,
+                                        2
+                                    );
+                                  });
+
+                            })
+                                .catchError((error) {
+
+                              showToast("Failed to add: $error");
+                              print("Failed to add: $error");
+
+                            });
+
+                          }else{
+
+                            showToast("Check Internet Connection !");
+
+                          }
+
+                        },
+                        child: Row(
+                          children: <Widget>[
+                            Icon(
+                              Icons.ac_unit,
+                              color: Colors.black,
+                            ),
+                            SizedBox(
+                              width: MediaQuery.of(context).size.width * 0.01,
+                            ),
+                            Text(
+                              LocaleKeys.challenge.tr(),
+                              style: GoogleFonts.rubik(
+                                fontSize: 12,
+                                color: Colors.black,
+                              ),
+                            ),
+                          ],
                         ),
-                        Text(
-                          'GAME',
-                          style: GoogleFonts.rubik(
-                            fontSize: 12,
-                            color: Colors.black,
-                          ),
-                        ),
-                      ],
-                    ),
+                      ),
+                    ],
                   )
                   :
                   IconButton(

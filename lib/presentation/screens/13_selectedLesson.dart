@@ -8,6 +8,7 @@ import 'package:flick_video_player/flick_video_player.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:oktoast/oktoast.dart';
+import 'package:platform_info/platform_info.dart';
 import 'package:video_player/video_player.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 import '../../back/checkConnection.dart';
@@ -164,7 +165,255 @@ class _SelectedLessonState extends State<SelectedLesson> {
 
   @override
   Widget build(BuildContext context) {
-    if (kIsWeb) {
+    if(Platform.I.operatingSystem.isAndroid || Platform.I.operatingSystem.isIOS){
+      return Scaffold(
+        backgroundColor: Colors.white,
+        appBar: AppBar(
+          backgroundColor: Colors.white,
+          elevation: 0.0,
+          leading: IconButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            icon: Icon(
+              Icons.arrow_back_ios,
+              color: Colors.black,
+            ),
+          ),
+        ),
+        body: SafeArea(
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(15.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('${widget.chaName} > ${widget.lessonName}'),
+                  SizedBox(
+                    height: MediaQuery.of(context).size.height * 0.01,
+                  ),
+                  Text(
+                    widget.videoName,
+                    style: GoogleFonts.rubik(
+                      fontSize: 26.0,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  SizedBox(
+                    height: MediaQuery.of(context).size.height * 0.03,
+                  ),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(15.0),
+                    child: loadingg
+                        ? Center(child: CircularProgressIndicator())
+                        : VisibilityDetector(key: ObjectKey(flickManager),
+                        onVisibilityChanged: (visibility){
+                          log("3333333333333aaaaaaaaaaaaaaaaaaaa");
+                          if (visibility.visibleFraction == 0 && this.mounted) {
+                            flickManager.flickControlManager?.pause();//pausing  functionality
+                          }
+
+                        },
+                        child: FlickVideoPlayer(flickManager: flickManager)),
+                  ),
+                  Row(
+                    children: [
+                      defaultTextButton(
+                        text: LocaleKeys.download_pdf.tr(),
+                        onpressed: () async {
+                          if (await checkConnectionn()) {
+
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => pdfScreen(PDFURL: 'https://cdn.syncfusion.com/content/PDFViewer/flutter-succinctly.pdf',))
+                            );
+
+                          } else {
+                            showDialog(
+                                barrierDismissible: false,
+                                context: context,
+                                builder: (context) {
+                                  return noInternetAlert(
+                                    context,
+                                  );
+                                });
+                          }
+                        },
+                        color: Colors.teal,
+                      ),
+                      Icon(
+                        Icons.menu_book_outlined,
+                        color: Colors.teal,
+                      )
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      Text(
+                        LocaleKeys.notes.tr(),
+                        style: GoogleFonts.rubik(
+                          fontSize: 26.0,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Spacer(),
+                      defaultTextButton(
+                        text:
+                        '${LocaleKeys.save.tr()} ${LocaleKeys.notes.tr()}',
+                        onpressed: () async {
+                          if (await checkConnectionn()) {
+                            loading(context: context);
+
+                            if (noteID == "") {
+                              FirebaseFirestore.instance
+                                  .collection("Notes")
+                                  .add({
+                                'userID': await FirebaseAuth
+                                    .instance.currentUser!.uid,
+                                'videoID': widget.videoID,
+                                'text': notesController.text,
+                              }).catchError((error) {
+                                showToast("Failed to add: $error");
+                                print("Failed to add: $error");
+                              }).then((value) {
+                                Navigator.of(context).pop();
+                              });
+                            } else {
+                              FirebaseFirestore.instance
+                                  .collection("Notes")
+                                  .doc(noteID)
+                                  .update({
+                                'text': notesController.text,
+                              }).catchError((error) {
+                                showToast("Failed to add: $error");
+                                print("Failed to add: $error");
+                              }).then((value) {
+                                Navigator.of(context).pop();
+                              });
+                            }
+                          } else {
+                            showDialog(
+                                barrierDismissible: false,
+                                context: context,
+                                builder: (context) {
+                                  return noInternetAlert(
+                                    context,
+                                  );
+                                });
+                          }
+                        },
+                        color: Colors.teal,
+                      ),
+                    ],
+                  ),
+                  SizedBox(
+                    height: MediaQuery.of(context).size.height * 0.01,
+                  ),
+                  TextField(
+                    controller: notesController,
+                    decoration: InputDecoration(
+                      border: InputBorder.none,
+                      hintText: LocaleKeys.write_notes.tr(),
+                    ),
+                    keyboardType: TextInputType.multiline,
+                    maxLines: null,
+                  ),
+                  SizedBox(
+                    height: MediaQuery.of(context).size.height * 0.15,
+                  ),
+                  Text(
+                    LocaleKeys.exams.tr(),
+                    style: GoogleFonts.rubik(
+                      fontSize: 18.0,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  SizedBox(
+                    height: MediaQuery.of(context).size.height * 0.02,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      defaultButton(
+                        context: context,
+                        color: Colors.green,
+                        text: LocaleKeys.easy.tr(),
+                        onpressed: () {
+
+                          showDialog(
+                              barrierDismissible: false,
+                              context: context,
+                              builder: (context) {
+                                return openExam(
+                                    context,
+                                    widget.videoID,
+                                    FirebaseAuth.instance.currentUser!.uid,
+                                    "Easy",
+                                    widget.subjectName
+                                );
+                              });
+
+                        },
+                      ),
+                      defaultButton(
+                        context: context,
+                        color: Colors.yellow.shade800,
+                        text: LocaleKeys.moderate.tr(),
+                        onpressed: () {
+
+                          //Navigator.push(context, MaterialPageRoute(builder: (context) => Discussion()));
+
+                          showDialog(
+                              barrierDismissible: false,
+                              context: context,
+                              builder: (context) {
+                                return openExam(
+                                    context,
+                                    widget.videoID,
+                                    FirebaseAuth.instance.currentUser!.uid,
+                                    "Average",
+                                    widget.subjectName
+                                );
+                              });
+
+                        },
+                      ),
+                      defaultButton(
+                        context: context,
+                        color: Colors.red,
+                        text: LocaleKeys.hard.tr(),
+                        onpressed: () {
+
+                          showDialog(
+                              barrierDismissible: false,
+                              context: context,
+                              builder: (context) {
+                                return openExam(
+                                    context,
+                                    widget.videoID,
+                                    FirebaseAuth.instance.currentUser!.uid,
+                                    "Hard",
+                                    widget.subjectName
+                                );
+                              });
+
+
+                        },
+                      ),
+                    ],
+                  ),
+                  SizedBox(
+                    height: MediaQuery.of(context).size.height * 0.02,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+    else {
       return Scaffold(
         appBar: AppBar(
           backgroundColor: Colors.white,
@@ -407,253 +656,6 @@ class _SelectedLessonState extends State<SelectedLesson> {
                         },
                       ),
                     ],
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      );
-    } else {
-      return Scaffold(
-        backgroundColor: Colors.white,
-        appBar: AppBar(
-          backgroundColor: Colors.white,
-          elevation: 0.0,
-          leading: IconButton(
-            onPressed: () {
-              Navigator.pop(context);
-            },
-            icon: Icon(
-              Icons.arrow_back_ios,
-              color: Colors.black,
-            ),
-          ),
-        ),
-        body: SafeArea(
-          child: SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.all(15.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('${widget.chaName} > ${widget.lessonName}'),
-                  SizedBox(
-                    height: MediaQuery.of(context).size.height * 0.01,
-                  ),
-                  Text(
-                    widget.videoName,
-                    style: GoogleFonts.rubik(
-                      fontSize: 26.0,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  SizedBox(
-                    height: MediaQuery.of(context).size.height * 0.03,
-                  ),
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(15.0),
-                    child: loadingg
-                        ? Center(child: CircularProgressIndicator())
-                        : VisibilityDetector(key: ObjectKey(flickManager),
-                        onVisibilityChanged: (visibility){
-                          log("3333333333333aaaaaaaaaaaaaaaaaaaa");
-                          if (visibility.visibleFraction == 0 && this.mounted) {
-                            flickManager.flickControlManager?.pause();//pausing  functionality
-                          }
-
-                        },
-                        child: FlickVideoPlayer(flickManager: flickManager)),
-                  ),
-                  Row(
-                    children: [
-                      defaultTextButton(
-                        text: LocaleKeys.download_pdf.tr(),
-                        onpressed: () async {
-                          if (await checkConnectionn()) {
-
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => pdfScreen(PDFURL: 'https://cdn.syncfusion.com/content/PDFViewer/flutter-succinctly.pdf',))
-                            );
-
-                          } else {
-                            showDialog(
-                                barrierDismissible: false,
-                                context: context,
-                                builder: (context) {
-                                  return noInternetAlert(
-                                    context,
-                                  );
-                                });
-                          }
-                        },
-                        color: Colors.teal,
-                      ),
-                      Icon(
-                        Icons.menu_book_outlined,
-                        color: Colors.teal,
-                      )
-                    ],
-                  ),
-                  Row(
-                    children: [
-                      Text(
-                        LocaleKeys.notes.tr(),
-                        style: GoogleFonts.rubik(
-                          fontSize: 26.0,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      Spacer(),
-                      defaultTextButton(
-                        text:
-                            '${LocaleKeys.save.tr()} ${LocaleKeys.notes.tr()}',
-                        onpressed: () async {
-                          if (await checkConnectionn()) {
-                            loading(context: context);
-
-                            if (noteID == "") {
-                              FirebaseFirestore.instance
-                                  .collection("Notes")
-                                  .add({
-                                'userID': await FirebaseAuth
-                                    .instance.currentUser!.uid,
-                                'videoID': widget.videoID,
-                                'text': notesController.text,
-                              }).catchError((error) {
-                                showToast("Failed to add: $error");
-                                print("Failed to add: $error");
-                              }).then((value) {
-                                Navigator.of(context).pop();
-                              });
-                            } else {
-                              FirebaseFirestore.instance
-                                  .collection("Notes")
-                                  .doc(noteID)
-                                  .update({
-                                'text': notesController.text,
-                              }).catchError((error) {
-                                showToast("Failed to add: $error");
-                                print("Failed to add: $error");
-                              }).then((value) {
-                                Navigator.of(context).pop();
-                              });
-                            }
-                          } else {
-                            showDialog(
-                                barrierDismissible: false,
-                                context: context,
-                                builder: (context) {
-                                  return noInternetAlert(
-                                    context,
-                                  );
-                                });
-                          }
-                        },
-                        color: Colors.teal,
-                      ),
-                    ],
-                  ),
-                  SizedBox(
-                    height: MediaQuery.of(context).size.height * 0.01,
-                  ),
-                  TextField(
-                    controller: notesController,
-                    decoration: InputDecoration(
-                      border: InputBorder.none,
-                      hintText: LocaleKeys.write_notes.tr(),
-                    ),
-                    keyboardType: TextInputType.multiline,
-                    maxLines: null,
-                  ),
-                  SizedBox(
-                    height: MediaQuery.of(context).size.height * 0.15,
-                  ),
-                  Text(
-                    LocaleKeys.exams.tr(),
-                    style: GoogleFonts.rubik(
-                      fontSize: 18.0,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  SizedBox(
-                    height: MediaQuery.of(context).size.height * 0.02,
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      defaultButton(
-                        context: context,
-                        color: Colors.green,
-                        text: LocaleKeys.easy.tr(),
-                        onpressed: () {
-
-                          showDialog(
-                              barrierDismissible: false,
-                              context: context,
-                              builder: (context) {
-                                return openExam(
-                                  context,
-                                  widget.videoID,
-                                    FirebaseAuth.instance.currentUser!.uid,
-                                  "Easy",
-                                  widget.subjectName
-                                );
-                              });
-
-                        },
-                      ),
-                      defaultButton(
-                        context: context,
-                        color: Colors.yellow.shade800,
-                        text: LocaleKeys.moderate.tr(),
-                        onpressed: () {
-
-                          //Navigator.push(context, MaterialPageRoute(builder: (context) => Discussion()));
-
-                          showDialog(
-                              barrierDismissible: false,
-                              context: context,
-                              builder: (context) {
-                                return openExam(
-                                    context,
-                                    widget.videoID,
-                                    FirebaseAuth.instance.currentUser!.uid,
-                                    "Average",
-                                    widget.subjectName
-                                );
-                              });
-
-                        },
-                      ),
-                      defaultButton(
-                        context: context,
-                        color: Colors.red,
-                        text: LocaleKeys.hard.tr(),
-                        onpressed: () {
-
-                          showDialog(
-                              barrierDismissible: false,
-                              context: context,
-                              builder: (context) {
-                                return openExam(
-                                    context,
-                                    widget.videoID,
-                                    FirebaseAuth.instance.currentUser!.uid,
-                                    "Hard",
-                                    widget.subjectName
-                                );
-                              });
-
-
-                        },
-                      ),
-                    ],
-                  ),
-                  SizedBox(
-                    height: MediaQuery.of(context).size.height * 0.02,
                   ),
                 ],
               ),

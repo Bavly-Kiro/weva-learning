@@ -28,6 +28,8 @@ import '../widgets/game_card.dart';
 import '12_chapter.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 
+import 'package:platform_info/platform_info.dart' as Platformm;
+
 class HomeScreen extends StatefulWidget {
   HomeScreen({Key? key}) : super(key: key);
 
@@ -47,6 +49,15 @@ class _HomeScreenState extends State<HomeScreen> {
   int rightAns = 0;
   int totalAns = 0;
   double lastTestPercentage = 0;
+
+
+  @override
+  void setState(fn) {
+    if(mounted) {
+      super.setState(fn);
+    }
+  }
+
 
   @override
   void initState() {
@@ -222,7 +233,7 @@ class _HomeScreenState extends State<HomeScreen> {
             .get(const GetOptions(source: Source.server))
             .then((valuee) async {
           if (valuee.exists) {
-            log("exist");
+            log("home exist");
 
             setState(() {
               subName = valuee.get("subjectName") ?? "";
@@ -234,11 +245,11 @@ class _HomeScreenState extends State<HomeScreen> {
 
           getSubjects();
         }).onError((error, stackTrace) {
-          log(error.toString());
+          log("home 1 $error");
           showToast("Error: $error");
         });
       }).onError((error, stackTrace) {
-        log(error.toString());
+        log("home 2 $error");
         showToast("Error: $error");
       });
     } else {
@@ -251,49 +262,364 @@ class _HomeScreenState extends State<HomeScreen> {
   void getSubjects() async {
     subjects = [];
 
-    if (await checkConnectionn()) {
-      FirebaseFirestore.instance
-          .collection('subjects')
-          .where("gradeID", isEqualTo: gradeID)
-          .get(const GetOptions(source: Source.server))
-          .then((value) {
-        final List<subject> loadData = [];
+    if(mounted){
+      if (await checkConnectionn()) {
+        log("home 3 1");
+        FirebaseFirestore.instance
+            .collection('subjects')
+            .where("gradeID", isEqualTo: gradeID)
+            .get(const GetOptions(source: Source.server))
+            .then((value) {
+          final List<subject> loadData = [];
+          log("home 3 2");
 
-        for (var element in value.docs) {
-          loadData.add(subject(
-            idToEdit: element.id,
-            nameAr: element.data()['nameAr'] ?? "",
-            nameEN: element.data()['nameEN'] ?? "",
-            countryID: element.data()['countryID'] ?? "",
-            majorID: element.data()['majorID'] ?? "",
-            gradeID: element.data()['gradeID'] ?? "",
-            typeOfSchoolID: element.data()['typeOfSchoolID'] ?? "",
-            teacherID: element.data()['teacherID'] ?? "",
-            chaptersPerLevel: element.data()['chaptersPerLevel'] ?? "",
-            imageURL: element.data()['imageURL'] ?? "",
-            userDoneAction: element.data()['userDoneAction'] ?? "",
-            LastUserDoneAction: element.data()['LastUserDoneAction'] ?? "",
-            status: element.data()['status'] ?? "",
-          ));
-        }
+          for (var element in value.docs) {
+            loadData.add(subject(
+              idToEdit: element.id,
+              nameAr: element.data()['nameAr'] ?? "",
+              nameEN: element.data()['nameEN'] ?? "",
+              countryID: element.data()['countryID'] ?? "",
+              majorID: element.data()['majorID'] ?? "",
+              gradeID: element.data()['gradeID'] ?? "",
+              typeOfSchoolID: element.data()['typeOfSchoolID'] ?? "",
+              teacherID: element.data()['teacherID'] ?? "",
+              chaptersPerLevel: element.data()['chaptersPerLevel'] ?? "",
+              imageURL: element.data()['imageURL'] ?? "",
+              userDoneAction: element.data()['userDoneAction'] ?? "",
+              LastUserDoneAction: element.data()['LastUserDoneAction'] ?? "",
+              status: element.data()['status'] ?? "",
+            ));
+          }
+          log("home 3 3");
 
-        setState(() {
-          subjects = loadData;
+          if (this.mounted) {
+            setState(() {
+              subjects = loadData;
+            });
+          }
+          log("home 3 4");
+
+          Navigator.of(context).pop();
+        }).onError((error, stackTrace) {
+          log("home 3 $error");
+          print("home 3 $error");
+          showToast("Error: $error");
         });
-
-        Navigator.of(context).pop();
-      }).onError((error, stackTrace) {
-        log(error.toString());
-        showToast("Error: $error");
-      });
-    } else {
-      showToast("Check Internet Connection !");
+      }
+      else {
+        showToast("Check Internet Connection !");
+      }
     }
+
   }
 
   @override
   Widget build(BuildContext context) {
-    if (kIsWeb) {
+    if(Platformm.Platform.I.operatingSystem.isAndroid || Platformm.Platform.I.operatingSystem.isIOS){
+      return RefreshIndicator(
+        onRefresh: () => getUserData(),
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(12.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Card(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: TxtFld(
+                    onSubmit: (v) async {
+                      if (v.isNotEmpty) {
+                        List<friend> friends = [];
+
+                        if (await checkConnectionn()) {
+                          loading(context: context);
+
+                          FirebaseFirestore.instance
+                              .collection('students')
+                              .where("number", isEqualTo: v)
+                              .get(const GetOptions(source: Source.server))
+                              .then((value) {
+                            final List<friend> loadData = [];
+
+                            for (var element in value.docs) {
+                              loadData.add(friend(
+                                idToEdit: element.id,
+                                name: element.data()['name'] ?? "",
+                                number: element.data()['number'] ?? "",
+                                imageURL: element.data()['imageURL'] ?? "",
+                                userID: element.data()['userID'] ?? "",
+                                friendID: element.data()['friendID'] ?? "",
+                              ));
+                            }
+
+                            loadData.sort((a, b) => a.name.compareTo(b.name));
+
+                            setState(() {
+                              friends = loadData;
+                            });
+
+                            Navigator.of(context).pop();
+
+                            showDialog(
+                                barrierDismissible: false,
+                                context: context,
+                                builder: (context) {
+                                  return findFriends(context, "", "", friends);
+                                });
+                          }).onError((error, stackTrace) {
+                            log("home 4 $error");
+                            showToast("Error: $error");
+                          });
+                        } else {
+                          showToast("Check Internet Connection !");
+                        }
+                      }
+                    },
+                    controller: searchController,
+                    label: LocaleKeys.search_num.tr(),
+                    picon: Icon(
+                      Icons.search,
+                      size: MediaQuery.of(context).size.width * 0.08,
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.02,
+                ),
+                Text(LocaleKeys.subjects.tr(),
+                    style: GoogleFonts.rubik(
+                      fontSize: 16,
+                      color: Colors.black,
+                      fontWeight: FontWeight.w600,
+                    )),
+                SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.02,
+                ),
+                SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.18,
+                  child: ListView.builder(
+                    shrinkWrap: true,
+                    scrollDirection: Axis.horizontal,
+                    itemCount: subjects.length,
+                    itemBuilder: (context, index) {
+                      return categoryCard(
+                          imagePath: subjects[index].imageURL,
+                          title:
+                          Localizations.localeOf(context).toString() == "en"
+                              ? subjects[index].nameEN
+                              : subjects[index].nameAr,
+                          context: context,
+                          onTap: () {
+                            Navigator.of(context).push(MaterialPageRoute(
+                                builder: (context) => Chapter(
+                                  subjectID: subjects[index].idToEdit,
+                                  name: Localizations.localeOf(context)
+                                      .toString() ==
+                                      "en"
+                                      ? subjects[index].nameEN
+                                      : subjects[index].nameAr,
+                                )));
+                          });
+                    },
+                  ),
+                ),
+                SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.02,
+                ),
+                Text(LocaleKeys.new_games.tr(),
+                    style: GoogleFonts.rubik(
+                      fontSize: 16,
+                      color: Colors.black,
+                      fontWeight: FontWeight.w600,
+                    )),
+                SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.02,
+                ),
+                SizedBox(
+                  height: MediaQuery.of(context).size.width * 0.50,
+                  child: ListView(
+                    shrinkWrap: true,
+                    scrollDirection: Axis.horizontal,
+                    children: [
+                      SizedBox(
+                        width: MediaQuery.of(context).size.width * 0.01,
+                      ),
+                      gameCard(
+                        imagePath: "assets/images/games/Group 624573.png",
+                        discussionTitle: LocaleKeys.discussion.tr(),
+                        discussion: LocaleKeys.about_discussion.tr(),
+                        context: context,
+                      ),
+                      SizedBox(
+                        width: MediaQuery.of(context).size.width * 0.02,
+                      ),
+                      gameCard(
+                          imagePath: "assets/images/games/Group 20127.png",
+                          discussionTitle: LocaleKeys.five_days_chall.tr(),
+                          discussion: LocaleKeys.about_5_days_chall.tr(),
+                          context: context,
+                          onTap: () {
+                            showDialog(
+                              context: context,
+                              builder: (context) {
+                                var height = MediaQuery.of(context).size.height;
+                                var width = MediaQuery.of(context).size.width;
+                                return Container(
+                                  width:
+                                  MediaQuery.of(context).size.width * 0.45,
+                                  child: AlertDialog(
+                                    insetPadding: EdgeInsets.symmetric(
+                                        horizontal: 200, vertical: 200),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(25),
+                                    ),
+                                    title: Center(
+                                      child: Text('Choose Chapter and lesson'),
+                                    ),
+                                    content: Column(
+                                      mainAxisAlignment:
+                                      MainAxisAlignment.center,
+                                      children: [
+                                        DropDown(
+                                          // Selecteditems: [
+                                          //   'a7a',
+                                          //   'sha5ra',
+                                          //   'sha5ra b a7a'
+                                          // ],
+                                          Selecteditems: lessonss
+                                              .map(buildMenuitem)
+                                              .toList(),
+                                          SelectedValue: Selectedvalue2,
+                                          onChanged: (valuee) {
+                                            setState(() {
+                                              Selectedvalue1 = valuee;
+                                              value = valuee;
+
+                                              // log(value);
+                                              //
+                                              // log(chapters[chapters.indexWhere((f) => (Localizations.localeOf(context).toString() == "en"? f.nameEN : f.nameAr) == value)].idToEdit);
+                                              //
+                                              //
+                                              // getLessons(chapters[chapters.indexWhere((f) => (Localizations.localeOf(context).toString() == "en"? f.nameEN : f.nameAr) == value)].idToEdit);
+                                            });
+                                          },
+                                          context: context,
+                                          hint: 'Chapter',
+                                        ),
+                                        SizedBox(
+                                          height: MediaQuery.of(context)
+                                              .size
+                                              .height *
+                                              0.03,
+                                        ),
+                                        DropDown(
+                                          // Selecteditems: [
+                                          //   'nfs el a7a',
+                                          //   'nfs el sha5ra',
+                                          //   'nfs el sha5ra b a7a',
+                                          // ],
+                                          Selecteditems: lessonss
+                                              .map(buildMenuitem)
+                                              .toList(),
+                                          SelectedValue: Selectedvalue2,
+                                          onChanged: (value) {
+                                            setState(() {
+                                              Selectedvalue2 = value;
+                                            });
+                                          },
+                                          context: context,
+                                          hint: 'Lesson',
+                                        ),
+                                      ],
+                                    ),
+                                    actions: [
+                                      Row(
+                                        mainAxisAlignment:
+                                        MainAxisAlignment.center,
+                                        children: [
+                                          smalldefaultButton(
+                                            context: context,
+                                            color: Colors.white70,
+                                            textColor: Colors.black,
+                                            text: LocaleKeys.cancel.tr(),
+                                            onpressed: () {
+                                              Navigator.pop(context);
+                                            },
+                                          ),
+                                          SizedBox(
+                                            width: MediaQuery.of(context)
+                                                .size
+                                                .width *
+                                                0.03,
+                                          ),
+                                          smalldefaultButton(
+                                            color: dodblue,
+                                            text: LocaleKeys.submit.tr(),
+                                            onpressed: () {},
+                                            context: context,
+                                          ),
+                                        ],
+                                      ),
+                                      SizedBox(
+                                        height:
+                                        MediaQuery.of(context).size.height *
+                                            0.02,
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
+                            );
+                          }),
+                      SizedBox(
+                        width: MediaQuery.of(context).size.width * 0.02,
+                      ),
+                      gameCard(
+                        imagePath: "assets/images/games/Group 624572.png",
+                        discussionTitle: LocaleKeys.challenge.tr(),
+                        discussion: LocaleKeys.about_chall.tr(),
+                        context: context,
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.02,
+                ),
+                scoreStack(
+                  subject: "Subject: $subName",
+                  score: LocaleKeys.last_test_score.tr(),
+                  context: context,
+                  percent: lastTestPercentage.toInt(),
+                  foregroundColor: Colors.blue.shade400,
+                  direction: Localizations.localeOf(context).toString() == "en"
+                      ? Direction.rtl
+                      : Direction.ltr,
+                  backgroundColor: Colors.blueAccent.shade700,
+                ),
+                SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.02,
+                ),
+                scoreStack(
+                  subject: "Subject: Math",
+                  score: LocaleKeys.last_game_score.tr(),
+                  context: context,
+                  percent: 42,
+                  foregroundColor: Colors.pink.shade300,
+                  direction: Localizations.localeOf(context).toString() == "en"
+                      ? Direction.rtl
+                      : Direction.ltr,
+                  backgroundColor: Colors.pink.shade800,
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+    else {
       return RefreshIndicator(
         onRefresh: () => getUserData(),
         child: SingleChildScrollView(
@@ -343,7 +669,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 return findFriends(context, "", "", friends);
                               });
                         }).onError((error, stackTrace) {
-                          log(error.toString());
+                          log("home 5 $error");
                           showToast("Error: $error");
                         });
                       } else {
@@ -566,264 +892,6 @@ class _HomeScreenState extends State<HomeScreen> {
                   height: MediaQuery.of(context).size.height * 0.02,
                 ),
                 webscoreStack(
-                  subject: "Subject: Math",
-                  score: LocaleKeys.last_game_score.tr(),
-                  context: context,
-                  percent: 42,
-                  foregroundColor: Colors.pink.shade300,
-                  direction: Localizations.localeOf(context).toString() == "en"
-                      ? Direction.rtl
-                      : Direction.ltr,
-                  backgroundColor: Colors.pink.shade800,
-                ),
-              ],
-            ),
-          ),
-        ),
-      );
-    } else {
-      return RefreshIndicator(
-        onRefresh: () => getUserData(),
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(12.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Card(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: TxtFld(
-                    onSubmit: (v) {
-                      log("dsfsacsdcsadcsadcsdac sad");
-                    },
-                    controller: searchController,
-                    label: LocaleKeys.search_num.tr(),
-                    picon: Icon(
-                      Icons.search,
-                      size: MediaQuery.of(context).size.width * 0.08,
-                    ),
-                  ),
-                ),
-                SizedBox(
-                  height: MediaQuery.of(context).size.height * 0.02,
-                ),
-                Text(LocaleKeys.subjects.tr(),
-                    style: GoogleFonts.rubik(
-                      fontSize: 16,
-                      color: Colors.black,
-                      fontWeight: FontWeight.w600,
-                    )),
-                SizedBox(
-                  height: MediaQuery.of(context).size.height * 0.02,
-                ),
-                SizedBox(
-                  height: MediaQuery.of(context).size.height * 0.18,
-                  child: ListView.builder(
-                    shrinkWrap: true,
-                    scrollDirection: Axis.horizontal,
-                    itemCount: subjects.length,
-                    itemBuilder: (context, index) {
-                      return categoryCard(
-                          imagePath: subjects[index].imageURL,
-                          title:
-                              Localizations.localeOf(context).toString() == "en"
-                                  ? subjects[index].nameEN
-                                  : subjects[index].nameAr,
-                          context: context,
-                          onTap: () {
-                            Navigator.of(context).push(MaterialPageRoute(
-                                builder: (context) => Chapter(
-                                      subjectID: subjects[index].idToEdit,
-                                      name: Localizations.localeOf(context)
-                                                  .toString() ==
-                                              "en"
-                                          ? subjects[index].nameEN
-                                          : subjects[index].nameAr,
-                                    )));
-                          });
-                    },
-                  ),
-                ),
-                SizedBox(
-                  height: MediaQuery.of(context).size.height * 0.02,
-                ),
-                Text(LocaleKeys.new_games.tr(),
-                    style: GoogleFonts.rubik(
-                      fontSize: 16,
-                      color: Colors.black,
-                      fontWeight: FontWeight.w600,
-                    )),
-                SizedBox(
-                  height: MediaQuery.of(context).size.height * 0.02,
-                ),
-                SizedBox(
-                  height: MediaQuery.of(context).size.width * 0.50,
-                  child: ListView(
-                    shrinkWrap: true,
-                    scrollDirection: Axis.horizontal,
-                    children: [
-                      SizedBox(
-                        width: MediaQuery.of(context).size.width * 0.01,
-                      ),
-                      gameCard(
-                        imagePath: "assets/images/games/Group 624573.png",
-                        discussionTitle: LocaleKeys.discussion.tr(),
-                        discussion: LocaleKeys.about_discussion.tr(),
-                        context: context,
-                      ),
-                      SizedBox(
-                        width: MediaQuery.of(context).size.width * 0.02,
-                      ),
-                      gameCard(
-                          imagePath: "assets/images/games/Group 20127.png",
-                          discussionTitle: LocaleKeys.five_days_chall.tr(),
-                          discussion: LocaleKeys.about_5_days_chall.tr(),
-                          context: context,
-                          onTap: () {
-                            showDialog(
-                              context: context,
-                              builder: (context) {
-                                var height = MediaQuery.of(context).size.height;
-                                var width = MediaQuery.of(context).size.width;
-                                return Container(
-                                  width:
-                                      MediaQuery.of(context).size.width * 0.45,
-                                  child: AlertDialog(
-                                    insetPadding: EdgeInsets.symmetric(
-                                        horizontal: 200, vertical: 200),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(25),
-                                    ),
-                                    title: Center(
-                                      child: Text('Choose Chapter and lesson'),
-                                    ),
-                                    content: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        DropDown(
-                                          // Selecteditems: [
-                                          //   'a7a',
-                                          //   'sha5ra',
-                                          //   'sha5ra b a7a'
-                                          // ],
-                                          Selecteditems: lessonss
-                                              .map(buildMenuitem)
-                                              .toList(),
-                                          SelectedValue: Selectedvalue2,
-                                          onChanged: (valuee) {
-                                            setState(() {
-                                              Selectedvalue1 = valuee;
-                                              value = valuee;
-
-                                              // log(value);
-                                              //
-                                              // log(chapters[chapters.indexWhere((f) => (Localizations.localeOf(context).toString() == "en"? f.nameEN : f.nameAr) == value)].idToEdit);
-                                              //
-                                              //
-                                              // getLessons(chapters[chapters.indexWhere((f) => (Localizations.localeOf(context).toString() == "en"? f.nameEN : f.nameAr) == value)].idToEdit);
-                                            });
-                                          },
-                                          context: context,
-                                          hint: 'Chapter',
-                                        ),
-                                        SizedBox(
-                                          height: MediaQuery.of(context)
-                                                  .size
-                                                  .height *
-                                              0.03,
-                                        ),
-                                        DropDown(
-                                          // Selecteditems: [
-                                          //   'nfs el a7a',
-                                          //   'nfs el sha5ra',
-                                          //   'nfs el sha5ra b a7a',
-                                          // ],
-                                          Selecteditems: lessonss
-                                              .map(buildMenuitem)
-                                              .toList(),
-                                          SelectedValue: Selectedvalue2,
-                                          onChanged: (value) {
-                                            setState(() {
-                                              Selectedvalue2 = value;
-                                            });
-                                          },
-                                          context: context,
-                                          hint: 'Lesson',
-                                        ),
-                                      ],
-                                    ),
-                                    actions: [
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          smalldefaultButton(
-                                            context: context,
-                                            color: Colors.white70,
-                                            textColor: Colors.black,
-                                            text: LocaleKeys.cancel.tr(),
-                                            onpressed: () {
-                                              Navigator.pop(context);
-                                            },
-                                          ),
-                                          SizedBox(
-                                            width: MediaQuery.of(context)
-                                                    .size
-                                                    .width *
-                                                0.03,
-                                          ),
-                                          smalldefaultButton(
-                                            color: dodblue,
-                                            text: LocaleKeys.submit.tr(),
-                                            onpressed: () {},
-                                            context: context,
-                                          ),
-                                        ],
-                                      ),
-                                      SizedBox(
-                                        height:
-                                            MediaQuery.of(context).size.height *
-                                                0.02,
-                                      ),
-                                    ],
-                                  ),
-                                );
-                              },
-                            );
-                          }),
-                      SizedBox(
-                        width: MediaQuery.of(context).size.width * 0.02,
-                      ),
-                      gameCard(
-                        imagePath: "assets/images/games/Group 624572.png",
-                        discussionTitle: LocaleKeys.challenge.tr(),
-                        discussion: LocaleKeys.about_chall.tr(),
-                        context: context,
-                      ),
-                    ],
-                  ),
-                ),
-                SizedBox(
-                  height: MediaQuery.of(context).size.height * 0.02,
-                ),
-                scoreStack(
-                  subject: "Subject: $subName",
-                  score: LocaleKeys.last_test_score.tr(),
-                  context: context,
-                  percent: lastTestPercentage.toInt(),
-                  foregroundColor: Colors.blue.shade400,
-                  direction: Localizations.localeOf(context).toString() == "en"
-                      ? Direction.rtl
-                      : Direction.ltr,
-                  backgroundColor: Colors.blueAccent.shade700,
-                ),
-                SizedBox(
-                  height: MediaQuery.of(context).size.height * 0.02,
-                ),
-                scoreStack(
                   subject: "Subject: Math",
                   score: LocaleKeys.last_game_score.tr(),
                   context: context,

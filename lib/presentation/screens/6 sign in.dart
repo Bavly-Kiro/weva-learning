@@ -1,7 +1,9 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_phoenix/flutter_phoenix.dart';
 import 'package:oktoast/oktoast.dart';
+import 'package:platform_info/platform_info.dart';
 import 'package:weva/presentation/screens/main_screen.dart';
 import 'package:weva/presentation/widgets/default_text_button.dart';
 
@@ -12,6 +14,7 @@ import '../widgets/alert_dialog.dart';
 import '../widgets/cerved_container.dart';
 import '../widgets/registration_button.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
+import 'dart:html' as html;
 
 // ignore_for_file: prefer_const_constructors
 class SignIn extends StatefulWidget {
@@ -26,7 +29,7 @@ TextEditingController passwordController = TextEditingController();
 class _SignInState extends State<SignIn> {
   @override
   Widget build(BuildContext context) {
-    if (kIsWeb) {
+    if(Platform.I.operatingSystem.isAndroid || Platform.I.operatingSystem.isIOS){
       return Scaffold(
           backgroundColor: const Color(0XFFe4f1f8),
           body: SingleChildScrollView(
@@ -60,7 +63,7 @@ class _SignInState extends State<SignIn> {
                           SizedBox(
                             height: MediaQuery.of(context).size.height * 0.03,
                           ),
-                          webregistrationButton(
+                          registrationButton(
                             text: LocaleKeys.sign_in_face.tr(),
                             context: context,
                             imagePath: 'assets/images/Facebook F.png',
@@ -70,7 +73,7 @@ class _SignInState extends State<SignIn> {
                           SizedBox(
                             height: MediaQuery.of(context).size.height * 0.02,
                           ),
-                          webregistrationButton(
+                          registrationButton(
                             text: LocaleKeys.sign_in_google.tr(),
                             context: context,
                             imagePath: 'assets/images/Google.png',
@@ -90,7 +93,7 @@ class _SignInState extends State<SignIn> {
                           SizedBox(
                             height: MediaQuery.of(context).size.height * 0.02,
                           ),
-                          webTxtFld(
+                          TxtFld(
                             controller: emailController,
                             label: LocaleKeys.email.tr(),
                             validator: (value) {
@@ -99,13 +102,11 @@ class _SignInState extends State<SignIn> {
                               }
                               return null;
                             },
-                            context: context,
                           ),
                           SizedBox(
                             height: MediaQuery.of(context).size.height * 0.01,
                           ),
-                          webTxtFld(
-                            context: context,
+                          TxtFld(
                             sicon: IconButton(
                               onPressed: () {
                                 setState(() {
@@ -138,11 +139,11 @@ class _SignInState extends State<SignIn> {
                                 onpressed: () {})*/
                               SizedBox(
                                 height:
-                                    MediaQuery.of(context).size.height * 0.05,
+                                MediaQuery.of(context).size.height * 0.05,
                               ),
                             ],
                           ),
-                          webregistrationButton(
+                          registrationButton(
                             text: LocaleKeys.sign_in.tr(),
                             context: context,
                             onTap: () async {
@@ -152,13 +153,23 @@ class _SignInState extends State<SignIn> {
                                 try {
                                   await FirebaseAuth.instance
                                       .signInWithEmailAndPassword(
-                                          email: emailController.text,
-                                          password: passwordController.text)
+                                      email: emailController.text,
+                                      password: passwordController.text)
                                       .then((value) {
-                                    Navigator.of(context).push(
+
+                                    /*Navigator.of(context).push(
                                         MaterialPageRoute(
                                             builder: (context) =>
-                                                MainScreen()));
+                                                MainScreen()));*/
+
+                                    if(kIsWeb){
+                                      html.window.location.reload();
+                                    }else{
+                                      // a8yarha wa7shaa
+                                      Phoenix.rebirth(context);
+                                    }
+
+
                                   });
                                 } on FirebaseAuthException catch (e) {
                                   //here
@@ -206,7 +217,7 @@ class _SignInState extends State<SignIn> {
                                     AlertDialog alert = AlertDialog(
                                       title: const Text("Wrong Email"),
                                       content:
-                                          const Text("please check your email"),
+                                      const Text("please check your email"),
                                       actions: [
                                         okButton,
                                       ],
@@ -244,7 +255,8 @@ class _SignInState extends State<SignIn> {
                   ],
                 )),
           ));
-    } else {
+    }
+    else {
       return Scaffold(
           backgroundColor: const Color(0XFFe4f1f8),
           body: SingleChildScrollView(
@@ -278,7 +290,7 @@ class _SignInState extends State<SignIn> {
                           SizedBox(
                             height: MediaQuery.of(context).size.height * 0.03,
                           ),
-                          registrationButton(
+                          webregistrationButton(
                             text: LocaleKeys.sign_in_face.tr(),
                             context: context,
                             imagePath: 'assets/images/Facebook F.png',
@@ -288,7 +300,7 @@ class _SignInState extends State<SignIn> {
                           SizedBox(
                             height: MediaQuery.of(context).size.height * 0.02,
                           ),
-                          registrationButton(
+                          webregistrationButton(
                             text: LocaleKeys.sign_in_google.tr(),
                             context: context,
                             imagePath: 'assets/images/Google.png',
@@ -308,7 +320,7 @@ class _SignInState extends State<SignIn> {
                           SizedBox(
                             height: MediaQuery.of(context).size.height * 0.02,
                           ),
-                          TxtFld(
+                          webTxtFld(
                             controller: emailController,
                             label: LocaleKeys.email.tr(),
                             validator: (value) {
@@ -317,11 +329,13 @@ class _SignInState extends State<SignIn> {
                               }
                               return null;
                             },
+                            context: context,
                           ),
                           SizedBox(
                             height: MediaQuery.of(context).size.height * 0.01,
                           ),
-                          TxtFld(
+                          webTxtFld(
+                            context: context,
                             sicon: IconButton(
                               onPressed: () {
                                 setState(() {
@@ -358,7 +372,7 @@ class _SignInState extends State<SignIn> {
                               ),
                             ],
                           ),
-                          registrationButton(
+                          webregistrationButton(
                             text: LocaleKeys.sign_in.tr(),
                             context: context,
                             onTap: () async {
@@ -371,10 +385,19 @@ class _SignInState extends State<SignIn> {
                                           email: emailController.text,
                                           password: passwordController.text)
                                       .then((value) {
-                                    Navigator.of(context).push(
+                                    /*Navigator.of(context).push(
                                         MaterialPageRoute(
                                             builder: (context) =>
-                                                MainScreen()));
+                                                MainScreen()));*/
+
+                                    if(kIsWeb){
+                                      html.window.location.reload();
+                                    }else{
+                                      // a8yarha wa7shaa
+                                      Phoenix.rebirth(context);
+                                    }
+
+
                                   });
                                 } on FirebaseAuthException catch (e) {
                                   //here

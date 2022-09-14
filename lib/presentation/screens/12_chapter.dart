@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:oktoast/oktoast.dart';
+import 'package:platform_info/platform_info.dart';
 
 import '../../back/checkConnection.dart';
 import '../../back/loading.dart';
@@ -184,186 +185,7 @@ class _ChapterState extends State<Chapter> {
 
   @override
   Widget build(BuildContext context) {
-    if (kIsWeb) {
-      return Scaffold(
-        appBar: AppBar(
-          backgroundColor: Colors.white,
-          elevation: 0.0,
-          leading: IconButton(
-            onPressed: () {
-              Navigator.pop(context);
-            },
-            icon: Icon(
-              Icons.arrow_back_ios,
-              color: Colors.black,
-            ),
-          ),
-        ),
-        backgroundColor: Colors.white,
-        body: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.only(
-              left: 20,
-              top: 50,
-              right: 20,
-            ),
-            child: SingleChildScrollView(
-              child: Form(
-                key: formKey,
-                child: Column(
-                  children: [
-
-                    SizedBox(
-                      height: MediaQuery.of(context).size.height * 0.45,
-                      child: Stack(
-                        children: [
-                          Image(
-                            image: AssetImage("assets/images/science.png"),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          widget.name,
-                          style: GoogleFonts.rubik(
-                            fontSize: 26.0,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-
-                    SizedBox(
-                      height: MediaQuery.of(context).size.height * 0.04,
-                    ),
-
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-
-                        webdefaultButton(
-                          context: context,
-                          color: Colors.green,
-                          text: "Live Schedules",
-                          onpressed: () {
-
-                            showDialog(
-                                barrierDismissible: false,
-                                context: context,
-                                builder: (context) {
-                                  return startExam(
-                                      context,
-                                      "${widget.name} Lives",
-                                      "Monday: 5 PM");
-                                });
-                          },
-                        ),
-                        webdefaultButton(
-                          context: context,
-                          color: Colors.yellow.shade800,
-                          text: "Exam",
-                          onpressed: () {
-
-
-                            if(value.isNotEmpty){
-
-                              showDialog(
-                                  barrierDismissible: false,
-                                  context: context,
-                                  builder: (context) {
-                                    return openExam(
-                                        context,
-                                        chapters[chapters.indexWhere((f) => (Localizations.localeOf(context).toString() == "en"? f.nameEN : f.nameAr) == value)].idToEdit,
-                                        FirebaseAuth.instance.currentUser!.uid,
-                                        "daysQuestions",
-                                        value
-                                    );
-                                  });
-
-                            }
-
-
-
-                          },
-                        ),
-
-
-                      ],
-                    ),
-
-                    SizedBox(
-                      height: MediaQuery.of(context).size.height * 0.04,
-                    ),
-
-                    webDropDown(
-                      Selecteditems: chapterss.map(buildMenuitem).toList(),
-                      SelectedValue: Selectedvalue1,
-                      onChanged: (valuee) {
-                        setState(() {
-                          Selectedvalue1 = valuee;
-                          value = valuee;
-
-                          log(value);
-
-                          log(chapters[chapters.indexWhere((f) => (Localizations.localeOf(context).toString() == "en"? f.nameEN : f.nameAr) == value)].idToEdit);
-
-
-                          getLessons(chapters[chapters.indexWhere((f) => (Localizations.localeOf(context).toString() == "en"? f.nameEN : f.nameAr) == value)].idToEdit);
-
-                        });
-                      },
-                      context: context,
-                      hint: 'Chapter',
-                    ),
-                    SizedBox(
-                      height: MediaQuery.of(context).size.height * 0.03,
-                    ),
-                    webDropDown(
-                      Selecteditems: lessonss.map(buildMenuitem).toList(),
-                      SelectedValue: Selectedvalue2,
-                      onChanged: (value) {
-                        setState(() {
-                          Selectedvalue2 = value;
-                        });
-                      },
-                      context: context,
-                      hint: 'Lesson',
-                    ),
-                    SizedBox(
-                      height: MediaQuery.of(context).size.height * 0.04,
-                    ),
-                    webregistrationButton(
-                      text: "Next",
-                      onTap: () {
-                        if (formKey.currentState!.validate()) {
-                          //Navigate to b2a hna
-
-
-                          if(Selectedvalue1 != null && Selectedvalue2 != null){
-
-                            Navigator.of(context).push(MaterialPageRoute(builder: (context)=> ListofVids(chName: Selectedvalue1!, lessonID: lessons[lessons.indexWhere((f) => (Localizations.localeOf(context).toString() == "en"? f.nameEN : f.nameAr) == Selectedvalue2)].idToEdit, nameAR: lessons[lessons.indexWhere((f) => (Localizations.localeOf(context).toString() == "en"? f.nameEN : f.nameAr) == Selectedvalue2)].nameAr, nameEN: lessons[lessons.indexWhere((f) => (Localizations.localeOf(context).toString() == "en"? f.nameEN : f.nameAr) == Selectedvalue2)].nameEN, lesonNum: lessons[lessons.indexWhere((f) => (Localizations.localeOf(context).toString() == "en"? f.nameEN : f.nameAr) == Selectedvalue2)].lessNum,subjectName: widget.name,)));
-
-                          }
-
-
-                        }
-                      },
-                      context: context,
-                    ),
-                    SizedBox(
-                      height: MediaQuery.of(context).size.height * 0.04,
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ),
-      );    }
-    else {
+    if(Platform.I.operatingSystem.isAndroid || Platform.I.operatingSystem.isIOS){
       return Scaffold(
         appBar: AppBar(
           backgroundColor: Colors.white,
@@ -543,6 +365,184 @@ class _ChapterState extends State<Chapter> {
           ),
         ),
       );    }
+    else {
+      return Scaffold(
+        appBar: AppBar(
+          backgroundColor: Colors.white,
+          elevation: 0.0,
+          leading: IconButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            icon: Icon(
+              Icons.arrow_back_ios,
+              color: Colors.black,
+            ),
+          ),
+        ),
+        backgroundColor: Colors.white,
+        body: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.only(
+              left: 20,
+              top: 50,
+              right: 20,
+            ),
+            child: SingleChildScrollView(
+              child: Form(
+                key: formKey,
+                child: Column(
+                  children: [
 
+                    SizedBox(
+                      height: MediaQuery.of(context).size.height * 0.45,
+                      child: Stack(
+                        children: [
+                          Image(
+                            image: AssetImage("assets/images/science.png"),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          widget.name,
+                          style: GoogleFonts.rubik(
+                            fontSize: 26.0,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    SizedBox(
+                      height: MediaQuery.of(context).size.height * 0.04,
+                    ),
+
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+
+                        webdefaultButton(
+                          context: context,
+                          color: Colors.green,
+                          text: "Live Schedules",
+                          onpressed: () {
+
+                            showDialog(
+                                barrierDismissible: false,
+                                context: context,
+                                builder: (context) {
+                                  return startExam(
+                                      context,
+                                      "${widget.name} Lives",
+                                      "Monday: 5 PM");
+                                });
+                          },
+                        ),
+                        webdefaultButton(
+                          context: context,
+                          color: Colors.yellow.shade800,
+                          text: "Exam",
+                          onpressed: () {
+
+
+                            if(value.isNotEmpty){
+
+                              showDialog(
+                                  barrierDismissible: false,
+                                  context: context,
+                                  builder: (context) {
+                                    return openExam(
+                                        context,
+                                        chapters[chapters.indexWhere((f) => (Localizations.localeOf(context).toString() == "en"? f.nameEN : f.nameAr) == value)].idToEdit,
+                                        FirebaseAuth.instance.currentUser!.uid,
+                                        "daysQuestions",
+                                        value
+                                    );
+                                  });
+
+                            }
+
+
+
+                          },
+                        ),
+
+
+                      ],
+                    ),
+
+                    SizedBox(
+                      height: MediaQuery.of(context).size.height * 0.04,
+                    ),
+
+                    webDropDown(
+                      Selecteditems: chapterss.map(buildMenuitem).toList(),
+                      SelectedValue: Selectedvalue1,
+                      onChanged: (valuee) {
+                        setState(() {
+                          Selectedvalue1 = valuee;
+                          value = valuee;
+
+                          log(value);
+
+                          log(chapters[chapters.indexWhere((f) => (Localizations.localeOf(context).toString() == "en"? f.nameEN : f.nameAr) == value)].idToEdit);
+
+
+                          getLessons(chapters[chapters.indexWhere((f) => (Localizations.localeOf(context).toString() == "en"? f.nameEN : f.nameAr) == value)].idToEdit);
+
+                        });
+                      },
+                      context: context,
+                      hint: 'Chapter',
+                    ),
+                    SizedBox(
+                      height: MediaQuery.of(context).size.height * 0.03,
+                    ),
+                    webDropDown(
+                      Selecteditems: lessonss.map(buildMenuitem).toList(),
+                      SelectedValue: Selectedvalue2,
+                      onChanged: (value) {
+                        setState(() {
+                          Selectedvalue2 = value;
+                        });
+                      },
+                      context: context,
+                      hint: 'Lesson',
+                    ),
+                    SizedBox(
+                      height: MediaQuery.of(context).size.height * 0.04,
+                    ),
+                    webregistrationButton(
+                      text: "Next",
+                      onTap: () {
+                        if (formKey.currentState!.validate()) {
+                          //Navigate to b2a hna
+
+
+                          if(Selectedvalue1 != null && Selectedvalue2 != null){
+
+                            Navigator.of(context).push(MaterialPageRoute(builder: (context)=> ListofVids(chName: Selectedvalue1!, lessonID: lessons[lessons.indexWhere((f) => (Localizations.localeOf(context).toString() == "en"? f.nameEN : f.nameAr) == Selectedvalue2)].idToEdit, nameAR: lessons[lessons.indexWhere((f) => (Localizations.localeOf(context).toString() == "en"? f.nameEN : f.nameAr) == Selectedvalue2)].nameAr, nameEN: lessons[lessons.indexWhere((f) => (Localizations.localeOf(context).toString() == "en"? f.nameEN : f.nameAr) == Selectedvalue2)].nameEN, lesonNum: lessons[lessons.indexWhere((f) => (Localizations.localeOf(context).toString() == "en"? f.nameEN : f.nameAr) == Selectedvalue2)].lessNum,subjectName: widget.name,)));
+
+                          }
+
+
+                        }
+                      },
+                      context: context,
+                    ),
+                    SizedBox(
+                      height: MediaQuery.of(context).size.height * 0.04,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      );    }
   }
 }

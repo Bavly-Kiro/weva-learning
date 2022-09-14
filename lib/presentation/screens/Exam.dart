@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:oktoast/oktoast.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
+import 'package:platform_info/platform_info.dart';
 import 'package:vibration/vibration.dart';
 import 'package:weva/presentation/widgets/default_button.dart';
 
@@ -486,7 +487,226 @@ class _ExamState extends State<Exam> {
 
   @override
   Widget build(BuildContext context) {
-    if (kIsWeb) {
+    if(Platform.I.operatingSystem.isAndroid || Platform.I.operatingSystem.isIOS){
+      return loadingg? Container()
+          : Scaffold(
+        backgroundColor: Colors.white,
+        body: SafeArea(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(
+                height: MediaQuery.of(context).size.height * 0.02,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  IconButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                      stopTimer();
+                      resetTimer();
+                    },
+                    icon: Icon(
+                      Icons.close,
+                      color: Colors.black,
+                    ),
+                  ),
+                  SizedBox(
+                    width: MediaQuery.of(context).size.width * 0.2,
+                  ),
+                  Icon(
+                    Icons.timer_outlined,
+                    size: 30.0,
+                  ),
+                  SizedBox(
+                    width: MediaQuery.of(context).size.width * 0.02,
+                  ),
+                  Text(
+                    '${myDuration.inSeconds.toString()}${LocaleKeys.s_remaining.tr()}',
+                    style: GoogleFonts.rubik(
+                      fontSize: 18.0,
+                      color: linearColor,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(
+                height: MediaQuery.of(context).size.height * 0.01,
+              ),
+              Container(
+                child: LinearPercentIndicator(
+                  padding: EdgeInsets.all(0.0),
+                  width: MediaQuery.of(context).size.width,
+                  percent: myDuration.inSeconds / 120,
+                  barRadius: Radius.circular(20),
+                  // animation: true,
+                  // animationDuration: 1500,
+                  progressColor: linearColor,
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(15.0),
+                child: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        '${LocaleKeys.question.tr()} $questionNumber ${LocaleKeys.of.tr()} ${questions.length}',
+                        style: GoogleFonts.rubik(
+                          fontSize: 14.0,
+                          color: Colors.grey,
+                        ),
+                      ),
+                      SizedBox(
+                        height: MediaQuery.of(context).size.height * 0.03,
+                      ),
+                      Text(
+                        //$question
+                        questions[questionNumber-1].questionText,
+                        style: GoogleFonts.rubik(
+                          fontSize: 18.0,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      SizedBox(
+                        height: MediaQuery.of(context).size.height * 0.05,
+                      ),
+                      ListView.separated(
+                        physics: NeverScrollableScrollPhysics(),
+                        separatorBuilder: (context, index) => SizedBox(
+                          height: MediaQuery.of(context).size.height * 0.02,
+                        ),
+                        shrinkWrap: true,
+                        itemCount: 4,
+                        itemBuilder: (context, index) => Material(
+                          borderRadius: BorderRadius.circular(10),
+                          elevation: 2,
+                          shadowColor: Colors.grey,
+                          color: x[index] == 0
+                              ? Colors.white
+                              : x[index] == 1
+                              ? Color(0xff45CB6A)
+                              : x[index] == 2
+                              ? Colors.red.shade700
+                              : Colors.white,
+                          child: Container(
+                            decoration: x[index] == 3
+                                ? BoxDecoration(
+                              borderRadius:
+                              BorderRadius.circular(10),
+                              border: Border.all(
+                                color: Color(0xff45CB6A),
+                                width: 2,
+                              ),
+                            )
+                                : BoxDecoration(),
+                            child: ListTile(
+                              title: Text(
+                                index == 0 ? questions[questionNumber-1].ansOne : index == 1? questions[questionNumber-1].ansTwo : index == 2? questions[questionNumber-1].ansThree : questions[questionNumber-1].ansFour,
+                                style: GoogleFonts.rubik(
+                                  color: x[index] == 0 || x[index] == 3
+                                      ? Colors.black
+                                      : Colors.white,
+                                  fontSize: 17.0,
+                                ),
+                              ),
+                              leading: IconButton(
+                                onPressed: () {
+
+                                  if(clickable){
+                                    checkAns(index+1, questions[questionNumber-1].correctAns);
+                                  }
+
+                                },
+                                icon: x[index] == 0
+                                    ? Icon(
+                                  greenBorderandShadow
+                                      ? Icons.panorama_fish_eye
+                                      : Icons.lens,
+                                  color: greenBorderandShadow
+                                      ? Color(0xff45CB6A)
+                                      : Colors.grey,
+                                )
+                                    : x[index] == 1
+                                    ? Icon(
+                                  Icons.done,
+                                  color: Colors.white,
+                                )
+                                    : x[index] == 2
+                                    ? Icon(
+                                  Icons.close,
+                                  color: Colors.white,
+                                )
+                                    : x[index] == 3
+                                    ? Icon(
+                                  Icons
+                                      .panorama_fish_eye,
+                                  color:
+                                  Color(0xff45CB6A),
+                                )
+                                    : Icon(
+                                  Icons
+                                      .panorama_fish_eye,
+                                  color: Colors.white,
+                                ),
+                              ),
+                              onTap: () {
+                                setState(() {
+
+                                  if(clickable){
+                                    checkAns(index+1, questions[questionNumber-1].correctAns);
+                                  }
+
+                                });
+                              },
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              Spacer(),
+              Material(
+                // shadowColor: Colors.grey.withAlpha(40),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey.withOpacity(0.5),
+                        spreadRadius: 5,
+                        blurRadius: 7,
+                        offset: Offset(0, 3), // changes position of shadow
+                      ),
+                    ],
+                  ),
+                  padding: EdgeInsets.all(15.0),
+                  width: MediaQuery.of(context).size.width,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        //$question
+                        '${widget.subjectName} ${LocaleKeys.exam.tr()}',
+                        style: GoogleFonts.rubik(
+                          fontSize: 18.0,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+    else {
       return loadingg? Container()
           : Scaffold(
         backgroundColor: Colors.white,
@@ -751,225 +971,6 @@ class _ExamState extends State<Exam> {
             )
 
           ],
-        ),
-      );
-    }
-    else {
-      return loadingg? Container()
-          : Scaffold(
-        backgroundColor: Colors.white,
-        body: SafeArea(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              SizedBox(
-                height: MediaQuery.of(context).size.height * 0.02,
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  IconButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                      stopTimer();
-                      resetTimer();
-                    },
-                    icon: Icon(
-                      Icons.close,
-                      color: Colors.black,
-                    ),
-                  ),
-                  SizedBox(
-                    width: MediaQuery.of(context).size.width * 0.2,
-                  ),
-                  Icon(
-                    Icons.timer_outlined,
-                    size: 30.0,
-                  ),
-                  SizedBox(
-                    width: MediaQuery.of(context).size.width * 0.02,
-                  ),
-                  Text(
-                    '${myDuration.inSeconds.toString()}${LocaleKeys.s_remaining.tr()}',
-                    style: GoogleFonts.rubik(
-                      fontSize: 18.0,
-                      color: linearColor,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(
-                height: MediaQuery.of(context).size.height * 0.01,
-              ),
-              Container(
-                child: LinearPercentIndicator(
-                  padding: EdgeInsets.all(0.0),
-                  width: MediaQuery.of(context).size.width,
-                  percent: myDuration.inSeconds / 120,
-                  barRadius: Radius.circular(20),
-                  // animation: true,
-                  // animationDuration: 1500,
-                  progressColor: linearColor,
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(15.0),
-                child: SingleChildScrollView(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        '${LocaleKeys.question.tr()} $questionNumber ${LocaleKeys.of.tr()} ${questions.length}',
-                        style: GoogleFonts.rubik(
-                          fontSize: 14.0,
-                          color: Colors.grey,
-                        ),
-                      ),
-                      SizedBox(
-                        height: MediaQuery.of(context).size.height * 0.03,
-                      ),
-                      Text(
-                        //$question
-                        questions[questionNumber-1].questionText,
-                        style: GoogleFonts.rubik(
-                          fontSize: 18.0,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      SizedBox(
-                        height: MediaQuery.of(context).size.height * 0.05,
-                      ),
-                      ListView.separated(
-                        physics: NeverScrollableScrollPhysics(),
-                        separatorBuilder: (context, index) => SizedBox(
-                          height: MediaQuery.of(context).size.height * 0.02,
-                        ),
-                        shrinkWrap: true,
-                        itemCount: 4,
-                        itemBuilder: (context, index) => Material(
-                          borderRadius: BorderRadius.circular(10),
-                          elevation: 2,
-                          shadowColor: Colors.grey,
-                          color: x[index] == 0
-                              ? Colors.white
-                              : x[index] == 1
-                              ? Color(0xff45CB6A)
-                              : x[index] == 2
-                              ? Colors.red.shade700
-                              : Colors.white,
-                          child: Container(
-                            decoration: x[index] == 3
-                                ? BoxDecoration(
-                              borderRadius:
-                              BorderRadius.circular(10),
-                              border: Border.all(
-                                color: Color(0xff45CB6A),
-                                width: 2,
-                              ),
-                            )
-                                : BoxDecoration(),
-                            child: ListTile(
-                              title: Text(
-                                index == 0 ? questions[questionNumber-1].ansOne : index == 1? questions[questionNumber-1].ansTwo : index == 2? questions[questionNumber-1].ansThree : questions[questionNumber-1].ansFour,
-                                style: GoogleFonts.rubik(
-                                  color: x[index] == 0 || x[index] == 3
-                                      ? Colors.black
-                                      : Colors.white,
-                                  fontSize: 17.0,
-                                ),
-                              ),
-                              leading: IconButton(
-                                onPressed: () {
-
-                                  if(clickable){
-                                    checkAns(index+1, questions[questionNumber-1].correctAns);
-                                  }
-
-                                },
-                                icon: x[index] == 0
-                                    ? Icon(
-                                  greenBorderandShadow
-                                      ? Icons.panorama_fish_eye
-                                      : Icons.lens,
-                                  color: greenBorderandShadow
-                                      ? Color(0xff45CB6A)
-                                      : Colors.grey,
-                                )
-                                    : x[index] == 1
-                                    ? Icon(
-                                  Icons.done,
-                                  color: Colors.white,
-                                )
-                                    : x[index] == 2
-                                    ? Icon(
-                                  Icons.close,
-                                  color: Colors.white,
-                                )
-                                    : x[index] == 3
-                                    ? Icon(
-                                  Icons
-                                      .panorama_fish_eye,
-                                  color:
-                                  Color(0xff45CB6A),
-                                )
-                                    : Icon(
-                                  Icons
-                                      .panorama_fish_eye,
-                                  color: Colors.white,
-                                ),
-                              ),
-                              onTap: () {
-                                setState(() {
-
-                                  if(clickable){
-                                    checkAns(index+1, questions[questionNumber-1].correctAns);
-                                  }
-
-                                });
-                              },
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              Spacer(),
-              Material(
-                // shadowColor: Colors.grey.withAlpha(40),
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey.withOpacity(0.5),
-                        spreadRadius: 5,
-                        blurRadius: 7,
-                        offset: Offset(0, 3), // changes position of shadow
-                      ),
-                    ],
-                  ),
-                  padding: EdgeInsets.all(15.0),
-                  width: MediaQuery.of(context).size.width,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        //$question
-                        '${widget.subjectName} ${LocaleKeys.exam.tr()}',
-                        style: GoogleFonts.rubik(
-                          fontSize: 18.0,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
         ),
       );
     }

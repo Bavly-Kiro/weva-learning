@@ -6,6 +6,7 @@ import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:flutter_ringtone_player/flutter_ringtone_player.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:oktoast/oktoast.dart';
+import 'package:platform_info/platform_info.dart';
 import 'package:weva/presentation/widgets/default_button.dart';
 
 import '../../back/checkConnection.dart';
@@ -17,7 +18,6 @@ import '../screens/6 sign in.dart';
 import '../screens/Exam.dart';
 import '../screens/Live.dart';
 import 'friend_card.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
 
 //
 // Widget ClickAlert({
@@ -438,8 +438,7 @@ Widget startExam(context, String text1, String text2) => AlertDialog(
       ],
     );
 
-Widget findFriends(context, String text1, String text2, List<friend> friends) =>
-    AlertDialog(
+Widget findFriends(context, String text1, String text2, List<friend> friends) => AlertDialog(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(25),
       ),
@@ -465,21 +464,22 @@ Widget findFriends(context, String text1, String text2, List<friend> friends) =>
                 itemBuilder: (context, index) {
                   return Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 30.0),
-                    child: kIsWeb
-                        ? webfriendCard(
+                    child: (Platform.I.operatingSystem.isAndroid || Platform.I.operatingSystem.isIOS)
+                        ? friendCard(
+                        context,
+                        friends[index].name,
+                        friends[index].imageURL,
+                        friends[index].number,
+                        friends[index].idToEdit,
+                        2)
+                    : webfriendCard(
                             context,
                             friends[index].name,
                             friends[index].imageURL,
                             friends[index].number,
                             friends[index].idToEdit,
                             2)
-                        : friendCard(
-                            context,
-                            friends[index].name,
-                            friends[index].imageURL,
-                            friends[index].number,
-                            friends[index].idToEdit,
-                            2),
+                        ,
                   );
                 }),
           ),
@@ -541,21 +541,21 @@ Widget recievedCall(context, String name, String callerID) => AlertDialog(
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            kIsWeb
-                ? webdefaultButton(
-                    context: context,
-                    color: Colors.white70,
-                    textColor: Colors.black,
-                    text: LocaleKeys.cancel.tr(),
-                    onpressed: () {
-                      Navigator.pop(context);
+            (Platform.I.operatingSystem.isAndroid || Platform.I.operatingSystem.isIOS)
+                ? defaultButton(
+              context: context,
+              color: Colors.white70,
+              textColor: Colors.black,
+              text: LocaleKeys.cancel.tr(),
+              onpressed: () {
+                Navigator.pop(context);
 
-                      FlutterRingtonePlayer.stop();
+                FlutterRingtonePlayer.stop();
 
-                      //wa a8yar al value bta3t caller
-                    },
-                  )
-                : defaultButton(
+                //wa a8yar al value bta3t caller
+              },
+            )
+            : webdefaultButton(
                     context: context,
                     color: Colors.white70,
                     textColor: Colors.black,
@@ -568,40 +568,40 @@ Widget recievedCall(context, String name, String callerID) => AlertDialog(
                       //wa a8yar al value bta3t caller
                     },
                   ),
-            kIsWeb
-                ? webdefaultButton(
-                    context: context,
-                    color: Colors.white70,
-                    textColor: Colors.black,
-                    text: "Accept",
-                    onpressed: () async {
-                      FlutterRingtonePlayer.stop();
+            (Platform.I.operatingSystem.isAndroid || Platform.I.operatingSystem.isIOS)
+                ? defaultButton(
+              context: context,
+              color: Colors.white70,
+              textColor: Colors.black,
+              text: "Accept",
+              onpressed: () async {
+                FlutterRingtonePlayer.stop();
 
-                      if (await checkConnectionn()) {
-                        loading(context: context);
+                if (await checkConnectionn()) {
+                  loading(context: context);
 
-                        FirebaseFirestore.instance
-                            .collection('students')
-                            .doc(callerID)
-                            .update({
-                          'call': 3,
-                          'callerID': FirebaseAuth.instance.currentUser!.uid,
-                        }).then((value) {
-                          Navigator.pop(context);
-                          Navigator.pop(context);
+                  FirebaseFirestore.instance
+                      .collection('students')
+                      .doc(callerID)
+                      .update({
+                    'call': 3,
+                    'callerID': FirebaseAuth.instance.currentUser!.uid,
+                  }).then((value) {
+                    Navigator.pop(context);
+                    Navigator.pop(context);
 
-                          Navigator.of(context).push(MaterialPageRoute(
-                              builder: (context) => SignIn()));
-                        }).catchError((error) {
-                          showToast("Failed to add: $error");
-                          print("Failed to add: $error");
-                        });
-                      } else {
-                        showToast("Check Internet Connection !");
-                      }
-                    },
-                  )
-                : defaultButton(
+                    Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) => SignIn()));
+                  }).catchError((error) {
+                    showToast("Failed to add: $error");
+                    print("Failed to add: $error");
+                  });
+                } else {
+                  showToast("Check Internet Connection !");
+                }
+              },
+            )
+            : webdefaultButton(
                     context: context,
                     color: Colors.white70,
                     textColor: Colors.black,
@@ -641,7 +641,7 @@ Widget recievedCall(context, String name, String callerID) => AlertDialog(
       ],
     );
 
-Widget callingg(context, String text1, String text2) => AlertDialog(
+Widget callingg(context, String text1, String text2, int type) => AlertDialog(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(25),
       ),
@@ -703,3 +703,5 @@ Widget callingg(context, String text1, String text2) => AlertDialog(
         ),
       ],
     );
+
+

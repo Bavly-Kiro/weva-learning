@@ -462,8 +462,6 @@ class _HomeScreenState extends State<HomeScreen> {
                                   // width:
                                   //     MediaQuery.of(context).size.width * 0.45,
                                   child: AlertDialog(
-                                    insetPadding: EdgeInsets.symmetric(
-                                        horizontal: 150, vertical: 150),
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(25),
                                     ),
@@ -471,6 +469,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                       child: Text('Choose Chapter and lesson'),
                                     ),
                                     content: Column(
+                                      mainAxisSize: MainAxisSize.min,
                                       mainAxisAlignment:
                                           MainAxisAlignment.center,
                                       children: [
@@ -610,6 +609,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                       child: Text('Choose Chapter and lesson'),
                                     ),
                                     content: Column(
+                                      mainAxisSize: MainAxisSize.min,
                                       mainAxisAlignment:
                                           MainAxisAlignment.center,
                                       children: [
@@ -721,8 +721,6 @@ class _HomeScreenState extends State<HomeScreen> {
                               return Container(
                                 width: MediaQuery.of(context).size.width * 0.45,
                                 child: AlertDialog(
-                                  insetPadding: EdgeInsets.symmetric(
-                                      horizontal: 150, vertical: 150),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(25),
                                   ),
@@ -730,6 +728,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     child: Text('Choose Chapter and lesson'),
                                   ),
                                   content: Column(
+                                    mainAxisSize: MainAxisSize.min,
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       DropDown(

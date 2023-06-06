@@ -1,16 +1,9 @@
 # weva
 
-weva learning project
+using: Flutter and Firebase.
 
-## Getting Started
+I led a team that developed an e-learning system - a mobile and web app that provided students with easy access to their school curriculums and professional teacher support, with a focus on gamification to incentivize student engagement. Utilizing webRTC technology, our team implemented quiz calls between two students, allowing them to solve quizzes together without a timer. The app also included real-time timed quizzes where two students could compete on who would finish faster, as well as a single-player option for timed quizzes, allowing students to test their knowledge at their own pace. The system also featured a weekly dashboard and coin collection feature, with private note-taking capabilities for each video.
 
-This project is a starting point for a Flutter application.
+As the team lead and project manager, I oversaw the development of the app and ensured that it met the requirements and needs of our users. I also managed the team's tasks and timelines, ensuring that we delivered the project on time and within budget. On the backend, we built a robust teacher and admin panel ( https://github.com/Bavly-Kiro/IntlakPanel ) with full control over the curriculums, videos, questions, subjects, and downloadable documents for every curriculum in every country. This allowed teachers and admins to edit, add, or delete content to ensure that the curriculum was up-to-date and relevant to the student's needs.
 
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+Through this project, I gained valuable experience in team leadership, project management, front-end, and back-end development, webRTC technology, gamification, and user experience design. I also improved my skills in communication, problem-solving, and decision-making. This project not only addressed a real-world need for e-learning solutions but also demonstrated my ability to lead a team and deliver a successful product.
